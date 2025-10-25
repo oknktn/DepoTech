@@ -21,3 +21,10 @@ function updateDate() {
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   document.getElementById('date').textContent = now.toLocaleDateString('tr-TR', options);
 }
+
+// Menü başlıklarına tıklanınca alt menüyü aç/kapat
+function toggleMenu(header) {
+  const ul = header.nextElementSibling;
+  const isVisible = ul.style.display === 'block';
+  ul.style.display = isVisible ? 'none' : 'block';
+}
