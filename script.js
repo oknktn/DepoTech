@@ -24,3 +24,18 @@ function toggleMenu(button) {
   const isVisible = ul.style.display === 'block';
   ul.style.display = isVisible ? 'none' : 'block';
 }
+function goBack() {
+  window.location.href = 'index.html';
+}
+
+function printKasa() {
+  console.log("Yazdırılıyor...");
+}
+
+function saveKasa() {
+  console.log("Kasa kaydedildi.");
+}
+
+function closeKasa() {
+  console.log("Kasa paneli kapatıldı.");
+}
