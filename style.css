@@ -245,7 +245,24 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .left-column .panel-title { font-size: 16px; margin-bottom: 8px; padding-bottom: 4px; }
 .left-column .form-control { height: 26px; padding: 4px 6px; font-size: 12px; }
 .kasa-durum-grid label { font-size: 12px; }
-.para-sayi-grid, .duzeltme-grid { gap: 4px; margin-bottom: 2px; }
+/* YUKARIDAKİ HATALI SATIRIN YERİNE BUNLARI EKLEYİN: */
+
+.para-sayi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; /* 3 sütunlu ızgarayı geri ekle */
+  gap: 4px; 
+  margin-bottom: 2px;
+  align-items: center;
+}
+
+.duzeltme-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 2 sütunlu ızgarayı geri ekle */
+  gap: 4px; 
+  margin-bottom: 2px; 
+  align-items: center;
+}
+
 .kasa-durum-grid { gap: 4px; margin-bottom: 4px; }
 .total-row { margin-top: 4px; padding-top: 4px; flex-shrink: 0; }
 .kasa-buton-grup .btn { padding: 6px 10px; font-size: 13px; }
