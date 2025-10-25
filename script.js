@@ -1,4 +1,3 @@
-
 // Sayfa yüklenince yükleme ekranını kaldır ve ana ekranı göster
 window.addEventListener('load', () => {
   setTimeout(() => {
