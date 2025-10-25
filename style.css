@@ -464,3 +464,88 @@ input:read-only {
     padding: 6px 10px;
     font-size: 13px;
 }
+/* ======================================== */
+/* 7. EKRANA SIĞDIRMA (SCROLL-LESS LAYOUT) */
+/* (style.css dosyasının en altına ekleyin) */
+/* ======================================== */
+
+/* Sayfanın tamamını görünür alana sığdır */
+html, body {
+  height: 100%;
+  overflow: hidden; /* Ana sayfa scrollbar'ını engelle */
+}
+
+/* Body'yi bir flex container yapıp 
+  header ve .container'ı dikey olarak dizelim 
+*/
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header sabit kalsın, .container esnesin */
+.header {
+  flex-shrink: 0; /* Header küçülmesin */
+}
+
+/* .container'ın kalan tüm dikey alanı doldurmasını sağla */
+.container.page-layout {
+  flex-grow: 1; /* Esneyerek tüm boşluğu doldur */
+  
+  /* 'min-height: 0' flex-grow'un 
+    düzgün çalışması için gereklidir.
+  */
+  min-height: 0; 
+  
+  /* pesin.html'deki .container için max-width: 95% vardı.
+    Tam ekran sığdırma için bunu %100 yapalım.
+  */
+  max-width: 100%;
+  margin: 0; /* Kenar boşluklarını sıfırla */
+  padding: 20px; /* İçeriden boşluk verelim */
+  box-sizing: border-box; /* Padding'i hesaba kat */
+}
+
+/* Artık sol ve sağ sütunların da 
+  kendilerine ayrılan alanın tamamını doldurması gerekiyor.
+*/
+.left-column,
+.right-column {
+  /* Sütunların yüksekliği %100 olsun */
+  height: 100%; 
+  overflow-y: auto; /* EĞER İÇERİK SIĞMAZSA, BU SÜTUNA SCROLLBAR EKLE */
+}
+
+/* Sol sütundaki 3 panelin esnemesine gerek yok,
+  sadece alt alta dizilsinler. Scrollbar zaten 
+  .left-column'da var.
+*/
+.left-column .panel {
+   flex-shrink: 0; /* Panellerin kendisi küçülmesin */
+}
+
+
+/* Sağ sütundaki .panel'in (Satış Kayıtları) 
+  dikeyde tüm alanı kaplamasını istiyoruz.
+*/
+.right-column {
+  display: flex;
+  flex-direction: column;
+}
+.right-column .panel {
+   flex-grow: 1; /* Panel, sağ sütunun tamamını kaplasın */
+   
+   /* Panelin de iç scrollbar'a ihtiyacı var */
+   display: flex;
+   flex-direction: column;
+   overflow: hidden; /* Dışarı taşmayı engelle */
+}
+
+/* Satış kayıtları tablosunun ("#satisKayitlariContainer")
+  kendi içinde scroll olmasını sağlayalım
+*/
+#satisKayitlariContainer {
+  overflow-y: auto;
+  flex-grow: 1; /* Kalan tüm dikey alanı doldur */
+  min-height: 100px; /* Minimum bir yüksekliği olsun */
+}
