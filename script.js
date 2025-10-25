@@ -164,7 +164,7 @@ function initPesinPage() {
 
   // 2. Düzeltme Satırlarını Oluştur (10 tane boş)
   duzeltmeContainer.innerHTML = ''; // İçini temizle
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 5; i++) {
     const row = document.createElement("div");
     row.className = "duzeltme-grid";
     row.innerHTML = `
