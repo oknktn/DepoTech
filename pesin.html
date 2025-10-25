@@ -1,67 +1,82 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Peşin Satış - DepoTech</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="script.js" defer></script>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DepoTech - Peşin Satış</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root { --tkk-green: #1A6B3B; --tkk-light-green: #2E8B57; --tkk-orange: #FF9800; --tkk-white: #FFFFFF; --border-color: #ddd; }
+        body { background-color: #F5F5FF; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; }
+        .header { background-color: var(--tkk-green); color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .header h1 { font-size: 18px; }
+        .back-button, .btn { border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .back-button { background-color: var(--tkk-light-green); color: white; }
+        .container { max-width: 95%; margin: 10px auto 20px auto; }
+        .panel { background-color: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .panel-title { font-size: 20px; font-weight: 600; color: var(--tkk-green); margin-bottom: 10px; border-bottom: 2px solid var(--tkk-light-green); padding-bottom: 5px; }
+        .top-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 10px; }
+        .form-label { font-weight: 600; margin-bottom: 5px; display: block; font-size: 14px; }
+        .form-control { width: 100%; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px; height: 30px; box-sizing: border-box; }
+        input:read-only { background-color: #e9ecef; }
+        .btn-guncelle { background-color: var(--tkk-light-green); color: white; height: 30px; padding: 4px 8px; }
+        .btn-kaydet { background-color: var(--tkk-orange); color: white; height: 30px; padding: 4px 8px; }
+        .para-sayi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 4px; }
+        .kasa-durum-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; align-items: center; margin-bottom: 6px; }
+        .kasa-durum-grid label { font-size: 13px; font-weight: 600; }
+        .duzeltme-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-bottom: 4px; }
+        .total-row { font-weight: bold; border-top: 1px solid #ccc; padding-top: 8px; margin-top: 8px; }
+        .kasa-durum-aciklama { padding: 8px; border-radius: 4px; font-weight: bold; text-align: center; font-size: 13px; }
+        .kasa-tam { background-color: #d4edda; color: #155724; }
+        .kasa-fazla { background-color: #fff3cd; color: #856404; }
+        .kasa-eksik { background-color: #f8d7da; color: #721c24; }
+        .satis-header { display: flex; justify-content: space-between; align-items: center; }
+        .btn-add-satis { background: none; border: none; color: var(--tkk-green); font-size: 18px; font-weight: bold; cursor: pointer; }
+        .satis-table-header { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr auto; gap: 10px; font-weight: bold; margin-top: 10px; }
+        .satis-item-row { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: center; margin-bottom: 5px; }
+        .btn-remove-row { background: none; border: none; color: red; font-size: 16px; cursor: pointer; }
+        .kasa-buton-grup { display: flex; gap: 10px; margin-top: 10px; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.85); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .loading-text { font-size: 18px; color: var(--tkk-green); font-weight: bold; }
+    </style>
 </head>
 <body>
-  <header class="header">
-    <h1>Peşin Satış</h1>
-  </header>
-
-  <main class="container">
-    <!-- Para Sayımı -->
-    <section class="panel" id="panel-para">
-      <h2>Para Sayıları</h2>
-      <div class="grid-header">
-        <div>Banknot</div><div>Adet</div><div>Toplam</div>
-      </div>
-      <div id="paraSayimiRows"></div>
-      <div class="grid-footer">
-        <div>Genel Toplam</div><div></div>
-        <input id="paraGenelToplam" class="form-control" readonly />
-      </div>
-    </section>
-
-    <!-- Kasa Durumu -->
-    <section class="panel" id="panel-kasa">
-      <h2>Kasa Durumu</h2>
-      <div class="form-row"><label>Nakit Satış</label><input id="kasaNakit" class="form-control" readonly /></div>
-      <div class="form-row"><label>Kasa Toplamı</label><input id="kasaToplam" class="form-control" readonly /></div>
-      <div class="form-row"><label>Kasa Bakiyesi</label><input id="kasaBakiyesi" class="form-control" oninput="hesaplaKasaDurumu()" /></div>
-      <div class="form-row"><label>Durum</label><input id="kasaDurum" class="form-control" readonly /></div>
-      <div class="form-row"><label>Açıklama</label><select id="kasaAciklama" class="form-control" disabled></select></div>
-      <div class="button-group">
-        <button onclick="yazdirKasa()" class="btn btn-orange">Yazdır</button>
-        <button onclick="kaydetKasa()" class="btn btn-primary">Kaydet</button>
-      </div>
-    </section>
-
-    <!-- Düzeltme Kayıtları -->
-    <section class="panel" id="panel-duzeltme">
-      <h2>Düzeltme Kayıtları</h2>
-      <div class="grid-header">
-        <div>Açıklama</div><div>Tutar</div>
-      </div>
-      <div id="duzeltmeRows"></div>
-      <div class="form-row"><label>Düzeltme Toplamı</label><input id="duzeltmeToplam" class="form-control" readonly /></div>
-      <div class="form-row"><label>Nakit Satış Toplamı</label><input id="nakitSatisToplam" class="form-control" readonly /></div>
-    </section>
-
-    <!-- Stok Bilgileri -->
-    <section class="panel" id="panel-stok">
-      <div class="stok-header">
-        <h2>Stok Bilgileri</h2>
-        <button onclick="addStokRow()" class="btn btn-green">➕</button>
-      </div>
-      <div class="grid-header">
-        <div>Stok Kodu</div><div>Stok Adı</div><div>Miktar</div><div>Birim Fiyat</div><div>Toplam</div>
-      </div>
-      <div id="stokRows"></div>
-    </section>
-  </main>
-</body>
-</html>
+    <div class="loading-overlay" id="loadingOverlay"><div class="loading-text">İşleniyor...</div></div>
+    <div class="header"> <button class="back-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Ana Menü</button> <h1 id="pageTitle"></h1> <div></div> </div>
+    <div class="container">
+        <div class="top-grid">
+            <div class="panel panel-compact">
+                <h3 class="panel-title">Para Sayıları</h3>
+                <div class="para-sayi-grid" style="font-weight:bold;"><label>Banknot</label><label>Adet</label><label>Toplam</label></div>
+                <div id="paraSayiContainer"></div>
+                <div class="para-sayi-grid total-row"><label>TOPLAM</label><div></div><input id="paraSayilariToplam" class="form-control" readonly></div>
+            </div>
+            <div class="panel panel-compact">
+                <h3 class="panel-title">Kasa Durumu</h3>
+                <div class="kasa-durum-grid"><label>Nakit Satış Toplamı</label><input id="nakitSatisKasaDurumu" class="form-control" readonly></div>
+                <div class="kasa-durum-grid"><label>Kasa Toplamı</label><input id="kasaToplami" class="form-control" readonly></div>
+                <div class="kasa-durum-grid"><label>Kasa Bakiyesi</label><input type="number" id="kasaBakiyesi" class="form-control" oninput="runAllCalculations()"></div>
+                <div class="kasa-durum-grid"><label>Durum</label><input id="kasaDurum" class="form-control" readonly></div>
+                <div style="margin-top:10px;"><label class="form-label" style="font-size: 13px;">Açıklama</label><div id="kasaDurumAciklama" class="kasa-durum-aciklama" style="display:none;"></div></div>
+                <div class="kasa-buton-grup">
+                    <button class="btn" style="background-color: var(--tkk-orange); color: white; flex:1;" onclick="yazdirKasa()"><i class="fas fa-print"></i> Yazdır</button>
+                    <button class="btn btn-primary" style="flex:1;" onclick="kaydetKasa()"><i class="fas fa-save"></i> Kaydet</button>
+                </div>
+            </div>
+            <div class="panel panel-compact">
+                <h3 class="panel-title">Düzeltme Kayıtları</h3>
+                <div class="duzeltme-grid" style="font-weight:bold;"><label>Açıklama</label><label>Tutar</label></div>
+                <div id="duzeltmeContainer"></div>
+                <div class="duzeltme-grid total-row"><label>Düzeltme Kayıtları Toplamı</label><input id="duzeltmeKayitlariToplam" class="form-control" readonly></div>
+                <div class="duzeltme-grid total-row"><label>Nakit Satış Toplamı</label><input id="nakitSatisDuzeltme" class="form-control" readonly></div>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="satis-header"><h3 class="panel-title" style="margin:0;">Satış Kayıtları</h3><button id="btnAddSatisRow" class="btn-add-fis" onclick="addSatisRow()" disabled><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</button></div>
+            <div class="satis-table-header"><div>Stok Kodu</div><div>Stok Adı</div><div>Miktar</div><div>Birim Fiyat</div><div>Toplam</div><div></div></div>
+            <div id="satisKayitlariContainer"></div>
+        </div>
+    </div>
