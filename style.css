@@ -208,7 +208,7 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   
   /* Ana container kalan alanı doldursun */
   flex-grow: 1; 
-  min-height: 0; /* Bu, flex-grow'un %100vh ile düzgün çalışması için şarttır */
+  min-height: 0; 
   
   max-width: 100%;
   margin: 0;
@@ -222,16 +222,16 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   display: flex;
   flex-direction: column; 
   gap: 15px;
-  height: 100%;
-  overflow: hidden; /* Sol sütun ASLA kaymasın */
+  /* height: 100%; KALDIRILDI. Sütun artık içeriği kadar uzayacak. */
+  overflow: hidden; 
 }
 
 .right-column {
   flex-grow: 1; 
   display: flex;
   flex-direction: column;
-  height: 100%;
-  overflow: hidden; /* Sağ sütun ASLA kaymasın */
+  height: 100%; /* Sağ sütun tüm dikey alanı doldursun */
+  overflow: hidden; 
 }
 
 /* Tüm panellerin alt boşluğunu sıfırla (gap var) */
@@ -244,14 +244,22 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .left-column .panel { padding: 12px; }
 .left-column .panel-title { font-size: 16px; margin-bottom: 8px; padding-bottom: 4px; }
 .left-column .form-control { height: 26px; padding: 4px 6px; font-size: 12px; }
-.kasa-durum-grid label { font-size: 12px; }
-/* YUKARIDAKİ HATALI SATIRIN YERİNE BUNLARI EKLEYİN: */
+
+/* === ÇÖZÜM BURADA: IZGARA (GRID) DÜZELTMELERİ === */
 
 .para-sayi-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr; /* 3 sütunlu ızgarayı geri ekle */
   gap: 4px; 
   margin-bottom: 2px;
+  align-items: center;
+}
+
+.kasa-durum-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr; /* 2 sütunlu ızgarayı geri ekle */
+  gap: 4px; 
+  margin-bottom: 4px;
   align-items: center;
 }
 
@@ -262,44 +270,51 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   margin-bottom: 2px; 
   align-items: center;
 }
+/* ================================================= */
 
-.kasa-durum-grid { gap: 4px; margin-bottom: 4px; }
-.total-row { margin-top: 4px; padding-top: 4px; flex-shrink: 0; }
+
+.total-row { 
+  margin-top: 4px; 
+  padding-top: 4px; 
+  flex-shrink: 0; 
+  border-top: 1px solid #eee; /* Toplam satırını ayırmak için */
+}
 .kasa-buton-grup .btn { padding: 6px 10px; font-size: 13px; }
-/* Kasa butonlarını panelin dibine iter */
-.kasa-buton-grup { flex-shrink: 0; margin-top: auto; padding-top: 5px; }
-
-
-/* === ÇÖZÜM BURADA: AKIŞKAN PANELLER === */
-
-/* Sol sütundaki panellerin dikey alanı paylaşmasını sağla */
-.left-column .panel:nth-child(1) { /* Para Sayıları (9 banknot) */
-  flex-grow: 2; /* Para ve Düzeltme, Kasa'dan daha fazla yer alsın */
-  min-height: 0; /* Panelin çökmesini engelle */
-}
-.left-column .panel:nth-child(2) { /* Kasa Durumu */
-  flex-grow: 1; /* Kasa paneli en az yeri alsın */
-  min-height: 0;
-}
-.left-column .panel:nth-child(3) { /* Düzeltme Kayıtları (5 satır) */
-  flex-grow: 2; /* Para ve Düzeltme, Kasa'dan daha fazla yer alsın */
-  min-height: 0;
+.kasa-buton-grup { 
+  flex-shrink: 0; 
+  margin-top: 5px; 
+  padding-top: 5px; 
+  border-top: 1px solid #eee; 
 }
 
-/* Sağ sütundaki Satış paneli tüm alanı doldursun */
+
+/* === ÇÖZÜM BURADA: BOŞLUK (FLEX-GROW) DÜZELTMESİ === */
+
+/* Sol sütundaki panellerin esnemesini (boşluk yaratmasını) engelle */
+.left-column .panel:nth-child(1),
+.left-column .panel:nth-child(2),
+.left-column .panel:nth-child(3) {
+   flex-grow: 0; /* Büyümeyi engelle */
+   min-height: auto; /* Otomatik yükseklik */
+}
+
+/* Sağ sütundaki Satış paneli tüm alanı doldursun (Bu doğru) */
 .right-column .panel {
   flex-grow: 1;
   min-height: 0; 
 }
 
+
 /* PANEL İÇİ KAYDIRMA ÇUBUKLARI */
 
-/* Gerekirse, bu listelerin kendi içinde kaymasını sağla */
+/* Sol panel listeleri için (artık büyümüyorlar, sadece sığmazlarsa kayıyorlar) */
 #paraSayiContainer,
-#duzeltmeContainer,
-#satisKayitlariContainer {
+#duzeltmeContainer {
   overflow-y: auto; /* SADECE BURASI KAYACAK */
-  flex-grow: 1; /* Panelin içinde kalan boşluğu doldur */
+  flex-grow: 0; /* BÜYÜMEYİ ENGELLE */
+  
+  /* Ekran çok küçükse sığmaları için makul bir yükseklik */
+  max-height: 250px; 
 }
 
 /* Düzeltme listesi için üst kenarlık */
@@ -307,6 +322,14 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   border-top: 1px solid #eee;
   padding-top: 5px;
 }
+
+/* Sağ panel (Satış) listesi tüm alanı doldurmaya devam etmeli */
+#satisKayitlariContainer {
+  overflow-y: auto; 
+  flex-grow: 1; /* Bu doğru, böyle kalmalı */
+  min-height: 100px;
+}
+
 
 /* Sabit başlıklar (kaydırmanın dışında kalacaklar) */
 .para-sayi-grid[style*="font-weight:bold"],
