@@ -355,3 +355,49 @@ input:read-only {
   color: var(--green);
   font-weight: bold;
 }
+
+/* ======================================== */
+/* pesin.html - 2 SÜTUNLU YENİ TASARIM */
+/* ======================================== */
+
+.page-layout {
+  display: flex;
+  flex-direction: row; /* Sütunları yan yana koy */
+  gap: 20px;
+}
+
+.left-column {
+  width: 380px; /* Sol sütun sabit genişlikte */
+  flex-shrink: 0; /* Küçülme */
+  display: flex;
+  flex-direction: column; /* Panelleri alt alta diz */
+  gap: 20px;
+}
+
+.right-column {
+  flex-grow: 1; /* Sağ sütun kalan tüm alanı kaplasın */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sol sütundaki panellerin alt boşluğunu kaldıralım (zaten gap var) */
+.left-column .panel {
+  margin-bottom: 0;
+}
+
+/* Sağ sütundaki "Satış Kayıtları" panelinin alt boşluğunu kaldıralım */
+.right-column .panel {
+  margin-bottom: 0;
+  flex-grow: 1; /* Panelin tüm dikey alanı kaplamasını sağla */
+}
+
+/* "Minimalize" etmek için kasa durumu etiketlerini küçültelim */
+.kasa-durum-grid label {
+  font-size: 13px;
+  font-weight: 500; /* Daha ince */
+}
+
+/* Düzeltme gridini de sola hizalı yapalım (opsiyonel) */
+.duzeltme-grid {
+    grid-template-columns: 2fr 1fr;
+}
