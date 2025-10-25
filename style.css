@@ -19,11 +19,8 @@ body {
   background-color: var(--gray);
   color: var(--dark);
   
-  /* EKRANA SIĞDIRMA: body'yi flex container yap */
-  display: flex;
-  flex-direction: column;
-  height: 100vh; /* Ekran yüksekliğinin %100'ü */
-  overflow: hidden; /* ANA KAYDIRMA ÇUBUĞUNU ENGELLE */
+  /* EKRANA SIĞDIRMA KODLARI KALDIRILDI. 
+     Artık normal, kaydırılabilir bir sayfa. */
 }
 
 /* ======================================== */
@@ -82,7 +79,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-shrink: 0; /* Header asla küçülmesin */
+  flex-shrink: 0; 
 }
 
 .header h1 {
@@ -111,10 +108,9 @@ body {
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   margin-bottom: 20px;
   
-  /* Panellerin iç scroll için ayarlanması */
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* İçerik taşarsa gizle (scroll'u iç elemente vereceğiz) */
+  overflow: hidden; 
 }
 
 .panel-title {
@@ -124,7 +120,7 @@ body {
   margin-bottom: 10px;
   border-bottom: 2px solid var(--light-green);
   padding-bottom: 5px;
-  flex-shrink: 0; /* Başlıklar asla küçülmesin */
+  flex-shrink: 0; 
 }
 
 /* ======================================== */
@@ -136,10 +132,6 @@ body {
   flex-direction: row;
   gap: 20px;
   padding: 20px;
-  
-  /* index.html'in de sığması için */
-  flex-grow: 1;
-  min-height: 0;
 }
 
 .info-column {
@@ -147,7 +139,6 @@ body {
   flex-direction: column;
   gap: 15px;
   width: 300px;
-  overflow-y: auto; 
 }
 
 .info-panel {
@@ -164,7 +155,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  overflow-y: auto; 
 }
 .menu-group button { width: 100%; padding: 10px; background-color: var(--light-green); color: var(--white); border: none; border-radius: 4px; font-size: 15px; cursor: pointer; text-align: left; }
 .menu-group button:hover { background-color: var(--green); }
@@ -198,7 +188,7 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 
 
 /* ======================================== */
-/* 6. pesin.html - EKRANA SIĞDIRMA FİNAL */
+/* 6. pesin.html - YERLEŞİM (LAYOUT) */
 /* ======================================== */
 
 .container.page-layout {
@@ -206,13 +196,10 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   flex-direction: row; 
   gap: 20px;
   
-  /* Ana container kalan alanı doldursun */
-  flex-grow: 1; 
-  min-height: 0; 
-  
-  max-width: 100%;
-  margin: 0;
-  padding: 20px;
+  /* Ekrana sığdırma kodları kaldırıldı */
+  max-width: 95%; /* Konteyner genişliği */
+  margin: 10px auto 20px auto; /* Ortala */
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -222,34 +209,38 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   display: flex;
   flex-direction: column; 
   gap: 15px;
-  /* height: 100%; KALDIRILDI. Sütun artık içeriği kadar uzayacak. */
-  overflow: hidden; 
 }
 
 .right-column {
   flex-grow: 1; 
   display: flex;
   flex-direction: column;
-  height: 100%; /* Sağ sütun tüm dikey alanı doldursun */
-  overflow: hidden; 
 }
 
-/* Tüm panellerin alt boşluğunu sıfırla (gap var) */
+/* Panellerin alt boşluğu geri geldi (gap yerine) */
 .left-column .panel,
 .right-column .panel {
-  margin-bottom: 0;
+  margin-bottom: 15px;
 }
 
 /* Minimalize stil (sol sütun için) */
 .left-column .panel { padding: 12px; }
 .left-column .panel-title { font-size: 16px; margin-bottom: 8px; padding-bottom: 4px; }
 .left-column .form-control { height: 26px; padding: 4px 6px; font-size: 12px; }
+.kasa-buton-grup .btn { padding: 6px 10px; font-size: 13px; }
+.kasa-buton-grup { 
+  flex-shrink: 0; 
+  margin-top: 5px; 
+  padding-top: 5px; 
+  border-top: 1px solid #eee; 
+}
 
-/* === ÇÖZÜM BURADA: IZGARA (GRID) DÜZELTMELERİ === */
+
+/* === ÇÖZÜM BURADA: TÜM IZGARA (GRID) DÜZELTMELERİ === */
 
 .para-sayi-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr; /* 3 sütunlu ızgarayı geri ekle */
+  grid-template-columns: 1fr 1fr 1fr; /* 3 sütun */
   gap: 4px; 
   margin-bottom: 2px;
   align-items: center;
@@ -257,7 +248,7 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 
 .kasa-durum-grid {
   display: grid;
-  grid-template-columns: 1fr 2fr; /* 2 sütunlu ızgarayı geri ekle */
+  grid-template-columns: 1fr 2fr; /* 2 sütun */
   gap: 4px; 
   margin-bottom: 4px;
   align-items: center;
@@ -265,10 +256,30 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 
 .duzeltme-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr; /* 2 sütunlu ızgarayı geri ekle */
+  grid-template-columns: 2fr 1fr; /* 2 sütun */
   gap: 4px; 
   margin-bottom: 2px; 
   align-items: center;
+}
+
+.satis-table-header {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 1fr 1fr auto; /* Stok paneli başlık ızgarası */
+  gap: 10px;
+  font-weight: bold;
+  margin-top: 10px;
+  padding: 8px;
+  background-color: var(--gray);
+  border-radius: 4px;
+  flex-shrink: 0; /* Kaydırmanın dışında kal */
+}
+
+.satis-item-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 1fr 1fr auto; /* Stok paneli satır ızgarası */
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 5px;
 }
 /* ================================================= */
 
@@ -279,67 +290,28 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   flex-shrink: 0; 
   border-top: 1px solid #eee; /* Toplam satırını ayırmak için */
 }
-.kasa-buton-grup .btn { padding: 6px 10px; font-size: 13px; }
-.kasa-buton-grup { 
-  flex-shrink: 0; 
-  margin-top: 5px; 
-  padding-top: 5px; 
-  border-top: 1px solid #eee; 
-}
 
-
-/* === ÇÖZÜM BURADA: BOŞLUK (FLEX-GROW) DÜZELTMESİ === */
-
-/* Sol sütundaki panellerin esnemesini (boşluk yaratmasını) engelle */
-.left-column .panel:nth-child(1),
-.left-column .panel:nth-child(2),
-.left-column .panel:nth-child(3) {
-   flex-grow: 0; /* Büyümeyi engelle */
-   min-height: auto; /* Otomatik yükseklik */
-}
-
-/* Sağ sütundaki Satış paneli tüm alanı doldursun (Bu doğru) */
-.right-column .panel {
-  flex-grow: 1;
-  min-height: 0; 
-}
-
-
-/* PANEL İÇİ KAYDIRMA ÇUBUKLARI */
-
-/* Sol panel listeleri için (artık büyümüyorlar, sadece sığmazlarsa kayıyorlar) */
+/* Panel içi kaydırmalar (Sadece gerekirse) */
+/* "Boşluk" sorununu çözmek için flex-grow: 0 yapıldı */
 #paraSayiContainer,
 #duzeltmeContainer {
-  overflow-y: auto; /* SADECE BURASI KAYACAK */
-  flex-grow: 0; /* BÜYÜMEYİ ENGELLE */
-  
-  /* Ekran çok küçükse sığmaları için makul bir yükseklik */
+  overflow-y: auto; 
+  flex-grow: 0; /* BOŞLUK SORUNUNU ÇÖZER */
   max-height: 250px; 
 }
 
-/* Düzeltme listesi için üst kenarlık */
 #duzeltmeContainer {
   border-top: 1px solid #eee;
   padding-top: 5px;
 }
 
-/* Sağ panel (Satış) listesi tüm alanı doldurmaya devam etmeli */
+/* Sağ panel (Satış) listesi */
 #satisKayitlariContainer {
   overflow-y: auto; 
-  flex-grow: 1; /* Bu doğru, böyle kalmalı */
-  min-height: 100px;
+  flex-grow: 0; /* Bu da kaydırılabilsin, esnemesin */
+  max-height: 400px; /* Veya istediğiniz bir yükseklik */
 }
 
-
-/* Sabit başlıklar (kaydırmanın dışında kalacaklar) */
-.para-sayi-grid[style*="font-weight:bold"],
-.duzeltme-grid[style*="font-weight:bold"],
-.satis-table-header {
-  flex-shrink: 0;
-  padding: 8px;
-  background-color: var(--gray);
-  border-radius: 4px;
-}
 
 /* Kasa durum açıklaması (kaymasın) */
 .kasa-durum-aciklama {
@@ -349,3 +321,23 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .kasa-tam { background-color: #d4edda; color: #155724; }
 .kasa-fazla { background-color: #fff3cd; color: #856404; }
 .kasa-eksik { background-color: #f8d7da; color: #721c24; }
+
+
+/* ======================================== */
+/* 7. MOBİL UYUMLULUK (Responsive) */
+/* ======================================== */
+@media (max-width: 900px) {
+  /* index.html ve pesin.html'deki 
+     yan yana sütun düzenini alt alta yap */
+  .main-layout,
+  .container.page-layout {
+    flex-direction: column;
+  }
+  
+  /* Sütunların genişliğini sıfırla */
+  .info-column,
+  .left-column {
+    width: 100%;
+    box-sizing: border-box; 
+  }
+}
