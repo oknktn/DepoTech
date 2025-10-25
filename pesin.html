@@ -9,13 +9,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-text">İşleniyor...</div>
-  </div>
-
   <header class="header">
     <button class="back-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Ana Menü</button>
-    <h1 id="pageTitle">Peşin Satış</h1>
+    <h1>Peşin Satış</h1>
     <div></div>
   </header>
 
@@ -23,62 +19,56 @@
     <section class="grid-panels">
       <!-- Para Sayımı -->
       <div class="panel">
-        <h3 class="panel-title">Para Sayımı</h3>
+        <h3>Para Sayıları</h3>
         <div class="money-grid header-row">
           <div>Banknot</div><div>Adet</div><div>Toplam</div>
         </div>
         <div id="moneyRowsContainer"></div>
         <div class="money-grid total-row">
-          <div>TOPLAM</div><div></div><input id="moneyTotal" class="form-control" readonly />
+          <div>Genel Toplam</div><div></div><input id="moneyTotal" class="form-control" readonly />
         </div>
       </div>
 
       <!-- Kasa Durumu -->
       <div class="panel">
-        <h3 class="panel-title">Kasa Durumu</h3>
-        <div class="form-group"><label>Nakit Toplamı</label><input id="kasaNakit" class="form-control" readonly /></div>
-        <div class="form-group"><label>Gider Toplamı</label><input id="kasaGider" class="form-control" readonly /></div>
-        <div class="form-group"><label>Kasa Bakiyesi</label><input id="kasaBakiyesi" class="form-control" readonly /></div>
-        <div class="form-group"><label>Açıklama</label><select id="kasaAciklama" class="form-control"><option value="">Seçiniz</option></select></div>
+        <h3>Kasa Durumu</h3>
+        <div class="form-group"><label>Nakit Satış</label><input id="kasaNakit" class="form-control" readonly /></div>
+        <div class="form-group"><label>Kasa Toplamı</label><input id="kasaToplam" class="form-control" readonly /></div>
+        <div class="form-group"><label>Kasa Bakiyesi</label><input id="kasaBakiyesi" class="form-control" oninput="updateKasaDurumu()" /></div>
+        <div class="form-group"><label>Durum</label><input id="kasaDurum" class="form-control" readonly /></div>
+        <div class="form-group"><label>Açıklama</label><input id="kasaAciklama" class="form-control" readonly /></div>
         <div class="button-group">
           <button class="btn btn-orange" onclick="printKasa()"><i class="fas fa-print"></i> Yazdır</button>
           <button class="btn btn-primary" onclick="saveKasa()"><i class="fas fa-save"></i> Kaydet</button>
-          <button class="btn btn-secondary" onclick="closeKasa()"><i class="fas fa-times"></i> Kapat</button>
         </div>
       </div>
 
       <!-- Düzeltme Kayıtları -->
       <div class="panel">
-        <h3 class="panel-title">Düzeltme Kayıtları</h3>
+        <h3>Düzeltme Kayıtları</h3>
         <div class="adjustment-grid header-row">
           <div>Açıklama</div><div>Tutar</div>
         </div>
         <div id="adjustmentRowsContainer"></div>
         <div class="adjustment-grid total-row">
-          <div>Düzeltme Toplamı</div><input id="adjustmentTotal" class="form-control" readonly />
+          <div>Düzeltme Toplamı</div><input id="duzeltmeToplam" class="form-control" readonly />
         </div>
         <div class="adjustment-grid total-row">
-          <div>Gider Toplamı</div><input id="giderTotal" class="form-control" readonly />
+          <div>Nakit Satış Toplamı</div><input id="nakitSatisToplam" class="form-control" readonly />
         </div>
       </div>
     </section>
 
-    <!-- Stok Kayıtları -->
+    <!-- Stok Bilgileri -->
     <section class="panel">
-      <h3 class="panel-title">Stok Kayıtları</h3>
-      <div class="stock-grid header-row">
+      <div class="stok-header">
+        <h3>Stok Bilgileri</h3>
+        <button onclick="addStokRow()" class="btn-add"><i class="fas fa-plus"></i></button>
+      </div>
+      <div class="stok-grid header-row">
         <div>Stok Kodu</div><div>Stok Adı</div><div>Miktar</div><div>Birim Fiyat</div><div>Toplam</div>
       </div>
-      <div id="stockRowsContainer"></div>
-    </section>
-
-    <!-- Satış Kayıtları -->
-    <section class="panel">
-      <h3 class="panel-title">Satış Kayıtları</h3>
-      <div class="sales-grid header-row">
-        <div>Stok Kodu</div><div>Stok Adı</div><div>Miktar</div><div>Birim Fiyat</div><div>Toplam</div>
-      </div>
-      <div id="salesRowsContainer"></div>
+      <div id="stokRowsContainer"></div>
     </section>
   </main>
 </body>
