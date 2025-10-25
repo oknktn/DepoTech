@@ -95,3 +95,125 @@ function calculateAdjustments() {
   let total = 0;
   [...adjustmentContainer.children].forEach(row => {
     const tutar = parseFloat(row.children[1].children[0].
+document.addEventListener("DOMContentLoaded", () => {
+  const banknotlar = [200, 100, 50, 20, 10, 5, 1, 0.5, 0.25];
+  const paraContainer = document.getElementById("paraSayimiRows");
+  const duzeltmeContainer = document.getElementById("duzeltmeRows");
+  const stokContainer = document.getElementById("stokRows");
+
+  // Para Sayımı Satırları
+  banknotlar.forEach(deger => {
+    const row = document.createElement("div");
+    row.className = "grid-header";
+    row.innerHTML = `
+      <input class="form-control" value="${deger}" readonly />
+      <input class="form-control" type="number" oninput="hesaplaParaSayimi()" />
+      <input class="form-control" readonly />
+    `;
+    paraContainer.appendChild(row);
+  });
+
+  // Düzeltme Satırları
+  for (let i = 0; i < 10; i++) {
+    const row = document.createElement("div");
+    row.className = "grid-header";
+    row.innerHTML = `
+      <input class="form-control" placeholder="Açıklama" />
+      <input class="form-control" type="number" oninput="hesaplaDuzeltme()" />
+    `;
+    duzeltmeContainer.appendChild(row);
+  }
+});
+
+// Para Sayımı Hesaplama
+function hesaplaParaSayimi() {
+  let toplam = 0;
+  const rows = document.querySelectorAll("#paraSayimiRows .grid-header");
+  rows.forEach(row => {
+    const banknot = parseFloat(row.children[0].value);
+    const adet = parseFloat(row.children[1].value) || 0;
+    const satirToplam = banknot * adet;
+    row.children[2].value = satirToplam.toFixed(2);
+    toplam += satirToplam;
+  });
+  document.getElementById("paraGenelToplam").value = toplam.toFixed(2);
+  document.getElementById("kasaToplam").value = toplam.toFixed(2);
+}
+
+// Kasa Durumu Hesaplama
+function hesaplaKasaDurumu() {
+  const toplam = parseFloat(document.getElementById("kasaToplam").value) || 0;
+  const bakiye = parseFloat(document.getElementById("kasaBakiyesi").value) || 0;
+  const fark = bakiye - toplam;
+  document.getElementById("kasaDurum").value = fark.toFixed(2);
+
+  const aciklama = document.getElementById("kasaAciklama");
+  aciklama.innerHTML = "";
+  const option = document.createElement("option");
+  if (fark === 0) option.text = "Kasa hesabı tam";
+  else if (fark < 0) option.text = `${Math.abs(fark).toFixed(2)} TL kasa hesabı eksik`;
+  else option.text = `${fark.toFixed(2)} TL kasa hesabı fazla`;
+  aciklama.appendChild(option);
+}
+
+// Düzeltme Toplamı Hesaplama
+function hesaplaDuzeltme() {
+  let toplam = 0;
+  const rows = document.querySelectorAll("#duzeltmeRows .grid-header");
+  rows.forEach(row => {
+    const tutar = parseFloat(row.children[1].value) || 0;
+    toplam += tutar;
+  });
+  document.getElementById("duzeltmeToplam").value = toplam.toFixed(2);
+}
+
+// Stok Satırı Ekleme
+function addStokRow() {
+  const row = document.createElement("div");
+  row.className = "stok-row";
+  row.innerHTML = `
+    <select class="form-control">
+      <option value="">Seç</option>
+      <option value="STK001">STK001</option>
+      <option value="STK002">STK002</option>
+    </select>
+    <select class="form-control">
+      <option value="">Seç</option>
+      <option value="Buğday">Buğday</option>
+      <option value="Arpa">Arpa</option>
+    </select>
+    <input class="form-control" type="number" oninput="hesaplaStok()" />
+    <input class="form-control" type="number" oninput="hesaplaStok()" />
+    <input class="form-control" readonly />
+  `;
+  document.getElementById("stokRows").appendChild(row);
+}
+
+// Stok Hesaplama
+function hesaplaStok() {
+  let toplam = 0;
+  const rows = document.querySelectorAll("#stokRows .stok-row");
+  rows.forEach(row => {
+    const miktar = parseFloat(row.children[2].value) || 0;
+    const fiyat = parseFloat(row.children[3].value) || 0;
+    const satirToplam = miktar * fiyat;
+    row.children[4].value = satirToplam.toFixed(2);
+    toplam += satirToplam;
+  });
+  document.getElementById("kasaNakit").value = toplam.toFixed(2);
+  document.getElementById("nakitSatisToplam").value = toplam.toFixed(2);
+}
+
+// Butonlar
+function yazdirKasa() {
+  alert("Yazdırılıyor...");
+}
+
+function kaydetKasa() {
+  alert("Kasa bilgileri kaydedildi.");
+}
+
+function goBack() {
+  alert("Ana menüye dönülüyor...");
+}
+                             
