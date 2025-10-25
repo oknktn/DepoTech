@@ -47,32 +47,61 @@
         </div>
       </aside>
 
-      <section class="menu-column">
-        <div class="menu-group">
-          <button onclick="toggleMenu(this)">Depo Çıkışı İşlemleri</button>
-          <ul style="display: none;">
-            <li onclick="navigate('pesin.html')">Peşin Satış</li>
-            <li onclick="navigate('cikis.html')">Çıkış Fişi</li>
-            <li onclick="navigate('tekrar.html')">Fiş Tekrarı</li>
-          </ul>
-        </div>
+<section class="menu-column">
+  <div class="menu-group">
+    <button onclick="toggleMenu(this)">Depo Çıkışı İşlemleri</button>
+    <ul style="display: none;">
+      <li onclick="navigate('pesin.html')">Peşin Satış</li>
+      <li onclick="navigate('cikis.html')">Çıkış Fişi</li>
+      <li onclick="navigate('tekrar.html')">Fiş Tekrarı</li>
+      <li onclick="navigate('iptal.html')">Fiş İptali</li>
+      <li onclick="navigate('fiyat.html')">Fiyat Listesi</li>
+    </ul>
+  </div>
 
-        <div class="menu-group">
-          <button onclick="toggleMenu(this)">Depo Kayıtları</button>
-          <ul style="display: none;">
-            <li onclick="navigate('giris.html')">Giriş Kaydı</li>
-            <li onclick="navigate('kayitlar.html')">Kayıtları Görüntüle</li>
-          </ul>
-        </div>
+  <div class="menu-group">
+    <button onclick="toggleMenu(this)">Çıkış Listesi</button>
+    <ul style="display: none;">
+      <li onclick="navigate('veresiye.html')">Veresiye Görüntüle</li>
+      <li onclick="navigate('liste.html')">Listeyi Görüntüle</li>
+    </ul>
+  </div>
 
-        <div class="menu-group">
-          <button onclick="toggleMenu(this)">Stok İşlemleri</button>
-          <ul style="display: none;">
-            <li onclick="navigate('stok-gor.html')">Görüntüle</li>
-            <li onclick="navigate('stok-ekle.html')">Ekle</li>
-          </ul>
-        </div>
-      </section>
+  <div class="menu-group">
+    <button onclick="toggleMenu(this)">Depo Kayıtları</button>
+    <ul style="display: none;">
+      <li onclick="navigate('giris.html')">Giriş Kaydı</li>
+      <li onclick="navigate('cikis-kayit.html')">Çıkış Kaydı</li>
+      <li onclick="navigate('kayitlar.html')">Kayıtları Görüntüle</li>
+    </ul>
+  </div>
+
+  <div class="menu-group">
+    <button onclick="toggleMenu(this)">Stok İşlemleri</button>
+    <ul style="display: none;">
+      <li onclick="navigate('stok-gor.html')">Görüntüle</li>
+      <li onclick="navigate('stok-guncelle.html')">Güncelle</li>
+      <li onclick="navigate('stok-ekle.html')">Ekle</li>
+    </ul>
+  </div>
+
+  <div class="menu-group">
+    <button onclick="toggleMenu(this)">Müşteri Kayıtları</button>
+    <ul style="display: none;">
+      <li onclick="navigate('ortak.html')">Ortak Listesi</li>
+      <li onclick="navigate('ortak-disi.html')">Ortak Dışı Listesi</li>
+    </ul>
+  </div>
+
+  <div class="menu-group">
+    <button onclick="toggleMenu(this)">Hesaplama</button>
+    <ul style="display: none;">
+      <li onclick="navigate('sayim.html')">Stok Sayım</li>
+      <li onclick="navigate('talep.html')">Talep Takibi</li>
+      <li onclick="navigate('hamaliye.html')">Hamaliye Hesapla</li>
+    </ul>
+  </div>
+</section>
     </div>
 
     <footer class="footer">
