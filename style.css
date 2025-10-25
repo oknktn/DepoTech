@@ -404,39 +404,80 @@ input:read-only {
 }
 
 /* ======================================== */
-/* 6. SOL SÜTUN MİNİMALİZE ETME */
-/* (style.css dosyasının en altına ekleyin) */
+/* 6. & 7. BLOKLAR (YENİ VERSİYON) */
+/* SOL SÜTUN MİNİMALİZE ETME ve EKRANA SIĞDIRMA */
 /* ======================================== */
 
-/* Sol sütundaki panellerin iç boşluğunu (padding) azalt */
-.left-column .panel {
-  padding: 10px 12px; /* Üst/alt 10px, sağ/sol 12px */
+/* --- 1. ANA YERLEŞİM (SCROLL-LESS) --- */
+
+html, body {
+  height: 100%;
+  overflow: hidden; /* Ana sayfa scrollbar'ını engelle */
 }
 
-/* Sol sütundaki panel başlıklarını küçült */
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  flex-shrink: 0; 
+}
+
+.container.page-layout {
+  flex-grow: 1; 
+  min-height: 0; 
+  max-width: 100%;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box; 
+}
+
+.left-column,
+.right-column {
+  height: 100%; 
+  display: flex;
+  flex-direction: column;
+}
+
+.left-column {
+  /* SOL SÜTUNUN KENDİ SCROLLBAR'INI KAPAT */
+  overflow-y: hidden;
+  gap: 15px; /* Paneller arası boşluk */
+}
+
+.right-column {
+  overflow-y: hidden; /* Sağ sütun da kaymasın */
+}
+
+/* --- 2. SOL SÜTUN (MİNİMALİZE) --- */
+
+.left-column .panel {
+  padding: 12px;
+  flex-shrink: 0; /* Paneller küçülmesin */
+  margin-bottom: 0;
+}
+
 .left-column .panel-title {
-  font-size: 16px; /* 20px'den 16px'e */
+  font-size: 16px;
   margin-bottom: 8px;
   padding-bottom: 4px;
 }
 
-/* Sol sütundaki form elemanlarının yüksekliğini azalt */
 .left-column .form-control {
-  height: 26px; /* 30px'den 26px'e */
+  height: 26px;
   padding: 4px 6px;
   font-size: 12px;
 }
 
-/* Kasa durumundaki etiketlerin fontunu küçült */
 .kasa-durum-grid label {
   font-size: 12px;
 }
 
-/* Grid satırları arasındaki boşlukları (gap) azalt */
 .para-sayi-grid,
 .duzeltme-grid {
-  gap: 4px; /* 8px'den 4px'e düşür */
-  margin-bottom: 2px; /* 4px'den 2px'e düşür */
+  gap: 4px;
+  margin-bottom: 2px;
 }
 
 .kasa-durum-grid {
@@ -444,108 +485,47 @@ input:read-only {
   margin-bottom: 4px;
 }
 
-/* Toplam satırının üst boşluğunu azalt */
 .total-row {
   margin-top: 4px;
   padding-top: 4px;
 }
 
-/* Kasa Durum Açıklamasını küçült */
-.kasa-durum-aciklama {
-    padding: 6px;
-    font-size: 12px;
-}
-
-/* Butonların iç boşluğunu azalt */
-.kasa-buton-grup {
-    margin-top: 8px;
-}
 .kasa-buton-grup .btn {
-    padding: 6px 10px;
-    font-size: 13px;
-}
-/* ======================================== */
-/* 7. EKRANA SIĞDIRMA (SCROLL-LESS LAYOUT) */
-/* (style.css dosyasının en altına ekleyin) */
-/* ======================================== */
-
-/* Sayfanın tamamını görünür alana sığdır */
-html, body {
-  height: 100%;
-  overflow: hidden; /* Ana sayfa scrollbar'ını engelle */
+  padding: 6px 10px;
+  font-size: 13px;
 }
 
-/* Body'yi bir flex container yapıp 
-  header ve .container'ı dikey olarak dizelim 
-*/
-body {
+/* --- 3. PANELLERE ÖZEL SCROLLBAR EKLEME --- */
+
+/* "Düzeltme Kayıtları" paneli için */
+.panel:has(#duzeltmeContainer) {
   display: flex;
   flex-direction: column;
+  /* Bu panelin kalan yüksekliği doldurmasını sağla */
+  flex-grow: 1; 
+  min-height: 0;
 }
 
-/* Header sabit kalsın, .container esnesin */
-.header {
-  flex-shrink: 0; /* Header küçülmesin */
-}
-
-/* .container'ın kalan tüm dikey alanı doldurmasını sağla */
-.container.page-layout {
-  flex-grow: 1; /* Esneyerek tüm boşluğu doldur */
-  
-  /* 'min-height: 0' flex-grow'un 
-    düzgün çalışması için gereklidir.
-  */
-  min-height: 0; 
-  
-  /* pesin.html'deki .container için max-width: 95% vardı.
-    Tam ekran sığdırma için bunu %100 yapalım.
-  */
-  max-width: 100%;
-  margin: 0; /* Kenar boşluklarını sıfırla */
-  padding: 20px; /* İçeriden boşluk verelim */
-  box-sizing: border-box; /* Padding'i hesaba kat */
-}
-
-/* Artık sol ve sağ sütunların da 
-  kendilerine ayrılan alanın tamamını doldurması gerekiyor.
-*/
-.left-column,
-.right-column {
-  /* Sütunların yüksekliği %100 olsun */
-  height: 100%; 
-  overflow-y: auto; /* EĞER İÇERİK SIĞMAZSA, BU SÜTUNA SCROLLBAR EKLE */
-}
-
-/* Sol sütundaki 3 panelin esnemesine gerek yok,
-  sadece alt alta dizilsinler. Scrollbar zaten 
-  .left-column'da var.
-*/
-.left-column .panel {
-   flex-shrink: 0; /* Panellerin kendisi küçülmesin */
+/* "Düzeltme Kayıtları" listesinin kendi içinde scroll olması */
+#duzeltmeContainer {
+  overflow-y: auto;
+  flex-grow: 1;
+  border-top: 1px solid #eee;
+  padding-top: 5px;
 }
 
 
-/* Sağ sütundaki .panel'in (Satış Kayıtları) 
-  dikeyde tüm alanı kaplamasını istiyoruz.
-*/
-.right-column {
-  display: flex;
-  flex-direction: column;
-}
+/* "Satış Kayıtları" paneli için */
 .right-column .panel {
-   flex-grow: 1; /* Panel, sağ sütunun tamamını kaplasın */
-   
-   /* Panelin de iç scrollbar'a ihtiyacı var */
+   flex-grow: 1; 
    display: flex;
    flex-direction: column;
-   overflow: hidden; /* Dışarı taşmayı engelle */
+   overflow: hidden; 
 }
 
-/* Satış kayıtları tablosunun ("#satisKayitlariContainer")
-  kendi içinde scroll olmasını sağlayalım
-*/
+/* "Satış Kayıtları" listesinin kendi içinde scroll olması */
 #satisKayitlariContainer {
   overflow-y: auto;
-  flex-grow: 1; /* Kalan tüm dikey alanı doldur */
-  min-height: 100px; /* Minimum bir yüksekliği olsun */
+  flex-grow: 1;
+  min-height: 100px;
 }
