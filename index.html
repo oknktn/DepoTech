@@ -3,78 +3,118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DepoTech - Ana Menü</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>DepoTech 2025</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <div class="loading-screen" id="loadingScreen">
     <div class="logo-container">
-      <img src="https://drive.google.com/thumbnail?id=1P8DR-V71FbSDJCAtmKnalJ5lqDOUSiyj&sz=w1000" alt="DepoTech Logo" class="logo" onerror="handleLogoError(this)">
+      <div class="logo-circle">DT</div>
     </div>
     <div class="loading-text">DepoTech Yükleniyor...</div>
-    <div class="copyright">copyright Okan KOTAN</div>
+    <div class="copyright">DepoTech 2025 © Okan Kotan</div>
   </div>
 
-  <div id="mainScreen" style="display: none;">
-    <div class="header">
+  <main id="mainScreen" style="display: none;">
+    <header class="header">
       <h1>DepoTech - Depo Yönetim Sistemi</h1>
-    </div>
+    </header>
 
-    <div class="container">
-      <div class="info-panel-group">
-        <div class="info-panel general-info">
-          <h2><i class="fas fa-calendar-alt"></i> Genel Bilgiler</h2>
-          <div class="info-items">
-            <div class="info-item"><label>Tarih</label><span id="general-date">--/--/----</span></div>
-            <div class="info-item"><label>Bünyan Hava Durumu</label><span id="general-weather">Yükleniyor...</span></div>
-            <div class="info-item"><label>USD/TL</label><span id="general-usd">Yükleniyor...</span></div>
-            <div class="info-item"><label>EUR/TL</label><span id="general-eur">Yükleniyor...</span></div>
-          </div>
-        </div>
-
-        <div class="info-panel">
-          <h2><i class="fas fa-truck-loading"></i> Çıkış Bekleyen</h2>
-          <div class="info-items" id="waiting-output-items">
-            <div class="info-item"><label>Gübre</label><input type="text" value="0,00 Ton" readonly></div>
-            <div class="info-item"><label>Tohum</label><input type="text" value="0 Kg" readonly></div>
-            <div class="info-item"><label>Yem</label><input type="text" value="0 Kg" readonly></div>
-            <div class="info-item"><label>Motorin</label><input type="text" value="0 Lt" readonly></div>
-          </div>
-        </div>
-
-        <div class="info-panel">
-          <h2><i class="fas fa-file-invoice-dollar"></i> Veresiye Kayıtları</h2>
-          <div class="info-items" id="credit-records-items">
-            <div class="info-item"><label>Gübre</label><input type="text" value="0,00 Ton" readonly></div>
-            <div class="info-item"><label>Tohum</label><input type="text" value="0 Kg" readonly></div>
-            <div class="info-item"><label>Yem</label><input type="text" value="0 Kg" readonly></div>
-            <div class="info-item"><label>Motorin</label><input type="text" value="0 Lt" readonly></div>
-          </div>
-        </div>
+    <section class="info-panels">
+      <div class="info-panel general-info">
+        <h2>Genel Bilgiler</h2>
+        <ul>
+          <li><strong>Tarih:</strong> <span id="date">--</span></li>
+          <li><strong>Hava Durumu:</strong> <span id="weather">Yükleniyor...</span></li>
+          <li><strong>USD/TL:</strong> <span id="usd">--</span></li>
+          <li><strong>EUR/TL:</strong> <span id="eur">--</span></li>
+          <li><strong>Altın:</strong> <span id="gold">--</span></li>
+          <li><strong>Haberler:</strong> <span id="news">Yükleniyor...</span></li>
+        </ul>
       </div>
 
-      <div class="menu-list">
-        <div class="menu-card">
-          <div class="menu-header" onclick="toggleMenuCard(this)">
-            <div><i class="fas fa-truck-loading menu-icon"></i>Depo Çıkışı İşlemleri</div>
-            <i class="fas fa-chevron-down menu-toggle"></i>
-          </div>
-          <ul class="menu-items">
-            <li class="menu-item" onclick="navigate('PesinSatis.html')">Peşin Satış (Kasa)</li>
-            <li class="menu-item" onclick="navigate('CikisFormu.html')">Çıkış Fişi</li>
-            <li class="menu-item" onclick="navigate('FisTekrari.html')">Fiş Tekrarı</li>
-            <li class="menu-item" onclick="navigate('FisIptali.html')">Fiş İptali</li>
-          </ul>
-        </div>
-        <!-- Diğer menü kartlarını da aynı şekilde ekleyebilirsin -->
+      <div class="info-panel">
+        <h2>Çıkış Bekleyen</h2>
+        <ul>
+          <li>Gübre: <span>0,00 Ton</span></li>
+          <li>Tohum: <span>0 Kg</span></li>
+          <li>Yem: <span>0 Kg</span></li>
+          <li>Motorin: <span>0 Lt</span></li>
+        </ul>
       </div>
-    </div>
 
-    <div class="footer">
-      <p>DepoTech © Okan KOTAN 2025 - 1890 Sayılı Bünyan Tarım Kredi Kooperatifi</p>
-    </div>
-  </div>
+      <div class="info-panel">
+        <h2>Veresiye Kayıtları</h2>
+        <ul>
+          <li>Gübre: <span>0,00 Ton</span></li>
+          <li>Tohum: <span>0 Kg</span></li>
+          <li>Yem: <span>0 Kg</span></li>
+          <li>Motorin: <span>0 Lt</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="menu-section">
+      <div class="menu-group">
+        <h3>Depo Çıkışı İşlemleri</h3>
+        <ul>
+          <li onclick="navigate('pesin.html')">Peşin Satış</li>
+          <li onclick="navigate('cikis.html')">Çıkış Fişi</li>
+          <li onclick="navigate('tekrar.html')">Fiş Tekrarı</li>
+          <li onclick="navigate('iptal.html')">Fiş İptali</li>
+          <li onclick="navigate('fiyat.html')">Fiyat Listesi</li>
+        </ul>
+      </div>
+
+      <div class="menu-group">
+        <h3>Çıkış Listesi</h3>
+        <ul>
+          <li onclick="navigate('veresiye.html')">Veresiye Görüntüle</li>
+          <li onclick="navigate('liste.html')">Listeyi Görüntüle</li>
+        </ul>
+      </div>
+
+      <div class="menu-group">
+        <h3>Depo Kayıtları</h3>
+        <ul>
+          <li onclick="navigate('giris.html')">Giriş Kaydı</li>
+          <li onclick="navigate('cikis-kayit.html')">Çıkış Kaydı</li>
+          <li onclick="navigate('kayitlar.html')">Kayıtları Görüntüle</li>
+        </ul>
+      </div>
+
+      <div class="menu-group">
+        <h3>Stok İşlemleri</h3>
+        <ul>
+          <li onclick="navigate('stok-gor.html')">Görüntüle</li>
+          <li onclick="navigate('stok-guncelle.html')">Güncelle</li>
+          <li onclick="navigate('stok-ekle.html')">Ekle</li>
+        </ul>
+      </div>
+
+      <div class="menu-group">
+        <h3>Müşteri Kayıtları</h3>
+        <ul>
+          <li onclick="navigate('ortak.html')">Ortak Listesi</li>
+          <li onclick="navigate('ortak-disi.html')">Ortak Dışı Listesi</li>
+        </ul>
+      </div>
+
+      <div class="menu-group">
+        <h3>Hesaplama</h3>
+        <ul>
+          <li onclick="navigate('sayim.html')">Stok Sayım</li>
+          <li onclick="navigate('talep.html')">Talep Takibi</li>
+          <li onclick="navigate('hamaliye.html')">Hamaliye Hesapla</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer class="footer">
+      DepoTech 2025 ©️ Okan Kotan
+    </footer>
+  </main>
 </body>
 </html>
