@@ -1,26 +1,33 @@
 // script.js
 
-/**
- * Sayfa yüklendiğinde çalışır.
- * Yükleme ekranını gizler ve ana ekranı gösterir.
- */
+// --- YERİNE BU YENİ KODU EKLEYİN ---
+
 window.addEventListener('load', () => {
-  // 1.5 saniye sonra yükleme ekranını soluklaştır
-  setTimeout(() => {
-    document.getElementById('loadingScreen').style.opacity = '0';
+  // Önce elementlerin var olup olmadığını kontrol et
+  const loadingScreen = document.getElementById('loadingScreen');
+  const mainScreen = document.getElementById('mainScreen');
 
-    // Soluklaşma animasyonu bittikten (500ms) sonra
+  // EĞER bu elementler sayfada VARSA (yani index.html'deysek),
+  // yükleme ekranı animasyonunu çalıştır.
+  if (loadingScreen && mainScreen) {
+    
+    // Sadece index.html'de çalışacak kod
     setTimeout(() => {
-      document.getElementById('loadingScreen').style.display = 'none';
-      document.getElementById('mainScreen').style.display = 'block';
-      
-      // Ana ekran göründüğünde verileri yükle
-      updateDate();
-      loadInfoPanelData();
-    }, 500);
-  }, 1500);
-});
+      loadingScreen.style.opacity = '0';
 
+      setTimeout(() => {
+        loadingScreen.style.display = 'none';
+        mainScreen.style.display = 'block';
+        
+        // Bu fonksiyonlar da sadece index'te çalışsın
+        updateDate();
+        loadInfoPanelData();
+      }, 500);
+    }, 1500);
+  }
+  
+  // (pesin.html'deysek bu 'if' bloğu atlanacak ve hata oluşmayacak)
+});
 /**
  * Menü linklerinden tıklandığında sayfaya yönlendirme yapar.
  * @param {string} page Gidilecek sayfanın adı (örn: 'pesin.html').
