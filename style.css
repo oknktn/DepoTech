@@ -180,13 +180,6 @@ body {
   padding-bottom: 5px;
 }
 
-.top-grid {
-  display: grid;
-  /* Ekran küçüldüğünde alt alta gelmesini sağlar */
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-}
-
 .form-group {
   margin-bottom: 10px;
 }
