@@ -9,98 +9,70 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
-  <div class="loading-screen" id="loadingScreen">
-    <div class="logo-circle">DT</div>
-    <div class="loading-text">Peşin Satış Yükleniyor...</div>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-text">İşleniyor...</div>
   </div>
 
-  <main id="mainScreen" style="display: none;">
-    <header class="header">
-      <button class="back-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Geri</button>
-      <h1>DepoTech - Peşin Satış</h1>
-      <div style="width: 60px;"></div>
-    </header>
+  <header class="header">
+    <button class="back-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Ana Menü</button>
+    <h1 id="pageTitle">Peşin Satış</h1>
+    <div></div>
+  </header>
 
-    <div class="container">
-      <div class="form-content">
-        <div class="left-panel">
-          <div class="form-group"><label>Tarih:</label><input type="text" id="tarih" readonly /></div>
-          <div class="form-group"><label>Fiş No:</label><input type="text" id="fisNo" readonly /></div>
-          <div class="form-group"><label>Kullanıcı:</label><input type="text" id="kullanici" readonly /></div>
-          <div class="form-group">
-            <label>Satış Türü:</label>
-            <select id="satisTuru">
-              <option value="">Seçiniz</option>
-              <option value="Peşin">Peşin</option>
-              <option value="Havale">Havale</option>
-              <option value="Kredi Kartı">Kredi Kartı</option>
-              <option value="Senetli">Senetli</option>
-              <option value="Veresiye">Veresiye</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="right-panel">
-          <div class="customer-type-section">
-            <button id="customerTypeBtn" class="customer-type-btn ortak-disi" onclick="toggleCustomerType()">Ortak Dışı</button>
-            <button class="mini-btn" onclick="openOrtakDisiModal()"><i class="fas fa-plus"></i> Yeni Ortak Dışı</button>
-          </div>
-
-          <div id="ortakIciDetails" class="customer-details">
-            <div class="form-group"><label>Ortak No:</label><select id="ortakNo"><option value="">Seçiniz</option></select></div>
-            <div class="form-group"><label>Ad Soyad:</label><select id="ortakAdSoyad"><option value="">Seçiniz</option></select></div>
-            <div class="form-group"><label>Telefon:</label><input type="text" id="ortakTelefon" readonly /></div>
-          </div>
-
-          <div id="ortakDisiDetails" class="customer-details active">
-            <div class="form-group"><label>Ad Soyad:</label><input type="text" id="ortakDisiAdSoyad" placeholder="Ad Soyad giriniz..." /></div>
-            <div class="form-group"><label>Telefon:</label><input type="text" id="ortakDisiTelefon" /></div>
-          </div>
-
-          <div class="form-group"><label>Açıklama:</label><textarea id="aciklama" rows="3" placeholder="Sevkiyat notları..."></textarea></div>
+  <main class="container">
+    <section class="top-grid">
+      <!-- Para Sayıları -->
+      <div class="panel panel-compact">
+        <h3 class="panel-title">Para Sayıları</h3>
+        <div class="grid-row bold"><label>Banknot</label><label>Adet</label><label>Toplam</label></div>
+        <div id="paraSayiContainer"></div>
+        <div class="grid-row total-row">
+          <label>TOPLAM</label><div></div><input id="paraSayilariToplam" class="form-control" readonly />
         </div>
       </div>
 
-      <div class="stock-section">
-        <div class="stock-header">
-          <span>Stok Bilgileri</span>
-          <button onclick="addStockRow()"><i class="fas fa-plus"></i></button>
-        </div>
-        <div id="stockRowsContainer">
-          <div class="stock-row headers">
-            <div>Stok Kodu</div>
-            <div>Stok Adı</div>
-            <div>Miktar</div>
-            <div>Birim</div>
-            <div></div>
-          </div>
+      <!-- Kasa Durumu -->
+      <div class="panel panel-compact">
+        <h3 class="panel-title">Kasa Durumu</h3>
+        <div class="grid-row"><label>Nakit Satış Toplamı</label><input id="nakitSatisKasaDurumu" class="form-control" readonly /></div>
+        <div class="grid-row"><label>Kasa Toplamı</label><input id="kasaToplami" class="form-control" readonly /></div>
+        <div class="grid-row"><label>Kasa Bakiyesi</label><input type="number" id="kasaBakiyesi" class="form-control" oninput="runAllCalculations()" /></div>
+        <div class="grid-row"><label>Durum</label><input id="kasaDurum" class="form-control" readonly /></div>
+        <div class="grid-row"><label>Açıklama</label><div id="kasaDurumAciklama" class="kasa-durum-aciklama"></div></div>
+        <div class="button-group">
+          <button class="btn btn-orange" onclick="yazdirKasa()"><i class="fas fa-print"></i> Yazdır</button>
+          <button class="btn btn-primary" onclick="kaydetKasa()"><i class="fas fa-save"></i> Kaydet</button>
         </div>
       </div>
 
-      <div class="form-actions">
-        <button class="btn btn-primary" onclick="saveForm()"><i class="fas fa-save"></i> Kaydet</button>
-        <button class="btn btn-secondary" onclick="goBack()"><i class="fas fa-times"></i> İptal</button>
+      <!-- Düzeltme Kayıtları -->
+      <div class="panel panel-compact">
+        <h3 class="panel-title">Düzeltme Kayıtları</h3>
+        <div class="grid-row bold"><label>Açıklama</label><label>Tutar</label></div>
+        <div id="duzeltmeContainer"></div>
+        <div class="grid-row total-row"><label>Düzeltme Toplamı</label><input id="duzeltmeKayitlariToplam" class="form-control" readonly /></div>
+        <div class="grid-row total-row"><label>Nakit Satış Toplamı</label><input id="nakitSatisDuzeltme" class="form-control" readonly /></div>
       </div>
-    </div>
+    </section>
 
-    <footer class="footer">
-      DepoTech © Okan KOTAN 2025 - Bünyan Tarım Kredi Kooperatifi
-    </footer>
+    <!-- Satış Kayıtları -->
+    <section class="panel">
+      <div class="satis-header">
+        <h3 class="panel-title">Satış Kayıtları</h3>
+        <button id="btnAddSatisRow" class="btn-add-fis" onclick="addSatisRow()" disabled>
+          <i class="fas fa-spinner fa-spin"></i> Yükleniyor...
+        </button>
+      </div>
+      <div class="satis-table-header">
+        <div>Stok Kodu</div>
+        <div>Stok Adı</div>
+        <div>Miktar</div>
+        <div>Birim Fiyat</div>
+        <div>Toplam</div>
+        <div></div>
+      </div>
+      <div id="satisKayitlariContainer"></div>
+    </section>
   </main>
-
-  <!-- Ortak Dışı Modal -->
-  <div class="modal-overlay" id="yeniOrtakDisiModal">
-    <div class="modal-content">
-      <div class="modal-header">Yeni Ortak Dışı Kayıt</div>
-      <form onsubmit="event.preventDefault(); saveNewOrtakDisi();">
-        <div class="form-group"><label>Ad Soyad</label><input type="text" id="modalOdAdSoyadi" required /></div>
-        <div class="form-group"><label>Telefon</label><input type="text" id="modalOdTelefon" /></div>
-        <div class="modal-actions">
-          <button type="button" onclick="closeOrtakDisiModal()">İptal</button>
-          <button type="submit"><i class="fas fa-save"></i> Kaydet</button>
-        </div>
-      </form>
-    </div>
-  </div>
 </body>
 </html>
