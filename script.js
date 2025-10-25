@@ -70,3 +70,52 @@ function loadInfoPanelData() {
   // TODO: "Çıkış Bekleyen" ve "Veresiye Kayıtları" verileri 
   // Google Sheets API'den çekilecek.
 }
+
+/* ======================================== */
+/* pesin.html için FONKSİYONLAR */
+/* (Mevcut script.js dosyanızın en altına ekleyin) */
+/* ======================================== */
+
+/**
+ * Ana Menüye (index.html) döner.
+ */
+function goBack() {
+  window.location.href = 'index.html';
+}
+
+/**
+ * Tüm Kasa hesaplamalarını çalıştırır.
+ * (İçi daha sonra doldurulacak)
+ */
+function runAllCalculations() {
+  console.log('Hesaplamalar çalışıyor...');
+  // TODO: Para sayımı, düzeltmeler ve kasa durumu hesaplanacak.
+}
+
+/**
+ * Kasa raporunu yazdırma işlemini tetikler.
+ * (İçi daha sonra doldurulacak)
+ */
+function yazdirKasa() {
+  console.log('Yazdırma işlemi başlatılıyor...');
+  alert('Yazdırma fonksiyonu henüz aktif değil.');
+}
+
+/**
+ * Kasa verilerini kaydetme işlemini tetikler.
+ * (İçi daha sonra doldurulacak)
+ */
+function kaydetKasa() {
+  console.log('Kaydetme işlemi başlatılıyor...');
+  alert('Kaydetme fonksiyonu henüz aktif değil.');
+  // TODO: Google Sheets API'ye veri gönderme işlemi burada olacak.
+}
+
+/**
+ * Satış kayıtları tablosuna yeni, boş bir satır ekler.
+ * (İçi daha sonra doldurulacak)
+ */
+function addSatisRow() {
+  console.log('Yeni satış satırı ekleniyor...');
+  // TODO: satisKayitlariContainer içine yeni HTML elementleri oluşturulacak.
+}
