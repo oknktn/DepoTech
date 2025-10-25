@@ -111,7 +111,7 @@ body {
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   margin-bottom: 20px;
   
-  /* EKRANA SIĞDIRMA: Panellerin iç scroll için ayarlanması */
+  /* Panellerin iç scroll için ayarlanması */
   display: flex;
   flex-direction: column;
   overflow: hidden; /* İçerik taşarsa gizle (scroll'u iç elemente vereceğiz) */
@@ -137,7 +137,7 @@ body {
   gap: 20px;
   padding: 20px;
   
-  /* EKRANA SIĞDIRMA: index.html'in de sığması için */
+  /* index.html'in de sığması için */
   flex-grow: 1;
   min-height: 0;
 }
@@ -147,7 +147,7 @@ body {
   flex-direction: column;
   gap: 15px;
   width: 300px;
-  overflow-y: auto; /* Gerekirse bu sütun kaysın */
+  overflow-y: auto; 
 }
 
 .info-panel {
@@ -164,9 +164,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  overflow-y: auto; /* Gerekirse bu sütun kaysın */
+  overflow-y: auto; 
 }
-/* ... (index.html'in kalan stilleri olduğu gibi kalıyor) ... */
 .menu-group button { width: 100%; padding: 10px; background-color: var(--light-green); color: var(--white); border: none; border-radius: 4px; font-size: 15px; cursor: pointer; text-align: left; }
 .menu-group button:hover { background-color: var(--green); }
 .menu-group ul { list-style: none; padding: 0; margin: 10px 0 0 0; }
@@ -204,12 +203,12 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 
 .container.page-layout {
   display: flex;
-  flex-direction: row; /* Sütunları yan yana koy */
+  flex-direction: row; 
   gap: 20px;
   
-  /* EKRANA SIĞDIRMA: Ana container kalan alanı doldursun */
-  flex-grow: 1; /* Esne ve kalan alanı doldur */
-  min-height: 0; /* Flexbox'ın çökmesini engelle */
+  /* Ana container kalan alanı doldursun */
+  flex-grow: 1; 
+  min-height: 0; 
   
   max-width: 100%;
   margin: 0;
@@ -239,7 +238,6 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .left-column .panel,
 .right-column .panel {
   margin-bottom: 0;
-  flex-shrink: 0; /* Panellerin normal boyutu korunsun */
 }
 
 /* Minimalize stil (sol sütun için) */
@@ -251,45 +249,40 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .kasa-durum-grid { gap: 4px; margin-bottom: 4px; }
 .total-row { margin-top: 4px; padding-top: 4px; flex-shrink: 0; }
 .kasa-buton-grup .btn { padding: 6px 10px; font-size: 13px; }
-.kasa-buton-grup { flex-shrink: 0; margin-top: auto; padding-top: 5px; } /* Butonları dibe it */
+.kasa-buton-grup { flex-shrink: 0; margin-top: 5px; padding-top: 5px; border-top: 1px solid #eee; }
 
 
 /* === ÇÖZÜM BURADA === */
 
-/* Para ve Kasa panelleri sabit kalsın */
-.left-column .panel:nth-child(1), /* Para Sayıları */
-.left-column .panel:nth-child(2) { /* Kasa Durumu */
-  flex-shrink: 0; 
+/* Panel İçeriği Listeleri */
+#paraSayiContainer,
+#duzeltmeContainer,
+#satisKayitlariContainer {
+  overflow-y: auto; /* SADECE BU ALANLAR KAYACAK */
+  flex-shrink: 1; /* Gerekirse küçülsünler */
+  min-height: 50px; /* Tamamen kaybolmalarını engelle */
 }
 
-/* Düzeltme Kayıtları paneli kalan alanı doldursun */
-.left-column .panel:nth-child(3) { /* Düzeltme Kayıtları */
-  flex-grow: 1;
-  min-height: 0; /* Çökmeyi engelle */
-}
+/* Düzeltme Kayıtları (10 satır) ve Satış Kayıtları (çok satır)
+   için özel ayarlar */
 
-/* Satış Kayıtları paneli kalan alanı doldursun */
-.right-column .panel {
-  flex-grow: 1;
-  min-height: 0; /* Çökmeyi engelle */
-}
-
-/* PANEL İÇİ KAYDIRMA ÇUBUKLARI */
-
-/* Düzeltme Kayıtları listesi */
 #duzeltmeContainer {
-  overflow-y: auto; /* SADECE BURASI KAYACAK */
-  flex-grow: 1;
+  /* 10 satırı (yaklaşık 30px * 10) sığdırmak için 
+     biraz daha fazla alan tanıyın, ama gerekirse scroll olsun */
+  max-height: 320px;
   border-top: 1px solid #eee;
   padding-top: 5px;
 }
 
-/* Satış Kayıtları listesi */
-#satisKayitlariContainer {
-  overflow-y: auto; /* SADECE BURASI KAYACAK */
+/* Satış Kayıtları paneli, sağdaki tüm alanı doldursun */
+.right-column .panel {
   flex-grow: 1;
-  min-height: 100px;
+  min-height: 0; /* Çökmeyi engelle */
 }
+#satisKayitlariContainer {
+   flex-grow: 1; /* Panelin içinde kalan tüm alanı doldur */
+}
+
 
 /* Sabit başlıklar (kaydırmanın dışında kalacaklar) */
 .para-sayi-grid[style*="font-weight:bold"],
