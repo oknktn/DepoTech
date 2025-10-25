@@ -23,15 +23,13 @@
     </header>
 
     <section class="info-panels">
-      <div class="info-panel general-info">
+      <div class="info-panel">
         <h2>Genel Bilgiler</h2>
         <ul>
           <li><strong>Tarih:</strong> <span id="date">--</span></li>
-          <li><strong>Hava Durumu:</strong> <span id="weather">Yükleniyor...</span></li>
-          <li><strong>USD/TL:</strong> <span id="usd">--</span></li>
-          <li><strong>EUR/TL:</strong> <span id="eur">--</span></li>
-          <li><strong>Altın:</strong> <span id="gold">--</span></li>
-          <li><strong>Haberler:</strong> <span id="news">Yükleniyor...</span></li>
+          <li><strong>Hava:</strong> <span id="weather">--</span></li>
+          <li><strong>USD:</strong> <span id="usd">--</span></li>
+          <li><strong>EUR:</strong> <span id="eur">--</span></li>
         </ul>
       </div>
 
@@ -40,16 +38,12 @@
         <ul>
           <li>Gübre: <span>0,00 Ton</span></li>
           <li>Tohum: <span>0 Kg</span></li>
-          <li>Yem: <span>0 Kg</span></li>
-          <li>Motorin: <span>0 Lt</span></li>
         </ul>
       </div>
 
       <div class="info-panel">
         <h2>Veresiye Kayıtları</h2>
         <ul>
-          <li>Gübre: <span>0,00 Ton</span></li>
-          <li>Tohum: <span>0 Kg</span></li>
           <li>Yem: <span>0 Kg</span></li>
           <li>Motorin: <span>0 Lt</span></li>
         </ul>
@@ -58,8 +52,8 @@
 
     <section class="menu-section">
       <div class="menu-group">
-        <h3>Depo Çıkışı İşlemleri</h3>
-        <ul>
+        <h3 onclick="toggleMenu(this)">Depo Çıkışı İşlemleri</h3>
+        <ul style="display: none;">
           <li onclick="navigate('pesin.html')">Peşin Satış</li>
           <li onclick="navigate('cikis.html')">Çıkış Fişi</li>
           <li onclick="navigate('tekrar.html')">Fiş Tekrarı</li>
@@ -69,16 +63,16 @@
       </div>
 
       <div class="menu-group">
-        <h3>Çıkış Listesi</h3>
-        <ul>
+        <h3 onclick="toggleMenu(this)">Çıkış Listesi</h3>
+        <ul style="display: none;">
           <li onclick="navigate('veresiye.html')">Veresiye Görüntüle</li>
           <li onclick="navigate('liste.html')">Listeyi Görüntüle</li>
         </ul>
       </div>
 
       <div class="menu-group">
-        <h3>Depo Kayıtları</h3>
-        <ul>
+        <h3 onclick="toggleMenu(this)">Depo Kayıtları</h3>
+        <ul style="display: none;">
           <li onclick="navigate('giris.html')">Giriş Kaydı</li>
           <li onclick="navigate('cikis-kayit.html')">Çıkış Kaydı</li>
           <li onclick="navigate('kayitlar.html')">Kayıtları Görüntüle</li>
@@ -86,8 +80,8 @@
       </div>
 
       <div class="menu-group">
-        <h3>Stok İşlemleri</h3>
-        <ul>
+        <h3 onclick="toggleMenu(this)">Stok İşlemleri</h3>
+        <ul style="display: none;">
           <li onclick="navigate('stok-gor.html')">Görüntüle</li>
           <li onclick="navigate('stok-guncelle.html')">Güncelle</li>
           <li onclick="navigate('stok-ekle.html')">Ekle</li>
@@ -95,16 +89,16 @@
       </div>
 
       <div class="menu-group">
-        <h3>Müşteri Kayıtları</h3>
-        <ul>
+        <h3 onclick="toggleMenu(this)">Müşteri Kayıtları</h3>
+        <ul style="display: none;">
           <li onclick="navigate('ortak.html')">Ortak Listesi</li>
           <li onclick="navigate('ortak-disi.html')">Ortak Dışı Listesi</li>
         </ul>
       </div>
 
       <div class="menu-group">
-        <h3>Hesaplama</h3>
-        <ul>
+        <h3 onclick="toggleMenu(this)">Hesaplama</h3>
+        <ul style="display: none;">
           <li onclick="navigate('sayim.html')">Stok Sayım</li>
           <li onclick="navigate('talep.html')">Talep Takibi</li>
           <li onclick="navigate('hamaliye.html')">Hamaliye Hesapla</li>
