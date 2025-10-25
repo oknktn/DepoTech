@@ -402,3 +402,65 @@ input:read-only {
 .btn-remove-row:hover {
   color: #e74c3c;
 }
+
+/* ======================================== */
+/* 6. SOL SÜTUN MİNİMALİZE ETME */
+/* (style.css dosyasının en altına ekleyin) */
+/* ======================================== */
+
+/* Sol sütundaki panellerin iç boşluğunu (padding) azalt */
+.left-column .panel {
+  padding: 10px 12px; /* Üst/alt 10px, sağ/sol 12px */
+}
+
+/* Sol sütundaki panel başlıklarını küçült */
+.left-column .panel-title {
+  font-size: 16px; /* 20px'den 16px'e */
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+}
+
+/* Sol sütundaki form elemanlarının yüksekliğini azalt */
+.left-column .form-control {
+  height: 26px; /* 30px'den 26px'e */
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+/* Kasa durumundaki etiketlerin fontunu küçült */
+.kasa-durum-grid label {
+  font-size: 12px;
+}
+
+/* Grid satırları arasındaki boşlukları (gap) azalt */
+.para-sayi-grid,
+.duzeltme-grid {
+  gap: 4px; /* 8px'den 4px'e düşür */
+  margin-bottom: 2px; /* 4px'den 2px'e düşür */
+}
+
+.kasa-durum-grid {
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+/* Toplam satırının üst boşluğunu azalt */
+.total-row {
+  margin-top: 4px;
+  padding-top: 4px;
+}
+
+/* Kasa Durum Açıklamasını küçült */
+.kasa-durum-aciklama {
+    padding: 6px;
+    font-size: 12px;
+}
+
+/* Butonların iç boşluğunu azalt */
+.kasa-buton-grup {
+    margin-top: 8px;
+}
+.kasa-buton-grup .btn {
+    padding: 6px 10px;
+    font-size: 13px;
+}
