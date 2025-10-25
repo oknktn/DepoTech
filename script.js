@@ -1,4 +1,3 @@
-// Sayfa yüklenince yükleme ekranını kaldır ve ana ekranı göster
 window.addEventListener('load', () => {
   setTimeout(() => {
     document.getElementById('loadingScreen').style.opacity = '0';
@@ -10,21 +9,18 @@ window.addEventListener('load', () => {
   }, 1500);
 });
 
-// Sayfa yönlendirme fonksiyonu
 function navigate(page) {
   window.location.href = page;
 }
 
-// Tarihi otomatik olarak güncelle
 function updateDate() {
   const now = new Date();
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   document.getElementById('date').textContent = now.toLocaleDateString('tr-TR', options);
 }
 
-// Menü başlıklarına tıklanınca alt menüyü aç/kapat
-function toggleMenu(header) {
-  const ul = header.nextElementSibling;
+function toggleMenu(button) {
+  const ul = button.nextElementSibling;
   const isVisible = ul.style.display === 'block';
   ul.style.display = isVisible ? 'none' : 'block';
 }
