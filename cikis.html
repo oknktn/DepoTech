@@ -23,9 +23,11 @@
             <h1>DepoTech - Depo Çıkış Fişi</h1>
             <div style="width: 60px;"></div> </div>
         
-        <div class="container">
-            <div class="form-content">
-                <div class="left-panel">
+        <div class="container page-layout">
+            
+            <aside class="left-column">
+                
+                <div class="panel">
                     <div class="form-group"><span class="form-label">Tarih:</span><input type="text" id="tarih" class="form-control" readonly></div>
                     <div class="form-group"><span class="form-label">Fiş Numarası:</span><input type="text" id="fisNo" class="form-control" readonly></div>
                     <div class="form-group"><span class="form-label">Kullanıcı:</span><input type="text" id="kullanici" class="form-control" readonly></div>
@@ -37,19 +39,21 @@
                     </div>
                 </div>
                 
-                <div class="right-panel">
+                <div class="panel">
                     <div class="customer-type-section">
-                        <button id="customerTypeBtn" class="customer-type-btn ortak-disi" onclick="toggleCustomerType()">Ortak Dışı</button>
-                        <button id="newCustomerBtn" class="mini-btn mini-btn-secondary" style="margin-left: 10px;" onclick="openOrtakDisiModal()"><i class="fas fa-plus"></i> Yeni Ortak Dışı Kayıt</button>
+                        <button id="customerTypeBtn" class="customer-type-btn ortak-ici" onclick="toggleCustomerType()">Ortak İçi</button>
+                        <button id="newCustomerBtn" class="mini-btn mini-btn-secondary" style="margin-left: 10px;" onclick="openOrtakModal()">
+                            <i class="fas fa-plus"></i> Yeni Ortak Kayıt
+                        </button>
                     </div>
                     
-                    <div id="ortakIciDetails" class="customer-details">
+                    <div id="ortakIciDetails" class="customer-details active">
                         <div class="form-group"><span class="form-label">Ortak Numarası:</span><select id="ortakNo" class="form-control"><option value="">Seçiniz</option></select></div>
                         <div class="form-group"><span class="form-label">Adı Soyadı:</span><select id="ortakAdSoyad" class="form-control"><option value="">Seçiniz</option></select></div>
                         <div class="form-group"><span class="form-label">Telefon Numarası:</span><input type="text" id="ortakTelefon" class="form-control" readonly></div>
                     </div>
                     
-                    <div id="ortakDisiDetails" class="customer-details active">
+                    <div id="ortakDisiDetails" class="customer-details">
                         <div class="form-group">
                             <span class="form-label">Adı Soyadı:</span>
                             <div class="autocomplete-container"><input type="text" id="ortakDisiAdSoyad" class="form-control" placeholder="Ad Soyad giriniz..." autocomplete="off"><div id="ortakDisiAutocompleteList" class="autocomplete-list"></div></div>
@@ -59,31 +63,34 @@
                     
                     <div class="form-group"><span class="form-label">Açıklama:</span><textarea id="aciklama" class="form-control" rows="3" placeholder="Sevkiyat ile ilgili notlarınızı buraya yazınız..."></textarea></div>
                 </div>
-            </div>
+            </aside>
             
-            <div class="stock-section">
-                <div class="stock-header"><span class="stock-title">Stok Bilgileri</span><button class="add-stock-btn" onclick="addStockRow()"><i class="fas fa-plus"></i></button></div>
-                <div id="stockRowsContainer">
-                    <div class="stock-row" id="stockRow_headers" style="background-color: transparent; font-weight: 600; padding: 0 10px;">
-                        <div><span class="stock-label">Stok Kodu</span></div>
-                        <div><span class="stock-label">Stok Adı</span></div>
-                        <div><span class="stock-label">Miktar</span></div>
-                        <div><span class="stock-label">Birim</span></div>
-                        <div></div>
+            <main class="right-column">
+                
+                <div class="panel stock-section">
+                    <div class="stock-header"><span class="stock-title">Stok Bilgileri</span><button class="add-stock-btn" onclick="addStockRow()"><i class="fas fa-plus"></i></button></div>
+                    <div id="stockRowsContainer">
+                        <div class="stock-row" id="stockRow_headers" style="background-color: transparent; font-weight: 600; padding: 0 10px;">
+                            <div><span class="stock-label">Stok Kodu</span></div>
+                            <div><span class="stock-label">Stok Adı</span></div>
+                            <div><span class="stock-label">Miktar</span></div>
+                            <div><span class="stock-label">Birim</span></div>
+                            <div></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="form-actions">
+                
+            </main>
+
+        </div> <div class="container" style="max-width: 1200px; margin-top: 0; padding-top: 0;">
+             <div class="form-actions">
                 <button class="btn btn-primary" onclick="saveForm()"><i class="fas fa-save"></i> Kaydet</button>
                 <button class="btn btn-secondary" onclick="goBack()"><i class="fas fa-times"></i> İptal</button>
             </div>
         </div>
         
         <div class="footer"><p>DepoTech © Okan KOTAN 2025 - 1890 Sayılı Bünyan Tarım Kredi Kooperatifi</p></div>
-    </div>
-
-    <div class="modal-overlay" id="yeniOrtakModal">
+    </div> <div class="modal-overlay" id="yeniOrtakModal">
         <div class="modal-content">
             <div class="modal-header">Yeni Ortak Kaydı</div>
             <form id="yeniOrtakFormInCikis" onsubmit="event.preventDefault(); saveNewOrtakFromCikis();">
@@ -99,7 +106,6 @@
             </form>
         </div>
     </div>
-
     <div class="modal-overlay" id="yeniOrtakDisiModal">
         <div class="modal-content">
             <div class="modal-header">Yeni Ortak Dışı Kayıt</div>
