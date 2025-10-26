@@ -1702,3 +1702,116 @@ function initStokEkleSayfasi() {
     // Başlangıçta Hamaliye Birimi'ni boşalt/güncelle
     guncelleBirimListesiStokEkle(''); 
 }
+
+/* ======================================== */
+/* 21. ortak.html (Ortak Listesi) FONKSİYONLARI */
+/* ======================================== */
+
+/**
+ * Yeni ortak kaydı modal penceresini açar.
+ */
+function openModal() {
+  const modal = document.getElementById('yeniKayitModal');
+  if (modal) {
+      // Formu temizle (varsa eski veriler kalmasın)
+      const form = document.getElementById('yeniOrtakForm');
+      if (form) form.reset();
+      
+      modal.style.display = 'flex';
+  }
+}
+
+/**
+ * Yeni ortak kaydı modal penceresini kapatır.
+ */
+function closeModal() {
+  const modal = document.getElementById('yeniKayitModal');
+  if (modal) {
+      modal.style.display = 'none';
+  }
+}
+
+/**
+ * Yeni ortak kaydını kaydeder.
+ */
+function saveNewOrtak() {
+  const ortakData = {
+      no: document.getElementById('ortakNumarasi').value.trim(),
+      tckn: document.getElementById('tckn').value.trim(),
+      adSoyad: document.getElementById('adSoyadi').value.trim(),
+      telefon: document.getElementById('telefon').value.trim(),
+      mahalle: document.getElementById('mahalle').value.trim()
+  };
+
+  // Zorunlu alan kontrolü
+  if (!ortakData.no || !ortakData.adSoyad) {
+    alert("Ortak Numarası ve Adı Soyadı alanları zorunludur.");
+    return;
+  }
+
+  console.log('Yeni Ortak Kaydediliyor:', ortakData);
+  
+  // TODO: Google Sheets API'ye yeni ortak verisini gönder
+  // API Çağrısı: addNewPartner(ortakData);
+  
+  // --- Örnek API Yanıt Simülasyonu ---
+  setTimeout(() => { 
+    const success = Math.random() > 0.1; 
+    const message = success ? `Ortak "${ortakData.adSoyad}" başarıyla eklendi.` : `Hata: Ortak eklenemedi!`;
+    
+    alert(message); // Basit alert ile bildirim
+    
+    if (success) {
+      closeModal(); // Modalı kapat
+      loadOrtakListesi(); // Listeyi yenile
+    }
+  }, 1000); 
+  // --- --- ---
+}
+
+/**
+ * Ortak listesini yükler ve tabloyu doldurur.
+ */
+function loadOrtakListesi() {
+  const tableBody = document.getElementById('dataTableBody');
+  if (!tableBody) return; // Yanlış sayfadaysak çık
+  
+  tableBody.innerHTML = '<tr><td colspan="5" class="loading-text">Ortak listesi yükleniyor...</td></tr>'; 
+  
+  console.log('Ortak listesi yükleniyor...');
+  // TODO: Google Sheets API'den 'Ortaklar' sayfasındaki verileri çek
+  
+  // Örnek Veri
+  setTimeout(() => { 
+    const data = [
+      { no: '123', tckn: '111...', adSoyad: 'Ali Veli', telefon: '555...', mahalle: 'Merkez' },
+      { no: '456', tckn: '222...', adSoyad: 'Zeynep Su', telefon: '544...', mahalle: 'Yeni Mah.' },
+      { no: '789', tckn: '333...', adSoyad: 'Hasan Kara', telefon: '533...', mahalle: 'Köy' },
+    ];
+    
+    tableBody.innerHTML = ''; 
+    
+    if (data.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="5" class="loading-text">Gösterilecek ortak kaydı bulunamadı.</td></tr>';
+      return;
+    }
+
+    data.forEach(item => {
+      const row = tableBody.insertRow(); 
+      row.insertCell().textContent = item.no || '';
+      row.insertCell().textContent = item.tckn || '';
+      row.insertCell().textContent = item.adSoyad || '';
+      row.insertCell().textContent = item.telefon || '';
+      row.insertCell().textContent = item.mahalle || '';
+    });
+  }, 1000); // 1 saniye bekle
+}
+
+
+// Bu sayfa yüklendiğinde ortak listesini çekmek için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'ortak.html' sayfasındaysak (hem tablo hem modal varsa)
+  if (document.getElementById("dataTableBody") && document.getElementById("yeniKayitModal")) {
+    loadOrtakListesi(); 
+  }
+});
