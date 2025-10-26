@@ -2700,3 +2700,440 @@ function saveNewTalep() {
     const talepData = {
         tarih: document.getElementById('modalTarih')?.value,
         kullanici: document.getElementById('modal
+
+/* ======================================== */
+/* 25. hamaliye.html (Hamaliye Hesaplama) FONKSİYONLARI */
+/* ======================================== */
+
+// --- Global Değişken (Hamaliye için) ---
+let fisNumaralari = []; // Hamaliye hesaplamasında kullanılacak fiş listesi
+// --- --- ---
+
+
+/**
+ * Hamaliye fiyatlarını düzenleme moduna geçirir veya kaydeder.
+ * @param {HTMLElement} button Tıklanan Güncelle/Kaydet butonu.
+ */
+function togglePriceEdit(button) {
+    const inputs = {
+        yem: document.getElementById('yemFiyati'),
+        gubre: document.getElementById('gubreFiyati'),
+        diger: document.getElementById('digerFiyati')
+    };
+    const inputElements = Object.values(inputs); // Input elementlerinin dizisi
+
+    if (button.dataset.state === 'view') {
+        // Düzenleme moduna geç
+        inputElements.forEach(input => {
+            if(input) {
+                // " TL" ekini ve boşlukları kaldırıp sayıya çevir
+                input.value = parseFloat(String(input.value).replace('TL', '').trim()) || 0; 
+                input.readOnly = false;
+                input.type = 'number'; // Sayısal girişe izin ver
+                input.step = '0.01';   // Ondalıklı girişe izin ver
+            }
+        });
+        button.textContent = 'Kaydet';
+        button.classList.remove('btn-guncelle'); 
+        button.classList.add('btn-kaydet');
+        button.dataset.state = 'edit';
+        if(inputs.yem) inputs.yem.focus(); // İlk inputa odaklan
+        
+    } else {
+        // Kaydetme moduna geç
+        const prices = { 
+            yem: parseFloat(inputs.yem?.value || 0), 
+            gubre: parseFloat(inputs.gubre?.value || 0), 
+            diger: parseFloat(inputs.diger?.value || 0) 
+        };
+        
+        console.log("Hamaliye fiyatları güncelleniyor:", prices);
+        // TODO: API Çağrısı: updateHamaliyePrices(prices);
+        
+        // --- Simülasyon ---
+        showLoadingOverlay("Fiyatlar Kaydediliyor...");
+        setTimeout(() => {
+            hideLoadingOverlay();
+            const success = true; // Simülasyon: Başarılı
+            const message = success ? "Fiyatlar başarıyla güncellendi." : "Fiyatlar güncellenemedi!";
+            alert(message); // Basit bildirim
+
+            if (success) {
+                inputElements.forEach(input => {
+                    if(input) {
+                        // Sayıyı TL formatına çevir
+                        input.value = (parseFloat(input.value) || 0).toFixed(2) + " TL"; 
+                        input.readOnly = true;
+                        input.type = 'text'; // Tekrar metin yap
+                    }
+                });
+                button.textContent = 'Güncelle';
+                button.classList.remove('btn-kaydet'); 
+                button.classList.add('btn-guncelle');
+                button.dataset.state = 'view';
+                hesaplaTumToplamlari(); // Kayıttan sonra toplamları yeniden hesapla
+            }
+        }, 1000);
+        // --- --- ---
+    }
+}
+ 
+/**
+ * Yeni bir fiş satırı (select kutusu) ekler.
+ */
+function addFisRow() {
+    const container = document.getElementById('fisRowsContainer');
+    if (!container) return;
+
+    const rowId = 'fisRow-' + Date.now();
+    const fisRowContainer = document.createElement('div');
+    fisRowContainer.id = rowId; 
+    fisRowContainer.className = 'fis-row-container';
+    
+    // Fiş numarası seçeneklerini oluştur
+    let optionsHtml = fisNumaralari.map(fis => `<option value="${fis.no}">${fis.no} (${fis.tarih})</option>`).join('');
+    
+    const content = `
+        <div class="fis-grid-layout" data-row-id="${rowId}">
+            <select class="fis-select" onchange="fetchFisDetails(this, '${rowId}')">
+                <option value="">Fiş Seçiniz...</option>
+                ${optionsHtml}
+            </select>
+            <div></div><div></div><div></div><div></div><div></div><div></div>
+             <button class="btn-remove-item" onclick="removeFisContainer('${rowId}')"><i class="fas fa-trash-alt"></i></button>
+        </div>
+        <div class="fis-items-details" style="display: none;"></div> 
+    `; // itemsContainer başlangıçta gizli
+    fisRowContainer.innerHTML = content;
+    container.appendChild(fisRowContainer);
+}
+
+/**
+ * Tüm fiş satırı konteynerını siler.
+ * @param {string} rowId Silinecek konteynerın ID'si.
+ */
+function removeFisContainer(rowId) {
+    const container = document.getElementById(rowId);
+    if (container) {
+        container.remove();
+        hesaplaTumToplamlari(); // Sildikten sonra toplamları yeniden hesapla
+    }
+}
+
+
+/**
+ * Seçilen fişin detaylarını (ürünlerini) yükler ve gösterir.
+ * @param {HTMLSelectElement} selectElement Fiş seçimi yapılan select kutusu.
+ * @param {string} rowId İlgili fiş satırı konteynerının ID'si.
+ */
+function fetchFisDetails(selectElement, rowId) {
+    const fisNo = selectElement.value;
+    const container = document.getElementById(rowId);
+    const itemsContainer = container ? container.querySelector('.fis-items-details') : null;
+    const removeButtonCell = selectElement.parentElement.querySelector('button')?.parentElement; // Sil butonunun hücresi
+    
+    if (!itemsContainer) return;
+    
+    // Önceki detayları temizle ve gizle
+    itemsContainer.innerHTML = '';
+    itemsContainer.style.display = 'none'; 
+    if(removeButtonCell) removeButtonCell.style.visibility = 'visible'; // Sil butonunu görünür yap
+
+    if (!fisNo) { // "-- Seçiniz --" seçildiyse
+        hesaplaTumToplamlari(); 
+        return; 
+    }
+
+    itemsContainer.innerHTML = '<div style="padding:10px; font-style: italic; text-align: center;">Ürün detayları yükleniyor...</div>';
+    itemsContainer.style.display = 'block'; // Yükleniyor mesajını göster
+    if(removeButtonCell) removeButtonCell.style.visibility = 'hidden'; // Detay yüklenirken sil butonunu gizle
+    
+    console.log(`Fiş detayları yükleniyor: ${fisNo}`);
+    // TODO: API Çağrısı: getDetailsForFis(fisNo);
+    // API şunları dönmeli: { success: true, data: [ {stokKodu, stokAdi, miktar, birim, stokTuru, eSutunuDegeri}, ... ] }
+    
+    // --- Simülasyon ---
+    setTimeout(() => {
+        const success = true; 
+        const data = [
+             { stokKodu: 'STK001', stokAdi: 'Gübre A - DAP', miktar: 50, birim: 'Kg', stokTuru: 'Kimyevi Gübre', eSutunuDegeri: 50 },
+             { stokKodu: 'STK005', stokAdi: 'Yem B - Süt', miktar: 1000, birim: 'Kg', stokTuru: 'Yem', eSutunuDegeri: 50 },
+             { stokKodu: 'MTR001', stokAdi: 'Motorin', miktar: 200, birim: 'Lt', stokTuru: 'Motorin', eSutunuDegeri: 1 },
+        ];
+        
+        itemsContainer.innerHTML = ''; // Temizle
+        if (success && data.length > 0) {
+            data.forEach(item => {
+                const itemRow = document.createElement('div');
+                itemRow.className = 'fis-grid-layout fis-item-row';
+                // Hamaliye hesaplamasında kullanılan E sütunu değerini sakla
+                itemRow.dataset.eSutunu = item.eSutunuDegeri || 0; 
+                
+                itemRow.innerHTML = `
+                    <div></div> <div style="text-align: center;"><input type="checkbox" onchange="handleCiftTekChange(this)"></div>
+                    <div>${item.stokKodu || ''}</div>
+                    <div>${item.stokAdi || ''}</div>
+                    <div class="item-miktar" data-original-miktar="${item.miktar || 0}">${item.miktar || 0}</div>
+                    <div>${item.stokTuru || ''}</div>
+                    <div class="item-toplam">0.00</div> <button class="btn-remove-item" onclick="removeItemRow(this)"><i class="fas fa-trash-alt"></i></button>
+                `;
+                itemsContainer.appendChild(itemRow);
+            });
+        } else {
+             itemsContainer.innerHTML = '<div style="padding:10px; color: red; text-align: center;">Bu fiş için detay bulunamadı veya yüklenemedi.</div>';
+        }
+        if(removeButtonCell) removeButtonCell.style.visibility = 'visible'; // Sil butonunu tekrar görünür yap
+        hesaplaTumToplamlari(); // Detaylar yüklenince toplamları hesapla
+    }, 800);
+    // --- --- ---
+}
+
+/**
+ * Bir ürün satırını fiş detaylarından kaldırır.
+ * @param {HTMLElement} buttonElement Tıklanan silme butonu.
+ */
+function removeItemRow(buttonElement) {
+    const itemRow = buttonElement.closest('.fis-item-row');
+    const itemsContainer = itemRow ? itemRow.parentElement : null;
+    const fisContainer = itemsContainer ? itemsContainer.closest('.fis-row-container') : null;
+
+    if (itemRow) {
+        itemRow.remove();
+        // Eğer bu son ürün satırıysa ve konteyner boşaldıysa, tüm fiş konteynerını sil
+        if (itemsContainer && itemsContainer.children.length === 0 && fisContainer) {
+             removeFisContainer(fisContainer.id); // Konteynerı tamamen sil
+        } else {
+             hesaplaTumToplamlari(); // Sadece toplamları yeniden hesapla
+        }
+    }
+}
+
+/**
+ * Çift/Tek checkbox'ı değiştiğinde ürün miktarını günceller.
+ * @param {HTMLInputElement} checkbox Değişiklik yapılan checkbox.
+ */
+function handleCiftTekChange(checkbox) {
+    const itemRow = checkbox.closest('.fis-item-row');
+    if (!itemRow) return;
+    
+    const miktarCell = itemRow.querySelector('.item-miktar');
+    if (!miktarCell) return;
+
+    const originalMiktar = parseFloat(miktarCell.dataset.originalMiktar || 0);
+    
+    // Miktarı güncelle (Çift ise x2, değilse orijinal)
+    miktarCell.textContent = checkbox.checked ? (originalMiktar * 2) : originalMiktar;
+    
+    hesaplaTumToplamlari(); // Toplamları yeniden hesapla
+}
+ 
+/**
+ * Tüm fişlerdeki ürünlere göre genel hamaliye toplamlarını hesaplar.
+ */
+function hesaplaTumToplamlari() {
+    let toplamYemTon = 0, toplamGubreTon = 0, toplamDigerLtAd = 0;
+    
+    // Fiyatları al (Güncelleme modunda değilse " TL" ekini kaldır)
+    const fiyatState = document.getElementById('btnToggleUpdate')?.dataset.state || 'view';
+    const yemFiyati = parseFloat(String(document.getElementById('yemFiyati')?.value || '0').replace('TL','').trim()) || 0;
+    const gubreFiyati = parseFloat(String(document.getElementById('gubreFiyati')?.value || '0').replace('TL','').trim()) || 0;
+    const digerFiyati = parseFloat(String(document.getElementById('digerFiyati')?.value || '0').replace('TL','').trim()) || 0;
+
+    // Tüm ürün satırlarını gez
+    document.querySelectorAll('.fis-item-row').forEach(row => {
+        const miktarCell = row.querySelector('.item-miktar');
+        const stokTuruCell = row.querySelector('div:nth-child(6)'); // Stok Türü hücresi
+        const eSutunuDegeri = parseFloat(row.dataset.eSutunu || 0); // Saklanan E sütunu değeri
+        const toplamCell = row.querySelector('.item-toplam');
+        
+        if (!miktarCell || !stokTuruCell || !toplamCell) return; // Gerekli hücreler yoksa atla
+        
+        const miktar = parseFloat(miktarCell.textContent || 0);
+        const stokTuru = stokTuruCell.textContent.trim();
+        let satirHamaliyeMiktari = 0; // Bu satırın hamaliye tonaj/lt/adet karşılığı
+        
+        // Hamaliye hesaplama mantığı (Apps Script'teki ile aynı)
+        if (['Motorin', 'Halk Sağlığı', 'Market'].includes(stokTuru)) {
+            toplamCell.textContent = 'Hamaliye Yok'; 
+            satirHamaliyeMiktari = 0;
+        } else if (stokTuru === 'Kimyevi Gübre') {
+            satirHamaliyeMiktari = miktar / 1000; // Kg'ı Tona çevir
+            toplamGubreTon += satirHamaliyeMiktari;
+            toplamCell.textContent = (satirHamaliyeMiktari * gubreFiyati).toFixed(2); // Tutar
+        } else if (stokTuru === 'Toz Gübre') {
+            satirHamaliyeMiktari = (miktar * eSutunuDegeri) / 1000; // Kg'ı Tona çevir
+            toplamGubreTon += satirHamaliyeMiktari;
+             toplamCell.textContent = (satirHamaliyeMiktari * gubreFiyati).toFixed(2); // Tutar
+        } else if (['Sıvı Gübre', 'Zirai İlaç', 'Madeni Yağ', 'Sulama'].includes(stokTuru)) {
+            satirHamaliyeMiktari = miktar * eSutunuDegeri; // Lt/Adet
+            toplamDigerLtAd += satirHamaliyeMiktari;
+            toplamCell.textContent = (satirHamaliyeMiktari * digerFiyati).toFixed(2); // Tutar
+        } else if (['Yem', 'Tohum'].includes(stokTuru)) {
+            satirHamaliyeMiktari = miktar / 1000; // Kg'ı Tona çevir
+            toplamYemTon += satirHamaliyeMiktari;
+            toplamCell.textContent = (satirHamaliyeMiktari * yemFiyati).toFixed(2); // Tutar
+        } else {
+             toplamCell.textContent = 'Hesaplanamadı'; // Bilinmeyen tür
+        }
+    });
+
+    // Toplamları formatlayarak inputlara yaz
+    const toplamYemInput = document.getElementById('toplamYem');
+    const toplamGubreInput = document.getElementById('toplamGubre');
+    const toplamDigerInput = document.getElementById('toplamDiger');
+    const genelTonajInput = document.getElementById('genelTonaj');
+    const genelTutarInput = document.getElementById('genelTutar');
+
+    if(toplamYemInput) toplamYemInput.value = toplamYemTon.toFixed(3) + " Ton";
+    if(toplamGubreInput) toplamGubreInput.value = toplamGubreTon.toFixed(3) + " Ton"; // 3 ondalık daha iyi olabilir
+    if(toplamDigerInput) toplamDigerInput.value = toplamDigerLtAd.toFixed(2) + " Lt/Ad";
+
+    // Genel Toplamları Hesapla
+    const genelTutar = (toplamYemTon * yemFiyati) + (toplamGubreTon * gubreFiyati) + (toplamDigerLtAd * digerFiyati);
+    // Genel Tonaj (Diğerleri Lt/Ad olduğu için tonaja direkt katılmaz, belki birim dönüşümü gerekir?)
+    // Şimdilik sadece Yem ve Gübre tonajını toplayalım:
+    const genelTonaj = toplamYemTon + toplamGubreTon; 
+
+    if(genelTutarInput) genelTutarInput.value = genelTutar.toFixed(2) + " TL";
+    if(genelTonajInput) genelTonajInput.value = genelTonaj.toFixed(3) + " Ton";
+}
+
+
+/**
+ * Hesaplanan hamaliye verilerini kaydeder ve PDF oluşturur.
+ */
+function kaydetHesaplama() {
+    if (!confirm("Tüm hesaplamayı sayfaya kaydetmek ve yazdırmak istediğinizden emin misiniz? Varsa önceki kayıtlar silinecektir.")) return;
+
+    const hesaplamaData = {
+        baslik: document.getElementById('pageTitle')?.textContent || 'Hamaliye Hesaplama',
+        genelToplamlar: {
+            yem_ton: parseFloat(document.getElementById('toplamYem')?.value) || 0,
+            gubre_ton: parseFloat(document.getElementById('toplamGubre')?.value) || 0,
+            diger_ltad: parseFloat(document.getElementById('toplamDiger')?.value) || 0,
+            tutar_tl: parseFloat(document.getElementById('genelTutar')?.value) || 0
+        },
+        fisDetaylari: [] // Kaydedilecek detaylı liste
+    };
+
+    // Tüm ürün satırlarını gezerek detayları topla
+    document.querySelectorAll('.fis-item-row').forEach(row => {
+        const container = row.closest('.fis-row-container');
+        const fisSelect = container ? container.querySelector('.fis-select') : null;
+        const fisNo = fisSelect ? fisSelect.value : '';
+        if (!fisNo) return; // Fiş numarası yoksa atla
+
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        const miktarCell = row.querySelector('.item-miktar');
+        const toplamCell = row.querySelector('.item-toplam');
+
+        hesaplamaData.fisDetaylari.push({
+            fisNo: fisNo,
+            stokKodu: row.cells[2]?.textContent || '',
+            stokAdi: row.cells[3]?.textContent || '',
+            miktar: parseFloat(miktarCell?.textContent || 0),
+            orjinalMiktar: parseFloat(miktarCell?.dataset.originalMiktar || 0),
+            isCift: checkbox ? checkbox.checked : false,
+            stokTuru: row.cells[5]?.textContent || '',
+            hesaplananTutar: parseFloat(toplamCell?.textContent || 0) || 0,
+            eSutunu: parseFloat(row.dataset.eSutunu || 0)
+        });
+    });
+    
+    if (hesaplamaData.fisDetaylari.length === 0) {
+        alert("Kaydedilecek fiş detayı bulunamadı.");
+        return;
+    }
+
+    console.log("Kaydedilecek Hamaliye Verisi:", hesaplamaData);
+    showLoadingOverlay("Kaydediliyor ve PDF Oluşturuluyor...");
+    
+    // TODO: Google Sheets API'ye hesaplama verisini gönder
+    // API Çağrısı: kaydetHamaliyeHesaplamasi(hesaplamaData);
+    // API tarafında:
+    // 1. Veriyi 'HamaliyeKayit' sayfasına yaz.
+    // 2. Bu veriden bir PDF oluştur ve URL'sini döndür.
+    
+    // --- Örnek API Yanıt Simülasyonu ---
+    setTimeout(() => { 
+        hideLoadingOverlay();
+        const success = Math.random() > 0.1; 
+        const pdfUrl = success ? "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" : null;
+        const message = success ? `Hesaplama başarıyla kaydedildi.` : `Hata: Hesaplama kaydedilemedi!`;
+        
+        alert(message);
+        
+        if (success && pdfUrl) {
+            // PDF'i yeni sekmede aç
+            window.open(pdfUrl, '_blank');
+            // Sayfayı yenile (isteğe bağlı, belki temizlemek yeterli?)
+            // location.reload(); 
+            // Veya sadece fiş listesini temizle
+            document.getElementById('fisRowsContainer').innerHTML = '';
+            hesaplaTumToplamlari(); // Toplamları sıfırla
+        }
+    }, 2500); // 2.5 saniye bekle
+    // --- --- ---
+}
+
+// Loading overlay fonksiyonları (Eğer yoksa ekleyin)
+function showLoadingOverlay(message = "İşleniyor...") {
+    const overlay = document.getElementById('loadingOverlay');
+    const textElement = overlay ? overlay.querySelector('.loading-text') : null;
+    if (overlay && textElement) {
+        textElement.textContent = message;
+        overlay.style.display = 'flex';
+    }
+}
+function hideLoadingOverlay() {
+     const overlay = document.getElementById('loadingOverlay');
+     if (overlay) overlay.style.display = 'none';
+}
+
+
+// Bu sayfa yüklendiğinde başlangıç verilerini çekmek için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'hamaliye.html' sayfasındaysak
+  if (document.querySelector(".hamaliye-container")) {
+    initHamaliyeSayfasi();
+  }
+});
+
+/**
+ * Hamaliye Hesaplama sayfasını başlatır.
+ */
+function initHamaliyeSayfasi() {
+    // Sayfa başlığını ayarla
+    const pageTitle = document.getElementById('pageTitle');
+    if(pageTitle) pageTitle.textContent = `${new Date().toLocaleDateString('tr-TR')} - TARİHLİ HAMALİYE ÖDEMESİ`;
+
+    // Hamaliye fiyatlarını yükle
+    console.log("Hamaliye fiyatları yükleniyor...");
+    // TODO: API Çağrısı: getHamaliyeInitialData(); -> { success: true, data: { yem: 50, gubre: 60, diger: 0.5 } }
+    // --- Simülasyon ---
+    setTimeout(() => {
+        const data = { yem: 50.00, gubre: 60.00, diger: 0.50 }; // Örnek fiyatlar
+        const yemInput = document.getElementById('yemFiyati');
+        const gubreInput = document.getElementById('gubreFiyati');
+        const digerInput = document.getElementById('digerFiyati');
+        if (yemInput) yemInput.value = (data.yem || 0).toFixed(2) + " TL";
+        if (gubreInput) gubreInput.value = (data.gubre || 0).toFixed(2) + " TL";
+        if (digerInput) digerInput.value = (data.diger || 0).toFixed(2) + " TL";
+        hesaplaTumToplamlari(); // Başlangıç toplamlarını hesapla (0 olmalı)
+    }, 300);
+    // --- --- ---
+    
+    // Fiş numaraları listesini yükle
+    console.log("Fiş numaraları yükleniyor (Hamaliye)...");
+    // TODO: API Çağrısı: getFisNumaralariForHamaliye(); -> { success: true, data: [ {no: 'CF-001', tarih: '27.10'}, ... ] }
+     // --- Simülasyon ---
+    setTimeout(() => {
+         fisNumaralari = [ {no: 'CF-001', tarih: '27.10'}, {no: 'CF-002', tarih: '26.10'}, {no: 'VF-001', tarih: '27.10'} ]; // Global değişkene ata
+         const btnAddFis = document.getElementById('btnAddFis');
+         if(btnAddFis) {
+             btnAddFis.innerHTML = '<i class="fas fa-plus-circle"></i> HESAPLAMAYA FİŞ EKLE';
+             btnAddFis.disabled = false;
+         }
+    }, 700);
+     // --- --- ---
+}
