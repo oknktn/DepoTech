@@ -820,3 +820,82 @@ input:read-only { background-color: #f0f0f0; color: #333; }
     color: var(--tkk-green);
     font-weight: bold;
 }
+
+/* ======================================== */
+/* 14. liste.html (Çıkış Listesi) STİLLERİ */
+/* ======================================== */
+
+/* Header'daki buton grubunu sağa yaslamak için */
+.header-actions {
+  display: flex;
+  gap: 10px; /* Butonlar arası boşluk */
+}
+
+/* Tarih filtreleme alanı */
+.date-filter {
+  background-color: #e9ecef; /* Biraz daha belirgin arka plan */
+  padding: 15px; /* Daha fazla boşluk */
+  border-bottom: 1px solid #dee2e6;
+  display: none; /* Başlangıçta gizli */
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap; /* Küçük ekranlarda alt alta geçsin */
+}
+.date-filter label {
+    font-weight: 600;
+    font-size: 14px;
+}
+.date-filter input[type="date"] {
+  padding: 8px; /* Daha rahat tıklama alanı */
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  font-size: 14px;
+}
+/* Filtrele butonu */
+.filter-button {
+    background-color: var(--orange); /* Farklı renk */
+}
+.filter-button:hover {
+    background-color: #e67e22;
+}
+
+/* Tablo konteynerı (veresiye ile aynı stil) */
+.list-table-container {
+  max-width: 98%; 
+  background-color: var(--white); 
+  border-radius: 8px; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+  overflow-x: auto; /* Yatay scroll */
+}
+
+/* Tablo stilleri (veresiye ile aynı stil) */
+.list-table-container table { 
+  width: 100%; 
+  border-collapse: collapse; 
+}
+.list-table-container th, 
+.list-table-container td { 
+  padding: 8px 10px; 
+  border: 1px solid var(--border-color); 
+  text-align: left; 
+  vertical-align: middle; 
+  font-size: 12px; 
+  white-space: nowrap; 
+}
+.list-table-container thead th { 
+  background-color: var(--light-green); 
+  color: var(--white); 
+  position: sticky; 
+  top: 0; 
+  z-index: 1;
+}
+.list-table-container tbody tr:nth-child(even) { 
+  background-color: var(--tkk-light-gray); 
+}
+.list-table-container .loading-text {
+    text-align: center;
+    padding: 20px;
+    color: var(--tkk-green);
+    font-weight: bold;
+}
