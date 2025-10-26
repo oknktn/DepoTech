@@ -440,3 +440,84 @@ function saveNewOrtakDisiFromCikis() {
   alert('Yeni Ortak Dışı Kaydediliyor...');
   closeOrtakDisiModal();
 }
+
+/* ======================================== */
+/* 10. tekrar.html (Fiş Tekrar) FONKSİYONLARI */
+/* ======================================== */
+
+/**
+ * Seçilen fiş numarasının detaylarını yükler.
+ */
+function loadFisDetaylari() {
+  const selectedFisNo = document.getElementById('fisNoSelect').value;
+  const detayAlani = document.getElementById('fisDetaylari');
+  
+  if (!selectedFisNo) {
+    detayAlani.value = '';
+    return;
+  }
+  
+  console.log(selectedFisNo + ' için detaylar yükleniyor...');
+  // TODO: Google Sheets API'den ilgili fişin verilerini çek
+  
+  // Örnek veri
+  detayAlani.value = `Fiş No: ${selectedFisNo}\nTarih: 27.10.2025\nMüşteri: Ahmet Yılmaz\n--------------------\n- Ürün A: 2 adet\n- Ürün B: 5 kg\n--------------------\nToplam: 150.00 TL`; 
+}
+
+/**
+ * Gösterilen fiş içeriğini yazdırma işlemini başlatır.
+ */
+function tekrarYazdir() {
+  const fisIcerigi = document.getElementById('fisDetaylari').value;
+  if (!fisIcerigi) {
+    alert('Yazdırılacak fiş içeriği bulunamadı.');
+    return;
+  }
+  
+  console.log('Fiş içeriği yazdırılıyor...');
+  
+  // TODO: Yazdırma için daha gelişmiş bir yöntem (örn: yeni pencere, özel CSS)
+  // Şimdilik basit window.print() kullanalım, ancak bu tüm sayfayı yazdırır.
+  // Daha iyisi, içeriği alıp yeni bir pencerede formatlayıp yazdırmak olur.
+  
+  // Geçici Çözüm: Sadece metni yazdırmayı dene (tarayıcı desteği değişebilir)
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write('<pre>' + fisIcerigi + '</pre>'); // <pre> formatlamayı korur
+  printWindow.document.close(); // Gerekli olabilir
+  printWindow.focus(); // Gerekli olabilir
+  printWindow.print();
+  // printWindow.close(); // İsteğe bağlı olarak kapatılabilir
+  
+  alert('Yazdırma diyaloğu açılıyor...'); 
+}
+
+// Bu sayfa yüklendiğinde fiş listesini çekmek için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'tekrar.html' sayfasındaysak bu fonksiyonu çalıştır
+  if (document.getElementById("fisNoSelect")) {
+    loadFisNumaralari();
+  }
+});
+
+/**
+ * Fiş numaraları listesini yükler ve select kutusunu doldurur.
+ */
+function loadFisNumaralari() {
+  const selectElement = document.getElementById('fisNoSelect');
+  selectElement.innerHTML = '<option value="">Yükleniyor...</option>'; // Mevcutları temizle
+  
+  console.log('Fiş numaraları yükleniyor...');
+  // TODO: Google Sheets API'den fiş numaralarını çek
+  
+  // Örnek Veri
+  setTimeout(() => { // API çağrısını simüle etmek için gecikme
+    const fisler = ['CF-2025-001', 'CF-2025-002', 'CF-2025-003']; 
+    selectElement.innerHTML = '<option value="">Seçiniz</option>'; // 'Yükleniyor'u temizle
+    fisler.forEach(fisNo => {
+      const option = document.createElement('option');
+      option.value = fisNo;
+      option.textContent = fisNo;
+      selectElement.appendChild(option);
+    });
+  }, 1000); // 1 saniye bekle
+}
