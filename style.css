@@ -1141,3 +1141,121 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   padding: 12px; 
   background-color: var(--green); /* Ana kaydet butonu rengi */
 }
+
+/* ======================================== */
+/* 17. kayitlar.html (Kayıt Görüntüle) STİLLERİ */
+/* ======================================== */
+
+/* Filtreleme Çubuğu */
+.filter-bar {
+  background-color: #e9ecef; 
+  padding: 10px 20px; /* Kenar boşlukları */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Ortala */
+  gap: 10px;
+  flex-wrap: wrap; /* Küçük ekranlarda alt alta */
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Filtre Butonları */
+.btn-filter {
+  background-color: var(--white); /* Normalde beyaz */
+  color: var(--dark);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px 15px;
+  cursor: pointer;
+  font-size: 13px; /* Biraz daha küçük */
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: background-color 0.3s, color 0.3s;
+}
+.btn-filter:hover {
+    background-color: var(--tkk-light-gray);
+}
+.btn-filter.active {
+  background-color: var(--tkk-light-green); /* Seçili buton rengi */
+  color: white;
+  border-color: var(--tkk-green);
+}
+
+/* Müşteri Filtre Select Kutusu */
+.filter-select {
+  padding: 8px 12px; /* İç boşluk */
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  min-width: 250px;
+  font-size: 13px;
+  height: 36px; /* Butonlarla aynı yükseklik */
+}
+
+/* Tablo konteynerı (öncekilerle aynı stil) */
+.records-table-container {
+  max-width: 98%; 
+  background-color: var(--white); 
+  border-radius: 8px; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+  overflow-x: auto; /* Yatay scroll */
+}
+
+/* Tablo stilleri (öncekilerle aynı stil) */
+.records-table-container table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  margin-top: 0; /* Konteyner padding'i yeterli */
+}
+.records-table-container th, 
+.records-table-container td { 
+  padding: 8px 10px; 
+  border: 1px solid var(--border-color); 
+  text-align: left; 
+  font-size: 11px; /* Daha küçük font */
+  white-space: nowrap; 
+  vertical-align: middle;
+}
+.records-table-container thead th { 
+  background-color: var(--light-green); 
+  color: var(--white); 
+  position: sticky; 
+  top: 0; 
+  z-index: 1;
+}
+.records-table-container tbody tr:nth-child(even) { 
+  background-color: var(--tkk-light-gray); 
+}
+
+/* Yükleniyor... metni */
+.records-table-container .loading-text {
+    text-align: center;
+    padding: 20px;
+    color: var(--tkk-green);
+    font-weight: bold;
+    font-size: 14px; /* Biraz daha büyük */
+}
+
+/* İptal Butonu (İşlem Sütunu için) */
+.btn-cancel { 
+  background-color: var(--tkk-red); 
+  color: white; 
+  border:none; 
+  padding: 5px 8px; 
+  font-size:10px; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.btn-cancel:hover {
+    background-color: #c82333;
+}
+.btn-cancel i { /* İkon boyutu */
+    font-size: 11px;
+}
+
+/* Durum Sütunu için renkler (Opsiyonel) */
+.status-devam { color: var(--orange); font-weight: bold; }
+.status-tamam { color: var(--green); font-weight: bold; }
