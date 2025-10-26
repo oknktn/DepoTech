@@ -329,8 +329,45 @@ input:read-only { background-color: #f0f0f0; color: #333; }
      otomatik olarak alt alta geçecektir. */
 }
 /* ======================================== */
-/* 8. cikis.html (Çıkış Fişi) STİLLERİ */
+/* 8. & 9. BLOKLAR: cikis.html 2-SÜTUNLU YERLEŞİM VE STİLLERİ */
+/* (Mevcut style.css dosyanızın en altına ekleyin) */
 /* ======================================== */
+
+/* --- 2 SÜTUNLU ANA YERLEŞİM (EKSİK OLAN KOD) --- */
+
+/* Bu, .container'a eklendiğinde 2 sütunlu düzeni etkinleştirir */
+.container.page-layout {
+  display: flex;
+  flex-direction: row; 
+  gap: 20px;
+  padding: 20px;
+  margin: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  
+  /* Sayfanın kalan dikey alanını doldur (body'ye sığma) */
+  flex-grow: 1; 
+  min-height: 0; 
+}
+
+.left-column {
+  width: 420px; /* Sol sütun biraz daha geniş */
+  flex-shrink: 0; 
+  display: flex;
+  flex-direction: column; 
+  gap: 15px;
+  overflow: visible; /* Sol sütun kaymasın */
+}
+
+.right-column {
+  flex-grow: 1; 
+  display: flex;
+  flex-direction: column;
+  /* height: 100%; KALDIRILDI, sağ sütun da normal aksın */
+  overflow: visible; 
+}
+
+/* --- cikis.html'e ÖZEL STİLLER --- */
 
 .form-content {
   display: flex;
@@ -338,16 +375,10 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   margin-bottom: 20px;
 }
 
-.left-panel, .right-panel {
-  flex: 1;
-  background-color: var(--white);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+/* HTML'den .left-panel ve .right-panel sınıflarını kaldırdık, 
+   o yüzden bu kurallara artık gerek yok */
 
-/* Modal içindekiler hariç form grupları */
+/* .form-content içindeki form grupları */
 .form-content .form-group {
   display: flex;
   align-items: center;
@@ -361,12 +392,10 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   min-width: 120px;
 }
 
-/* Form kontrollerinin yüksekliğini pesin.html ile eşitleyelim */
 .form-content .form-control {
   height: 36px;
   font-size: 14px;
 }
-/* Açıklama alanı daha uzun olabilir */
 .form-content textarea.form-control {
     height: auto;
 }
@@ -384,7 +413,6 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   min-width: 120px;
 }
@@ -401,7 +429,6 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s;
   height: 36px;
   white-space: nowrap;
 }
@@ -415,7 +442,7 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   border-radius: 8px; 
   padding: 20px; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
-  margin-top: 20px; 
+  /* margin-top: 20px; KALDIRILDI */
 }
 .stock-header { display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
 .stock-title { font-size: 16px; font-weight: 600; color: var(--green); }
@@ -424,11 +451,10 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 
 .stock-row { 
   display: grid; 
-  /* Stok Kodu, Stok Adı, Miktar, Birim, Sil Butonu */
   grid-template-columns: 1.5fr 3fr 1fr 1fr auto; 
   gap: 10px; 
   align-items: end; 
-  margin-bottom: 15px; 
+  margin-bottom: 8px; /* Boşluk azaltıldı */
   padding: 10px; 
   background-color: var(--gray); 
   border-radius: 4px; 
@@ -437,7 +463,7 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .remove-stock-btn:hover { background-color: #f8d7da; }
 .stock-label { font-size:12px; font-weight:600; display:block; margin-bottom:5px; }
 
-.form-actions { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
+.form-actions { display: flex; justify-content: center; gap: 15px; margin-top: 0; padding-top: 0; }
 .btn-secondary { background-color: #6c757d; color: var(--white); }
 .btn-secondary:hover { background-color: #5a6268; }
 
@@ -446,15 +472,12 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .autocomplete-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eee; }
 .autocomplete-item:hover { background-color: #f0f0f0; }
 
-/* --- MODAL (AÇILIR PENCERE) STİLLERİ --- */
+/* --- MODAL STİLLERİ --- */
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.6);
-  display: none; /* JS ile 'flex' yapılacak */
+  display: none; 
   justify-content: center;
   align-items: center;
   z-index: 1000;
@@ -473,7 +496,6 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   color: var(--green);
   margin-bottom: 20px;
 }
-/* Modal içindeki form grupları (dikey) */
 .modal-content .form-group {
     flex-direction: column; 
     align-items: flex-start;
@@ -489,43 +511,28 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   gap: 10px;
 }
 
-/* Mobil uyumluluk için (pesin.html'dekine benzer) */
-@media (max-width: 900px) {
-  .form-content {
-    flex-direction: column;
-  }
-}
+/* --- 'cikis.html' MİNİMALİZE VE STOK PANELİ DÜZELTMELERİ --- */
 
-/* ======================================== */
-/* 9. cikis.html - YENİ YERLEŞİM DÜZELTMELERİ */
-/* ======================================== */
-
-/* Sol sütundaki panelleri (Fiş ve Müşteri) minimalize et */
+/* Sol sütundaki panelleri minimalize et */
 .left-column .panel {
   padding: 12px;
+  margin-bottom: 0; 
 }
 .left-column .panel-title {
   font-size: 16px;
   margin-bottom: 8px;
   padding-bottom: 4px;
 }
-
-/* Sol sütundaki form elemanları */
 .left-column .form-label {
-  min-width: 90px; /* "120px" idi, küçülttük */
+  min-width: 90px;
   font-size: 13px;
 }
 .left-column .form-control {
-  height: 30px; /* "36px" idi, küçülttük */
+  height: 30px;
   font-size: 13px;
 }
 .left-column textarea.form-control {
     height: auto;
-}
-
-/* Stok satırları arasındaki boşluğu azalt */
-.stock-row {
-  margin-bottom: 8px; /* "15px" idi, azalttık */
 }
 
 /* Sağ sütundaki Stok panelini, kalan tüm yüksekliği dolduracak
@@ -533,11 +540,32 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .right-column .panel.stock-section {
   flex-grow: 1;
   min-height: 0;
+  margin-bottom: 0; 
+  /* "Ekrana sığdırma" için yükseklik ayarı */
+  height: 100%;
+  box-sizing: border-box;
 }
 
 /* Stok listesinin panel içinde kaymasını sağla */
 #stockRowsContainer {
   overflow-y: auto;
   flex-grow: 1;
-  min-height: 150px; /* Minimum yükseklik */
+  min-height: 150px; 
+}
+
+/* Mobil uyumlulukta .page-layout'u da alt alta diz */
+@media (max-width: 900px) {
+  .container.page-layout {
+    flex-direction: column;
+    height: auto; /* Mobil için yüksekliği serbest bırak */
+  }
+  
+  .left-column {
+    width: 100%;
+    box-sizing: border-box; 
+  }
+  
+  .right-column {
+      height: auto; /* Mobil için yüksekliği serbest bırak */
+  }
 }
