@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DepoTech - Talep Takibi</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay"><div class="loading-text">İşleniyor...</div></div>
+    
+    <div class="header">
+        <button class="back-button header-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Ana Menü</button>
+        <h1>Talep Takip Sistemi</h1>
+        <div style="width:120px;"></div> </div>
+
+    <div class="main-nav">
+        <button id="btnGoruntule" class="nav-btn active" onclick="switchTab('goruntule')">Talepleri Görüntüle</button>
+        <button id="btnIslem" class="nav-btn" onclick="switchTab('islem')">Talep Girişi / Güncelle</button>
+    </div>
+
+    <div id="goruntuleTab" class="tab-content active">
+        <div class="filter-bar demand-filter-bar"> <select id="durumFiltre" class="form-control filter-select" onchange="fetchTalepler()"><option value="Tümü">Tüm Durumlar</option><option>Talep Oluşturuldu</option><option>Sipariş Edildi</option><option>Satışı Tamamlandı</option><option>Tedarik Edilemiyor</option><option>İptal Edildi</option></select>
+            <select id="grupFiltre" class="form-control filter-select" onchange="fetchTalepler()"><option value="Tümü">Tüm Ürün Grupları</option><option>Gübre</option><option>Tohum</option><option>Motorin</option><option>Zirai İlaç</option><option>Yem</option><option>Diğer</option></select>
+        </div>
+        <div class="container demand-view-container" id="goruntuleContainer"> <div class="loading-text">Talepler yükleniyor...</div>
+        </div>
+    </div>
+
+    <div id="islemTab" class="tab-content">
+        <div class="filter-bar demand-action-bar"> <select id="islemTuru" class="form-control filter-select" onchange="handleIslemChange(this.value)">
+                <option value="">-- İşlem Seçiniz --</option><option value="ekle">Yeni Talep Ekle</option><option value="guncelle">Mevcut Talebi Güncelle/İptal Et</option>
+            </select>
+        </div>
+        <div class="container demand-action-container" id="islemContainer"> </div>
+    </div>
+    
+    <div class="modal-overlay" id="yeniTalepModal">
+        <div class="modal-content demand-modal-content"> <div class="modal-header">Yeni Talep Girişi</div>
+            <form id="yeniTalepForm" onsubmit="event.preventDefault(); saveNewTalep();">
+                </form>
+        </div>
+    </div>
+</body>
+</html>
