@@ -721,3 +721,76 @@ document.addEventListener("DOMContentLoaded", () => {
     loadPriceListData();
   }
 });
+
+/* ======================================== */
+/* 13. veresiye.html (Veresiye Listesi) FONKSİYONLARI */
+/* ======================================== */
+
+/**
+ * Veresiye kayıtlarını yükler ve tabloyu doldurur.
+ */
+function loadVeresiyeData() {
+  const tableBody = document.getElementById('veresiyeTableBody');
+  tableBody.innerHTML = '<tr><td colspan="12" class="loading-text">Veresiye kayıtları yükleniyor...</td></tr>'; // Mevcutları temizle
+  
+  console.log('Veresiye verileri yükleniyor...');
+  // TODO: Google Sheets API'den veresiye kayıtlarını çek
+  
+  // Örnek Veri
+  setTimeout(() => { // API çağrısını simüle et
+    const data = [
+      { tarih: '27.10.2025', fisNo: 'VF-001', kullanici: 'Okan K.', satisTuru: 'Veresiye', musteriTipi: 'Ortak İçi', ortakNo: '123', adSoyad: 'Ali Veli', stokKodu: 'STK001', stokAdi: 'Gübre A', miktar: 500, birim: 'Kg', aciklama: 'Teslim edildi' },
+      { tarih: '26.10.2025', fisNo: 'VF-002', kullanici: 'Okan K.', satisTuru: 'Veresiye', musteriTipi: 'Ortak Dışı', ortakNo: '', adSoyad: 'Ayşe Fatma', stokKodu: 'STK005', stokAdi: 'Yem B', miktar: 2, birim: 'Ton', aciklama: '' },
+      // ... daha fazla satır
+    ];
+    
+    tableBody.innerHTML = ''; // 'Yükleniyor'u temizle
+    
+    if (data.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="12" class="loading-text">Gösterilecek veresiye kaydı bulunamadı.</td></tr>';
+      return;
+    }
+
+    data.forEach(item => {
+      const row = tableBody.insertRow(); // Yeni satır ekle
+      
+      // Hücreleri sırayla doldur
+      row.insertCell().textContent = item.tarih || '';
+      row.insertCell().textContent = item.fisNo || '';
+      row.insertCell().textContent = item.kullanici || '';
+      row.insertCell().textContent = item.satisTuru || '';
+      row.insertCell().textContent = item.musteriTipi || '';
+      row.insertCell().textContent = item.ortakNo || '';
+      row.insertCell().textContent = item.adSoyad || '';
+      row.insertCell().textContent = item.stokKodu || '';
+      row.insertCell().textContent = item.stokAdi || '';
+      row.insertCell().textContent = item.miktar || '';
+      row.insertCell().textContent = item.birim || '';
+      row.insertCell().textContent = item.aciklama || '';
+      
+      // İleride düzenleme/silme butonları için hücre eklenebilir
+      // const actionsCell = row.insertCell();
+      // actionsCell.innerHTML = '<button>Düzenle</button>'; 
+    });
+  }, 1500); // 1.5 saniye bekle
+}
+
+/**
+ * Tabloda yapılan değişiklikleri kaydeder.
+ * (Bu fonksiyon şu anki tasarımda aktif değil, ama ileride lazım olabilir)
+ */
+function kaydetTumDegisiklikleri() {
+    console.log('Tablodaki değişiklikler kaydediliyor...');
+    // TODO: Eğer tabloda düzenleme yapılacaksa, bu fonksiyon doldurulacak.
+    // Şu anki tasarımda tablo sadece görüntüleme amaçlı.
+    alert('Değişiklikleri Kaydet fonksiyonu henüz aktif değil.');
+}
+
+
+// Bu sayfa yüklendiğinde veresiye listesini çekmek için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'veresiye.html' sayfasındaysak listeyi yükle
+  if (document.getElementById("veresiyeTableBody")) {
+    loadVeresiyeData();
+  }
+});
