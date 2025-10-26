@@ -1387,3 +1387,203 @@ document.addEventListener("DOMContentLoaded", () => {
     loadStokListData(); 
   }
 });
+
+/* ======================================== */
+/* 19. stok-guncelle.html (Stok Güncelle) FONKSİYONLARI */
+/* ======================================== */
+
+// --- Global Değişkenler (Stok Güncelleme için) ---
+const ambalajListesi = ['Adet', 'Cc', 'Gr', 'Kg', 'Lt', 'Metre', 'ML', 'Ton'];
+const stokTuruListesi = ['Halk Sağlığı', 'Kimyevi Gübre', 'Madeni Yağ', 'Market', 'Motorin', 'Sıvı Gübre', 'Sulama', 'Tohum', 'Toz Gübre', 'Yem', 'Zirai İlaç'];
+// Hamaliye Birimi koşulları
+const birimKosullari = {
+    'Adet': ['1'], 'Cc': ['200','250','500'], 'Gr': ['50','80','100','400','500','750','800','1750'],
+    'Kg': ['1','3','4','5','9','10','16','17.5','25','40','50','1000'],
+    'Lt': ['0.1','1','3','5','8','10','17','20'], 'Metre': ['5'], 'ML': ['500'], 'Ton': ['1']
+};
+// --- --- ---
+
+
+/**
+ * Stok verilerini yükler ve düzenlenebilir tabloyu oluşturur.
+ */
+function loadStokYonetimData() {
+  const tableBody = document.getElementById('stokTableBody');
+  if (!tableBody) return; // Yanlış sayfadaysak çık
+  
+  tableBody.innerHTML = '<tr><td colspan="6" class="loading-text">Stok verileri yükleniyor...</td></tr>'; 
+  
+  console.log('Stok Yönetim verileri yükleniyor...');
+  // TODO: Google Sheets API'den 'Stok Kartları' sayfasındaki verileri çek
+  
+  // Örnek Veri (stok-gor ile aynı)
+  setTimeout(() => { 
+    const data = [
+      { kod: 'STK001', ad: 'Gübre A - DAP 18-46-0', birim: 'Kg', ham_amb: 'Kg', ham_birim: '50', tur: 'Kimyevi Gübre' },
+      { kod: 'STK002', ad: 'Tohum C - Buğday Sertifikalı', birim: 'Kg', ham_amb: 'Kg', ham_birim: '1000', tur: 'Tohum' },
+      { kod: 'STK005', ad: 'Yem B - Süt Yemi 19 Protein', birim: 'Ton', ham_amb: 'Ton', ham_birim: '1', tur: 'Yem' },
+      { kod: 'MTR001', ad: 'Motorin (Petrol Ofisi)', birim: 'Lt', ham_amb: '', ham_birim: '', tur: 'Akaryakıt' },
+    ];
+    
+    renderEditableTable(data); // Düzenlenebilir tabloyu çiz
+    
+  }, 1000); // 1 saniye bekle
+}
+
+/**
+ * Verilen stok verileriyle düzenlenebilir tabloyu oluşturur.
+ * @param {Array} data Stok verileri dizisi.
+ */
+function renderEditableTable(data) {
+    const tableBody = document.getElementById('stokTableBody');
+    tableBody.innerHTML = ''; // Temizle
+    
+    if (!data || data.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="6" class="loading-text">Stok verisi bulunamadı.</td></tr>';
+      return;
+    }
+
+    data.forEach(item => {
+        const stokKodu = item.kod || '';
+        const row = document.createElement('tr');
+        row.id = `row-${stokKodu}`;
+        
+        // Sabit hücreler (Kod, Ad, Birim)
+        row.innerHTML = `<td>${stokKodu}</td><td>${item.ad || ''}</td><td>${item.birim || ''}</td>`;
+
+        // Dinamik Select Kutuları (Ambalaj, Birim, Tür)
+        const ambalajTd = document.createElement('td');
+        ambalajTd.innerHTML = createSelect(`ambalaj-${stokKodu}`, ambalajListesi, item.ham_amb || '', 
+                                           `kaydetDegisiklik('${stokKodu}', 'Hamaliye Ambalajı', this)`);
+        
+        const birimTd = document.createElement('td');
+        // Başlangıçta doğru birim listesini yükle
+        const gecerliBirimler = birimKosullari[item.ham_amb || ''] || []; 
+        birimTd.innerHTML = createSelect(`birim-${stokKodu}`, gecerliBirimler, item.ham_birim || '', 
+                                         `kaydetDegisiklik('${stokKodu}', 'Hamaliye Birimi', this)`);
+
+        const turTd = document.createElement('td');
+        turTd.innerHTML = createSelect(`tur-${stokKodu}`, stokTuruListesi, item.tur || '', 
+                                       `kaydetDegisiklik('${stokKodu}', 'Stok Türü', this)`);
+
+        row.appendChild(ambalajTd);
+        row.appendChild(birimTd);
+        row.appendChild(turTd);
+        tableBody.appendChild(row);
+    });
+}
+
+/**
+ * Verilen seçeneklerle bir select (dropdown) HTML'i oluşturur.
+ * @param {string} id Select elementinin ID'si.
+ * @param {Array} options Seçenekler dizisi.
+ * @param {string} selectedValue Seçili olan değer.
+ * @param {string} onChangeFunction Değişiklik olduğunda çağrılacak JS fonksiyonu (string olarak).
+ * @returns {string} Oluşturulan select HTML'i.
+ */
+function createSelect(id, options, selectedValue, onChangeFunction) {
+    let optionsHtml = '<option value="">Seçiniz</option>';
+    options.forEach(opt => {
+        // Değerleri string'e çevirerek karşılaştır (örn: 1 vs "1")
+        const selected = (String(opt) === String(selectedValue)) ? 'selected' : '';
+        optionsHtml += `<option value="${opt}" ${selected}>${opt}</option>`;
+    });
+    return `<select id="${id}" class="form-select" onchange="${onChangeFunction}">${optionsHtml}</select>`;
+}
+ 
+/**
+ * Hamaliye Ambalajı değiştiğinde Hamaliye Birimi listesini günceller.
+ * @param {string} stokKodu İlgili stok kodu.
+ * @param {string} yeniAmbalaj Seçilen yeni ambalaj değeri.
+ */
+function guncelleBirimListesi(stokKodu, yeniAmbalaj) {
+    const birimSelect = document.getElementById(`birim-${stokKodu}`);
+    if (!birimSelect) return;
+    
+    const yeniBirimler = birimKosullari[yeniAmbalaj] || [];
+    birimSelect.innerHTML = ''; // Temizle
+    
+    let optionsHtml = '<option value="">Seçiniz</option>';
+    yeniBirimler.forEach(opt => {
+        optionsHtml += `<option value="${opt}">${opt}</option>`;
+    });
+    birimSelect.innerHTML = optionsHtml;
+}
+
+/**
+ * Stok verisindeki bir değişikliği kaydeder (API çağrısı yapar).
+ * @param {string} stokKodu Değiştirilen stok kodu.
+ * @param {string} sutunAdi Değiştirilen sütunun adı (Sheets'teki başlık).
+ * @param {HTMLElement} element Değişikliği tetikleyen select elementi.
+ */
+function kaydetDegisiklik(stokKodu, sutunAdi, element) {
+    const yeniDeger = element.value;
+    const row = document.getElementById(`row-${stokKodu}`);
+    
+    // Eğer Ambalaj değiştiyse, Birim listesini güncelle ve Birim hücresini sunucuda sıfırla
+    if (sutunAdi === 'Hamaliye Ambalajı') {
+        guncelleBirimListesi(stokKodu, yeniDeger);
+        // Birim hücresini de sunucuda boş olarak güncellemek için ayrı bir API çağrısı yap
+        console.log(`Birim listesi güncellendi ${stokKodu} için. Sunucuda 'Hamaliye Birimi' sıfırlanıyor...`);
+        // TODO: API ÇAĞRISI - updateStokVerisi(stokKodu, 'Hamaliye Birimi', ''); 
+    }
+
+    console.log(`Kaydediliyor: Stok=${stokKodu}, Sütun=${sutunAdi}, Değer=${yeniDeger}`);
+    showNotification('Kaydediliyor...', true); // Geçici bildirim
+    
+    // TODO: Google Sheets API'ye güncelleme isteği gönder
+    // API Çağrısı: updateStokVerisi(stokKodu, sutunAdi, yeniDeger);
+    
+    // --- Örnek API Yanıt Simülasyonu ---
+    setTimeout(() => { 
+        const success = Math.random() > 0.2; // %80 başarılı olsun
+        const message = success ? `${stokKodu} ${sutunAdi} güncellendi.` : `Hata: ${stokKodu} güncellenemedi!`;
+        showNotification(message, success);
+        highlightRow(row, success);
+        
+        // Başarısız olursa eski değere geri döndür (opsiyonel)
+        // if (!success) { element.value = eskiDeger; } 
+    }, 750); // 0.75 saniye bekle
+    // --- --- ---
+}
+
+/**
+ * Bir tablo satırını geçici olarak vurgular (başarılı/başarısız).
+ * @param {HTMLElement} row Vurgulanacak tablo satırı (TR elementi).
+ * @param {boolean} success Başarılı ise true, değilse false.
+ */
+function highlightRow(row, success) {
+    if (!row) return;
+    row.classList.add(success ? 'row-success' : 'row-fail');
+    setTimeout(() => {
+        row.classList.remove('row-success', 'row-fail');
+    }, 1500); // 1.5 saniye sonra vurguyu kaldır
+}
+ 
+/**
+ * Ekranın sağ üst köşesinde bir bildirim gösterir.
+ * @param {string} message Gösterilecek mesaj.
+ * @param {boolean} success Başarı bildirimi mi (yeşil), hata mı (kırmızı).
+ */
+function showNotification(message, success) {
+    const notification = document.getElementById('notification');
+    if (!notification) return;
+    
+    notification.textContent = message;
+    notification.className = 'notification'; // Önceki sınıfları sıfırla
+    notification.classList.add(success ? 'success' : 'error');
+    notification.style.display = 'block';
+    
+    // 3 saniye sonra bildirimi gizle
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
+
+// Bu sayfa yüklendiğinde stok listesini çekmek için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'stok-guncelle.html' sayfasındaysak (notification ID'si varsa)
+  if (document.getElementById("notification")) {
+    loadStokYonetimData(); 
+  }
+});
