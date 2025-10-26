@@ -600,3 +600,124 @@ document.addEventListener("DOMContentLoaded", () => {
 zaten bir önceki adımda (tekrar.html için) script.js'e eklenmişti. 
 Bu sayfa da aynı fonksiyonları kullanacak.
 */
+
+/* ======================================== */
+/* 12. fiyat.html (Fiyat Listesi) FONKSİYONLARI */
+/* ======================================== */
+
+/**
+ * Fiyat listesini yükler ve tabloyu doldurur.
+ */
+function loadPriceListData() {
+  const container = document.getElementById('priceListRowsContainer');
+  container.innerHTML = '<i>Yükleniyor...</i>'; // Önceki veriyi temizle
+  
+  console.log('Fiyat listesi verileri yükleniyor...');
+  // TODO: Google Sheets API'den fiyat listesini çek
+  
+  // Örnek Veri
+  setTimeout(() => { // API çağrısını simüle et
+    const data = [
+      { kod: 'STK001', ad: 'Ürün A (Kg)', satis: 15.50, maliyet: 10.00 },
+      { kod: 'STK002', ad: 'Ürün B (Adet)', satis: 120.00, maliyet: 90.00 },
+      { kod: 'STK003', ad: 'Hizmet C (Saat)', satis: 250.00, maliyet: 150.00 },
+      // ... daha fazla satır
+    ];
+    
+    container.innerHTML = ''; // 'Yükleniyor'u temizle
+    
+    if (data.length === 0) {
+        container.innerHTML = '<i>Gösterilecek fiyat verisi bulunamadı.</i>';
+        return;
+    }
+
+    data.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'price-list-row';
+      
+      // Satış ve maliyet değerlerini formatla (2 ondalık)
+      const satisFiyati = parseFloat(item.satis || 0).toFixed(2);
+      const maliyetFiyati = parseFloat(item.maliyet || 0).toFixed(2);
+      
+      // Kar oranını hesapla (ilk yüklemede)
+      let karOrani = 0;
+      if (parseFloat(maliyetFiyati) > 0) {
+        karOrani = ((parseFloat(satisFiyati) - parseFloat(maliyetFiyati)) / parseFloat(maliyetFiyati)) * 100;
+      }
+      const karOraniFormatted = karOrani.toFixed(2);
+
+      row.innerHTML = `
+        <input type="text" class="form-control" value="${item.kod || ''}" readonly>
+        <input type="text" class="form-control" value="${item.ad || ''}" readonly>
+        <input type="number" step="0.01" class="form-control price-input" value="${satisFiyati}" oninput="calculateProfit(this)">
+        <input type="number" step="0.01" class="form-control price-input" value="${maliyetFiyati}" oninput="calculateProfit(this)">
+        <input type="text" class="form-control profit-margin" value="${karOraniFormatted}" readonly>
+      `;
+      container.appendChild(row);
+    });
+  }, 1500); // 1.5 saniye bekle
+}
+
+/**
+ * Bir satırdaki satış fiyatı veya maliyet değiştiğinde kar oranını hesaplar.
+ * @param {HTMLElement} inputElement Değişiklik yapılan input.
+ */
+function calculateProfit(inputElement) {
+    // Input'un ait olduğu satırı bul
+    const row = inputElement.closest('.price-list-row');
+    if (!row) return;
+
+    // Satış fiyatını, maliyeti ve kar oranı input'unu bul
+    const satisInput = row.querySelector('input:nth-child(3)');
+    const maliyetInput = row.querySelector('input:nth-child(4)');
+    const karOraniInput = row.querySelector('input:nth-child(5)');
+
+    const satisFiyati = parseFloat(satisInput.value) || 0;
+    const maliyetFiyati = parseFloat(maliyetInput.value) || 0;
+
+    let karOrani = 0;
+    // Maliyet 0'dan büyükse kar oranını hesapla
+    if (maliyetFiyati > 0) {
+        karOrani = ((satisFiyati - maliyetFiyati) / maliyetFiyati) * 100;
+    }
+    
+    // Kar oranı input'unu güncelle (2 ondalıkla)
+    karOraniInput.value = karOrani.toFixed(2);
+}
+
+
+/**
+ * Fiyat listesindeki değişiklikleri kaydeder.
+ */
+function savePriceList() {
+    console.log('Fiyat listesi değişiklikleri kaydediliyor...');
+    const rows = document.querySelectorAll('#priceListRowsContainer .price-list-row');
+    const dataToSave = [];
+
+    rows.forEach(row => {
+        const kod = row.querySelector('input:nth-child(1)').value;
+        // const ad = row.querySelector('input:nth-child(2)').value; // Ada gerek yok, kod yeterli
+        const satis = row.querySelector('input:nth-child(3)').value;
+        const maliyet = row.querySelector('input:nth-child(4)').value;
+        
+        dataToSave.push({
+            kod: kod,
+            satis: parseFloat(satis) || 0,
+            maliyet: parseFloat(maliyet) || 0
+        });
+    });
+
+    console.log('Kaydedilecek Veri:', dataToSave);
+    // TODO: Google Sheets API'ye 'dataToSave' dizisini gönderip güncelleme yap
+    
+    alert('Değişiklikler kaydediliyor... (Henüz API bağlı değil)');
+}
+
+
+// Bu sayfa yüklendiğinde fiyat listesini çekmek için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'fiyat.html' sayfasındaysak listeyi yükle
+  if (document.querySelector(".price-list-container")) {
+    loadPriceListData();
+  }
+});
