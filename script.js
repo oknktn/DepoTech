@@ -2699,7 +2699,7 @@ function removeDynamicRow(rowId) {
 function saveNewTalep() {
     const talepData = {
         tarih: document.getElementById('modalTarih')?.value,
-        kullanici: document.getElementById('modal
+        kullanici: document.getElementById('modal)
 
 /* ======================================== */
 /* 25. hamaliye.html (Hamaliye Hesaplama) FONKSİYONLARI */
