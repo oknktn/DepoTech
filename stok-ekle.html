@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DepoTech - Yeni Stok Ekle</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay"><div class="loading-text">Kaydediliyor...</div></div>
+
+    <div class="header">
+        <button class="back-button header-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Ana Menü</button>
+        <h1>Yeni Stok Ekle</h1>
+        <div style="width: 120px;"></div> </div>
+
+    <form id="stokEkleForm" class="container stock-add-container" onsubmit="event.preventDefault(); saveNewStok();"> <div class="form-grid stock-add-grid"> <div class="form-group">
+                <label for="stokKodu" class="form-label">Stok Kodu</label>
+                <input type="text" id="stokKodu" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="stokAdi" class="form-label">Stok Adı</label>
+                <input type="text" id="stokAdi" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="birim" class="form-label">Birim</label>
+                <select id="birim" class="form-control"></select> </div>
+            <div class="form-group">
+                <label for="stokTuru" class="form-label">Stok Türü</label>
+                <select id="stokTuru" class="form-control"></select> </div>
+            <div class="form-group">
+                <label for="hamaliyeAmbalaj" class="form-label">Hamaliye Ambalajı</label>
+                <select id="hamaliyeAmbalaj" class="form-control" onchange="guncelleBirimListesiStokEkle(this.value)"></select> </div>
+            <div class="form-group">
+                <label for="hamaliyeBirim" class="form-label">Hamaliye Birimi</label>
+                <select id="hamaliyeBirim" class="form-control"></select> </div>
+            <div class="form-group full-width"> <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Kaydet</button>
+            </div>
+        </div>
+    </form>
+</body>
+</html>
