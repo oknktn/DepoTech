@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DepoTech - Depo Kayıtları Görüntüle</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="header">
+        <button class="back-button header-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Ana Menü</button>
+        <h1>Depo Kayıtları</h1>
+        <div style="width: 120px;"></div> </div>
+
+    <div class="filter-bar">
+        <button id="btn-tumu" class="btn-filter active" onclick="applyFilter('Tümü', this)">Tümü</button>
+        <button id="btn-devam" class="btn-filter" onclick="applyFilter('Devam Ediyor', this)">Devam Edenler</button>
+        <button id="btn-tamam" class="btn-filter" onclick="applyFilter('Tamamlandı', this)">Tamamlananlar</button>
+        <select id="musteriFiltre" class="form-control filter-select" onchange="applyFilter(null, this)"><option value="Tümü">Tüm Müşteriler</option></select>
+    </div>
+
+    <div class="container records-table-container"> <table>
+            <thead>
+                <tr>
+                    <th>Tarih</th><th>Kullanıcı</th><th>Ortak No</th><th>Adı Soyadı</th><th>Stok Kodu</th><th>Stok Adı</th>
+                    <th>Alınan Miktar</th><th>Birim</th><th>Son Çıkan</th><th>Toplam Çıkan</th><th>Kalan Miktar</th><th>Durum</th><th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody id="dataTableBody">
+                 <tr><td colspan="13" class="loading-text">Kayıtlar yükleniyor...</td></tr>
+                 </tbody>
+        </table>
+    </div>
+</body>
+</html>
