@@ -1658,3 +1658,190 @@ input:read-only { background-color: #f0f0f0; color: #333; }
     font-size: 16px;
     color: var(--tkk-green);
 }
+
+/* ======================================== */
+/* 24. talep.html (Talep Takibi) STİLLERİ */
+/* ======================================== */
+
+/* Sekme Navigasyon Çubuğu */
+.main-nav {
+  display: flex;
+  justify-content: center;
+  background-color: var(--white);
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-bottom: 1px solid #eee; /* Alt çizgi */
+}
+
+/* Sekme Butonları */
+.nav-btn {
+  background-color: #e9ecef;
+  border: 1px solid #dee2e6;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background-color 0.3s, color 0.3s;
+}
+.nav-btn:hover {
+    background-color: #d1d5db;
+}
+.nav-btn.active {
+  background-color: var(--light-green);
+  color: white;
+  border-color: var(--green);
+}
+/* Butonlar arası boşluk için */
+.nav-btn:first-child { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+.nav-btn:last-child { border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-left: none; }
+
+
+/* Sekme İçerikleri */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Filtre Çubukları */
+.demand-filter-bar, .demand-action-bar {
+  background-color: #f8f9fa;
+  padding: 15px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  flex-wrap: wrap; /* Mobil için */
+}
+.demand-filter-bar .filter-select,
+.demand-action-bar .filter-select {
+    max-width: 250px; /* Genişlik */
+}
+
+/* Konteynerlar */
+.demand-view-container, .demand-action-container {
+  max-width: 98%;
+}
+
+/* Görüntüle Tablosu */
+.demand-view-container table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  background-color: white; 
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+  margin-top: 0;
+}
+.demand-view-container th, 
+.demand-view-container td { 
+  padding: 8px 10px; 
+  border: 1px solid var(--border-color); 
+  font-size: 12px; 
+  text-align: left; 
+  vertical-align: middle; 
+  white-space: nowrap;
+}
+.demand-view-container thead th { 
+  background-color: var(--light-green); 
+  color: white; 
+  position: sticky; 
+  top: 0; 
+  z-index: 10; 
+}
+.demand-view-container tbody tr:nth-child(even) { 
+  background-color: var(--tkk-light-gray); 
+}
+.demand-view-container .loading-text {
+    text-align: center;
+    padding: 20px;
+    font-weight: bold;
+    color: var(--green);
+}
+
+/* İşlem Sekmesi Tablosu (Güncelleme için) */
+.demand-action-container table {
+  width: 100%; 
+  border-collapse: collapse; 
+  background-color: white; 
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+  margin-top: 0;
+}
+.demand-action-container th, 
+.demand-action-container td { 
+  padding: 8px 10px; 
+  border: 1px solid var(--border-color); 
+  font-size: 12px; 
+  text-align: left; 
+  vertical-align: middle; 
+}
+.demand-action-container thead th { 
+  background-color: var(--light-green); 
+  color: white; 
+  position: sticky; 
+  top: 0; 
+  z-index: 10; 
+}
+.demand-action-container tbody tr:nth-child(even) { 
+  background-color: var(--tkk-light-gray); 
+}
+.demand-action-container .loading-text {
+    text-align: center;
+    padding: 20px;
+    font-weight: bold;
+    color: var(--green);
+}
+
+/* Güncelleme satırındaki input/select */
+.form-select-sm, .form-control-sm { /* Daha küçük elemanlar */
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    font-size: 11px;
+    height: auto;
+}
+.btn-sm { /* Mevcut .btn-sm'i biraz güncelleyelim */
+  border: none; 
+  border-radius: 4px; 
+  padding: 5px 10px; 
+  cursor: pointer; 
+  font-weight: 600;
+  font-size: 11px; 
+}
+
+
+/* Yeni Talep Modal */
+.demand-modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 800px; /* Daha geniş modal */
+  max-height: 90vh; /* Yükseklik limiti */
+  overflow-y: auto; /* İçerik sığmazsa scroll */
+  display: flex;
+  flex-direction: column;
+}
+/* Modal içindeki ızgara */
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 sütun */
+  gap: 15px;
+}
+.modal-grid label { font-size: 13px; font-weight: 600; margin-bottom: 4px; display: block; }
+
+/* Modal içindeki ürün ekleme bölümü */
+#modalUrunlerContainer .urun-row { /* JS'de eklenen class adı varsayımı */
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr auto;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center; /* Dikey hizalama */
+}
+
+/* Modal butonları */
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 15px; /* Üstten ayırıcı */
+  border-top: 1px solid #eee;
+}
