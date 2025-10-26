@@ -2699,8 +2699,220 @@ function removeDynamicRow(rowId) {
 function saveNewTalep() {
     const talepData = {
         tarih: document.getElementById('modalTarih')?.value,
-        kullanici: document.getElementById('modal)
+        kullanici: document.getElementById('modalKullanici')?.value,
+        musteriTipi: document.getElementById('modalOrtakIciPanel')?.style.display === 'block' ? 'Ortak İçi' : 'Ortak Dışı',
+        ortakBilgileri: {},
+        urunler: [],
+        durum: 'Talep Oluşturuldu' // Varsayılan durum
+    };
 
+    // Müşteri bilgilerini al
+    if (talepData.musteriTipi === 'Ortak İçi') {
+        const selectedIndex = document.getElementById('modalOrtakNo')?.value;
+        if(!selectedIndex || selectedIndex === "") { alert("Lütfen ortak seçiniz."); return; }
+        const ortak = modalOrtakListesi[selectedIndex];
+        talepData.ortakBilgileri = { numara: ortak.numara, adsoyad: ortak.adsoyad, telefon: ortak.telefon };
+    } else {
+        talepData.ortakBilgileri = { 
+            adsoyad: document.getElementById('modalOdAdSoyad')?.value.trim(), 
+            telefon: document.getElementById('modalOdTelefon')?.value.trim() 
+        };
+        if(!talepData.ortakBilgileri.adsoyad) { alert("Lütfen ortak dışı müşteri adını soyadını giriniz."); return; }
+        // Ortak dışı için numara boş olabilir
+        talepData.ortakBilgileri.numara = ''; 
+    }
+
+    // Ürün bilgilerini topla
+    const urunRows = document.querySelectorAll('#modalUrunlerContainer .urun-row');
+    urunRows.forEach(row => {
+        const grup = row.querySelector('.urun-grup')?.value;
+        const ad = row.querySelector('.urun-ad')?.value.trim();
+        const miktar = row.querySelector('.urun-miktar')?.value.trim();
+        // Sadece tüm alanları doluysa ekle
+        if (grup && ad && miktar) { 
+            talepData.urunler.push({ grup, ad, miktar }); 
+        }
+    });
+
+    if (talepData.urunler.length === 0) { 
+        alert("Lütfen en az bir geçerli ürün bilgisi giriniz (Grup, Ad, Miktar dolu olmalı)."); 
+        return; 
+    }
+
+    console.log('Yeni Talep Kaydediliyor:', talepData);
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) loadingOverlay.style.display = 'flex';
+    
+    // TODO: Google Sheets API'ye yeni talep verisini gönder
+    // API Çağrısı: addNewTalep(talepData);
+    // API tarafında: Bu veriler 'Talepler' sayfasına eklenecek.
+    
+    // --- Örnek API Yanıt Simülasyonu ---
+    setTimeout(() => { 
+        if (loadingOverlay) loadingOverlay.style.display = 'none';
+        const success = Math.random() > 0.1; 
+        const message = success ? `Talep başarıyla oluşturuldu.` : `Hata: Talep oluşturulamadı!`;
+        alert(message);
+        if (success) {
+            closeTalepModal();
+            // Eğer Görüntüle sekmesi aktifse listeyi yenile
+            if(document.getElementById('btnGoruntule')?.classList.contains('active')) {
+                fetchTalepler();
+            }
+        }
+    }, 1500); 
+    // --- --- ---
+}
+ 
+/**
+ * "İşlem" sekmesinde, güncellenebilecek talepleri listeler.
+ */
+function fetchUpdatableTalepler() {
+    const container = document.getElementById('islemContainer');
+    if (!container) return;
+    container.innerHTML = '<div class="loading-text">Güncellenecek talepler yükleniyor...</div>';
+    
+    console.log("Güncellenecek talepler yükleniyor...");
+    // TODO: Google Sheets API'den sadece durumu güncellenebilir olan talepleri çek
+    // API Çağrısı: getUpdatableTalepler(); (Belki sadece 'Talep Oluşturuldu' ve 'Sipariş Edildi' durumundakiler)
+    
+    // --- Örnek API Yanıt Simülasyonu ---
+    setTimeout(() => {
+        const data = [
+            { originalRow: 1, data: ['2025-10-27', 'user@example.com', '123', 'Ali Veli', '555...', 'Gübre', 'Üre Gübresi', '500 Kg', 'Talep Oluşturuldu', 'Acil lazım'] },
+            { originalRow: 2, data: ['2025-10-26', 'user@example.com', '', 'Ayşe Fatma', '544...', 'Tohum', 'Buğday Tohumu', '1 Ton', 'Sipariş Edildi', 'Bekleniyor'] },
+        ];
+        
+        let tableHtml = '<table><thead><tr><th>Tarih</th><th>Adı Soyadı</th><th>Ürün Adı</th><th>Mevcut Durum</th><th>Yeni Açıklama</th><th>İşlem</th></tr></thead><tbody>';
+        if (data.length > 0) {
+            data.forEach(item => {
+                const rowData = item.data;
+                const rowId = item.originalRow; // Sheets'teki satır numarası
+                const tarih = rowData[0] ? new Date(rowData[0]).toLocaleDateString('tr-TR') : ''; 
+                tableHtml += `<tr id="update-row-${rowId}">
+                    <td>${tarih}</td>
+                    <td>${rowData[3] || ''}</td>
+                    <td>${rowData[6] || ''}</td>
+                    <td class="durum-hucre">${rowData[8] || ''}</td>
+                    <td class="aciklama-hucre">${rowData[9] || ''}</td>
+                    <td><button class="btn-sm btn-orange" onclick="toggleUpdateRow(${rowId})">Güncelle</button></td>
+                </tr>`;
+             });
+        } else {
+            tableHtml += '<tr><td colspan="6" class="loading-text">Güncellenecek aktif talep bulunamadı.</td></tr>';
+        }
+        tableHtml += '</tbody></table>';
+        container.innerHTML = tableHtml;
+    }, 1000);
+    // --- --- ---
+}
+
+/**
+ * Güncelleme satırını düzenleme moduna geçirir.
+ * @param {number} rowId Düzenlenecek satırın ID'si (Sheets'teki satır no).
+ */
+function toggleUpdateRow(rowId) {
+    const row = document.getElementById(`update-row-${rowId}`);
+    if (!row) return;
+    
+    const durumCell = row.querySelector('.durum-hucre');
+    const aciklamaCell = row.querySelector('.aciklama-hucre');
+    const button = row.querySelector('button');
+    
+    // Eğer zaten düzenleme modundaysa (input varsa) geri dön
+    if (durumCell.querySelector('select')) return; 
+
+    const mevcutDurum = durumCell.textContent;
+    const mevcutAciklama = aciklamaCell.textContent;
+
+    // Güncellenebilecek durumlar (Mevcut durumu hariç tut)
+    const durumOptions = ['Talep Oluşturuldu', 'Sipariş Edildi', 'Tedarik Edilemiyor', 'İptal Edildi'];
+    let selectHtml = `<select class="form-select-sm">`; // Daha küçük select
+    // Önce mevcut durumu ekle (seçili olarak)
+    selectHtml += `<option value="${mevcutDurum}">${mevcutDurum}</option>`;
+    // Sonra diğer seçenekleri ekle
+    durumOptions.filter(o => o !== mevcutDurum).forEach(o => selectHtml += `<option value="${o}">${o}</option>`);
+    selectHtml += `</select>`;
+
+    durumCell.innerHTML = selectHtml;
+    aciklamaCell.innerHTML = `<input type="text" class="form-control-sm" value="${mevcutAciklama}" placeholder="Yeni açıklama...">`; // Daha küçük input
+    
+    // Butonu "Kaydet" yap
+    button.textContent = "Kaydet";
+    button.classList.remove('btn-orange');
+    button.classList.add('btn-primary');
+    button.setAttribute('onclick', `saveUpdateRow(${rowId})`);
+}
+
+/**
+ * Güncellenen talep durumunu ve açıklamasını kaydeder.
+ * @param {number} rowId Güncellenen satırın ID'si (Sheets'teki satır no).
+ */
+function saveUpdateRow(rowId) {
+    const row = document.getElementById(`update-row-${rowId}`);
+    if (!row) return;
+    
+    const durumSelect = row.querySelector('select');
+    const aciklamaInput = row.querySelector('input');
+    const button = row.querySelector('button');
+    
+    const yeniDurum = durumSelect ? durumSelect.value : '';
+    const yeniAciklama = aciklamaInput ? aciklamaInput.value.trim() : '';
+
+    // Açıklama boşsa veya sadece durum değiştiyse bile zorunlu kılalım
+    if (yeniAciklama === '') {
+        alert("Durum değişikliği için açıklama girmek zorunludur.");
+        aciklamaInput.focus();
+        return;
+    }
+
+    console.log(`Talep güncelleniyor: Satır=${rowId}, Durum=${yeniDurum}, Açıklama=${yeniAciklama}`);
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) loadingOverlay.style.display = 'flex';
+    
+    // TODO: Google Sheets API'ye güncelleme isteği gönder
+    // API Çağrısı: updateTalep(rowId, yeniDurum, yeniAciklama);
+    // API tarafında: İlgili satırın Durum ve Açıklama sütunları güncellenecek.
+    
+    // --- Örnek API Yanıt Simülasyonu ---
+    setTimeout(() => { 
+        if (loadingOverlay) loadingOverlay.style.display = 'none';
+        const success = Math.random() > 0.1; 
+        const message = success ? `Talep başarıyla güncellendi.` : `Hata: Talep güncellenemedi!`;
+        alert(message);
+        if (success) {
+            // Başarılıysa, satırı tekrar normal görünüme çevir (veya listeyi yenile)
+            fetchUpdatableTalepler(); 
+        } else {
+             // Başarısızsa, belki düzenleme modunda bırakmak daha iyi?
+             // Veya eski haline döndür:
+             /*
+             durumCell.innerHTML = mevcutDurum; 
+             aciklamaCell.innerHTML = mevcutAciklama;
+             button.textContent = "Güncelle";
+             button.classList.remove('btn-primary');
+             button.classList.add('btn-orange');
+             button.setAttribute('onclick', `toggleUpdateRow(${rowId})`);
+             */
+        }
+    }, 1500); 
+    // --- --- ---
+}
+
+
+// Bu sayfa yüklendiğinde varsayılan olarak Görüntüle sekmesini yükle
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'talep.html' sayfasındaysak
+  if (document.getElementById("goruntuleTab") && document.getElementById("islemTab")) {
+      // Başlangıçta Görüntüle sekmesini yükle
+      fetchTalepler(); 
+      
+      // Kullanıcı email'ini al (modal için)
+      console.log("Kullanıcı email'i alınıyor...");
+      // TODO: API Çağrısı: getUserEmail();
+       setTimeout(()=> { currentUserEmail = 'ornek@kullanici.com'; console.log("Email:", currentUserEmail); }, 200);
+  }
+});
 /* ======================================== */
 /* 25. hamaliye.html (Hamaliye Hesaplama) FONKSİYONLARI */
 /* ======================================== */
