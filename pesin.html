@@ -22,9 +22,8 @@
         <button class="back-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Ana Menü</button>
         <h1 id="pageTitle">Peşin Satış</h1> <div></div> </div>
 
-<div class="container page-layout">
-    
-    <aside class="left-column">
+<div class="container"> <div class="top-grid">
+        
         <div class="panel panel-compact">
             <h3 class="panel-title">Para Sayıları</h3>
             <div class="para-sayi-grid" style="font-weight:bold;">
@@ -87,28 +86,24 @@
                 <input id="nakitSatisDuzeltme" class="form-control" readonly>
             </div>
         </div>
-    </aside>
-
-    <main class="right-column">
-        <div class="panel">
-            <div class="satis-header">
-                <h3 class="panel-title" style="margin:0;">Satış Kayıtları</h3>
-                <button id="btnAddSatisRow" class="btn-add-fis" onclick="addSatisRow()">
-                    <i class="fas fa-plus"></i> Satır Ekle
-                </button>
-            </div>
-            <div class="satis-table-header">
-                <div>Stok Kodu</div>
-                <div>Stok Adı</div>
-                <div>Miktar</div>
-                <div>Birim Fiyat</div>
-                <div>Toplam</div>
-                <div></div>
-            </div>
-            <div id="satisKayitlariContainer">
-                </div>
+    </div> <div class="panel">
+        <div class="satis-header">
+            <h3 class="panel-title" style="margin:0;">Satış Kayıtları</h3>
+            <button id="btnAddSatisRow" class="btn-add-fis" onclick="addSatisRow()">
+                <i class="fas fa-plus"></i> Satır Ekle
+            </button>
         </div>
-    </main>
+        <div class="satis-table-header">
+            <div>Stok Kodu</div>
+            <div>Stok Adı</div>
+            <div>Miktar</div>
+            <div>Birim Fiyat</div>
+            <div>Toplam</div>
+            <div></div>
+        </div>
+        <div id="satisKayitlariContainer">
+            </div>
+    </div>
 </div>
     </div> </body>
 </html>
