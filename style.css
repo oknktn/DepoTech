@@ -1449,3 +1449,77 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   gap: 8px; 
   width: 100%; /* Tam genişlik */
 }
+
+/* ======================================== */
+/* 21. ortak.html (Ortak Listesi) STİLLERİ */
+/* ======================================== */
+
+.partner-list-container {
+  max-width: 95%; /* Geniş konteyner */
+  background-color: var(--white); 
+  border-radius: 8px; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+  overflow-x: auto; /* Yatay scroll */
+}
+
+/* Tablo stilleri (öncekilerle aynı) */
+.partner-list-container table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  margin-top: 0; 
+}
+.partner-list-container th, 
+.partner-list-container td { 
+  padding: 8px 10px; 
+  border: 1px solid var(--border-color); 
+  text-align: left; 
+  font-size: 12px; 
+  white-space: nowrap; 
+  vertical-align: middle;
+}
+.partner-list-container thead th { 
+  background-color: var(--light-green); 
+  color: var(--white); 
+  position: sticky; 
+  top: 0; 
+  z-index: 1;
+}
+.partner-list-container tbody tr:nth-child(even) { 
+  background-color: var(--tkk-light-gray); 
+}
+
+/* Yükleniyor... metni */
+.partner-list-container .loading-text {
+    text-align: center;
+    padding: 20px;
+    color: var(--tkk-green);
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Header'daki Ekle butonu */
+.header .add-button {
+    /* Özel stil gerekirse */
+}
+
+/* Modal içindeki form etiketleri */
+#yeniKayitModal .form-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 14px; /* Standart etiket boyutu */
+}
+
+/* Modal içindeki inputlar */
+#yeniKayitModal .form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Modal içindeki form grupları */
+#yeniKayitModal .form-group {
+    margin-bottom: 15px;
+}
