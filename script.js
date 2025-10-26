@@ -1815,3 +1815,110 @@ document.addEventListener("DOMContentLoaded", () => {
     loadOrtakListesi(); 
   }
 });
+
+/* ======================================== */
+/* 22. ortak-disi.html (Ortak Dışı Listesi) FONKSİYONLARI */
+/* ======================================== */
+
+/**
+ * Yeni ortak dışı kaydı modal penceresini açar.
+ */
+function openModalOrtakDisi() {
+  const modal = document.getElementById('yeniKayitModalOrtakDisi');
+  if (modal) {
+      const form = document.getElementById('yeniOrtakDisiForm');
+      if (form) form.reset();
+      modal.style.display = 'flex';
+  }
+}
+
+/**
+ * Yeni ortak dışı kaydı modal penceresini kapatır.
+ */
+function closeModalOrtakDisi() {
+  const modal = document.getElementById('yeniKayitModalOrtakDisi');
+  if (modal) {
+      modal.style.display = 'none';
+  }
+}
+
+/**
+ * Yeni ortak dışı kaydını kaydeder.
+ */
+function saveNewOrtakDisi() {
+  const ortakDisiData = {
+      adSoyad: document.getElementById('odAdSoyadi').value.trim(),
+      telefon: document.getElementById('odTelefon').value.trim()
+  };
+
+  // Zorunlu alan kontrolü
+  if (!ortakDisiData.adSoyad || !ortakDisiData.telefon) {
+    alert("Adı Soyadı ve Telefon Numarası alanları zorunludur.");
+    return;
+  }
+
+  console.log('Yeni Ortak Dışı Kaydediliyor:', ortakDisiData);
+  
+  // TODO: Google Sheets API'ye yeni ortak dışı verisini gönder
+  // API Çağrısı: addNewExternalPartner(ortakDisiData);
+  
+  // --- Örnek API Yanıt Simülasyonu ---
+  setTimeout(() => { 
+    const success = Math.random() > 0.1; 
+    const message = success ? `Ortak Dışı "${ortakDisiData.adSoyad}" başarıyla eklendi.` : `Hata: Ortak Dışı eklenemedi!`;
+    
+    alert(message); 
+    
+    if (success) {
+      closeModalOrtakDisi(); 
+      loadOrtakDisiListesi(); // Listeyi yenile
+    }
+  }, 1000); 
+  // --- --- ---
+}
+
+/**
+ * Ortak Dışı listesini yükler ve tabloyu doldurur.
+ */
+function loadOrtakDisiListesi() {
+  const tableBody = document.getElementById('dataTableBody');
+  // Sadece ortak-disi.html'de olduğumuzdan emin olmak için ekstra kontrol
+  const container = document.querySelector('.partner-ext-list-container'); 
+  if (!tableBody || !container) return; 
+  
+  tableBody.innerHTML = '<tr><td colspan="2" class="loading-text">Ortak Dışı listesi yükleniyor...</td></tr>'; 
+  
+  console.log('Ortak Dışı listesi yükleniyor...');
+  // TODO: Google Sheets API'den 'Ortak Dışı' sayfasındaki verileri çek
+  
+  // Örnek Veri
+  setTimeout(() => { 
+    const data = [
+      { adSoyad: 'Ayşe Fatma', telefon: '544...' },
+      { adSoyad: 'Deniz Can', telefon: '532...' },
+      { adSoyad: 'Mehmet Öztürk', telefon: '505...' },
+    ];
+    
+    tableBody.innerHTML = ''; 
+    
+    if (data.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="2" class="loading-text">Gösterilecek ortak dışı kayıt bulunamadı.</td></tr>';
+      return;
+    }
+
+    data.forEach(item => {
+      const row = tableBody.insertRow(); 
+      row.insertCell().textContent = item.adSoyad || '';
+      row.insertCell().textContent = item.telefon || '';
+    });
+  }, 1000); // 1 saniye bekle
+}
+
+
+// Bu sayfa yüklendiğinde ortak dışı listesini çekmek için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'ortak-disi.html' sayfasındaysak (modal ID'si varsa)
+  if (document.getElementById("yeniKayitModalOrtakDisi")) {
+    loadOrtakDisiListesi(); 
+  }
+});
