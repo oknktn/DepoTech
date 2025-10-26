@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DepoTech - Çıkış Listesi</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="header">
+        <button class="header-button back-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Ana Menü</button>
+        <h1>Çıkış Listesi</h1>
+        <div class="header-actions"> <button class="header-button" onclick="toggleDateFilter()"><i class="fas fa-calendar-alt"></i> Tarih Aralığı</button>
+            <button class="header-button" onclick="fetchAllData()"><i class="fas fa-list"></i> Tümünü Görüntüle</button>
+        </div>
+    </div>
+
+    <div class="date-filter" id="dateFilter">
+        <label>Başlangıç:</label> <input type="date" id="startDate">
+        <label>Bitiş:</label> <input type="date" id="endDate">
+        <button class="header-button filter-button" onclick="fetchFilteredData()"><i class="fas fa-filter"></i> Filtrele</button>
+    </div>
+
+    <div class="container list-table-container"> <table>
+            <thead>
+                <tr>
+                    <th>Tarih</th><th>Fiş No</th><th>Kullanıcı</th><th>Satış Türü</th><th>Müşteri Tipi</th><th>Ortak No</th><th>Ad Soyad</th>
+                    <th>Stok Kodu</th><th>Stok Adı</th><th>Miktar</th><th>Birim</th><th>Açıklama</th>
+                </tr>
+            </thead>
+            <tbody id="dataTableBody">
+                 <tr><td colspan="12" class="loading-text">Liste yükleniyor...</td></tr>
+                 </tbody>
+        </table>
+    </div>
+</body>
+</html>
