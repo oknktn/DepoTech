@@ -2402,3 +2402,301 @@ function loadStokTurleriFiltre() {
 
     }, 500); // Filtre hızlı yüklenebilir
 }
+
+/* ======================================== */
+/* 24. talep.html (Talep Takibi) FONKSİYONLARI */
+/* ======================================== */
+
+// --- Global Değişkenler (Talep Takibi için) ---
+let modalOrtakListesi = []; // Yeni talep modalı için ortak listesi
+let currentUserEmail = '';    // Giriş yapan kullanıcı
+// --- --- ---
+
+
+/**
+ * Sekmeler arasında geçiş yapar.
+ * @param {string} tabName Gösterilecek sekmenin adı ('goruntule' veya 'islem').
+ */
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    
+    const activeTab = document.getElementById(tabName + 'Tab');
+    const activeButton = document.getElementById(tabName === 'goruntule' ? 'btnGoruntule' : 'btnIslem');
+    
+    if (activeTab) activeTab.classList.add('active');
+    if (activeButton) activeButton.classList.add('active');
+    
+    // Aktif sekmeye göre ilgili veriyi yükle
+    if (tabName === 'goruntule') {
+        fetchTalepler();
+    } else {
+        const islemTuruSelect = document.getElementById('islemTuru');
+        handleIslemChange(islemTuruSelect ? islemTuruSelect.value : ''); // Seçili işleme göre içeriği yükle
+    }
+}
+
+/**
+ * Filtrelere göre talep listesini yükler.
+ */
+function fetchTalepler() {
+    const durumFiltre = document.getElementById('durumFiltre');
+    const grupFiltre = document.getElementById('grupFiltre');
+    const durum = durumFiltre ? durumFiltre.value : 'Tümü';
+    const grup = grupFiltre ? grupFiltre.value : 'Tümü';
+    const container = document.getElementById('goruntuleContainer');
+    
+    if (!container) return; // Eğer element yoksa çık
+    
+    container.innerHTML = '<div class="loading-text">Talepler yükleniyor...</div>';
+    
+    console.log(`Talepler yükleniyor... Durum: ${durum}, Grup: ${grup}`);
+    // TODO: Google Sheets API'den Talep Listesini çek (filtrelerle)
+    // API Çağrısı: getTalepListesi(durum, grup);
+    
+    // --- Örnek API Yanıt Simülasyonu ---
+    setTimeout(() => {
+        const data = [
+             { originalRow: 1, data: ['2025-10-27', 'user@example.com', '123', 'Ali Veli', '555...', 'Gübre', 'Üre Gübresi', '500 Kg', 'Talep Oluşturuldu', 'Acil lazım'] },
+             { originalRow: 2, data: ['2025-10-26', 'user@example.com', '', 'Ayşe Fatma', '544...', 'Tohum', 'Buğday Tohumu', '1 Ton', 'Sipariş Edildi', 'Bekleniyor'] },
+             { originalRow: 3, data: ['2025-10-25', 'other@example.com', '456', 'Zeynep Su', '533...', 'Yem', 'Süt Yemi', '2 Ton', 'Satışı Tamamlandı', 'Teslim edildi'] },
+        ];
+        
+        // Örnek Filtreleme (API yapmalı)
+        const filteredData = data.filter(item => {
+           const row = item.data;
+           if(durum !== 'Tümü' && row[8] !== durum) return false;
+           if(grup !== 'Tümü' && row[5] !== grup) return false;
+           return true; 
+        });
+
+        let tableHtml = '<table><thead><tr><th>Tarih</th><th>Kullanıcı</th><th>Ortak No</th><th>Adı Soyadı</th><th>Telefon</th><th>Ürün Grubu</th><th>Ürün Adı</th><th>Miktar</th><th>Durum</th><th>Açıklama</th></tr></thead><tbody>';
+        if (filteredData.length > 0) {
+            filteredData.forEach(item => {
+                const rowData = item.data;
+                // Tarihi formatla
+                const tarih = rowData[0] ? new Date(rowData[0]).toLocaleDateString('tr-TR') : ''; 
+                tableHtml += `<tr><td>${tarih}</td><td>${rowData[1]||''}</td><td>${rowData[2]||''}</td><td>${rowData[3]||''}</td><td>${rowData[4]||''}</td><td>${rowData[5]||''}</td><td>${rowData[6]||''}</td><td>${rowData[7]||''}</td><td>${rowData[8]||''}</td><td>${rowData[9]||''}</td></tr>`;
+            });
+        } else {
+            tableHtml += '<tr><td colspan="10" class="loading-text">Bu kriterlere uygun talep bulunamadı.</td></tr>';
+        }
+        tableHtml += '</tbody></table>';
+        container.innerHTML = tableHtml;
+    }, 1000);
+    // --- --- ---
+}
+
+/**
+ * "İşlem" sekmesinde seçilen türe göre içeriği ayarlar.
+ * @param {string} islem Seçilen işlem ('ekle' veya 'guncelle').
+ */
+function handleIslemChange(islem) {
+    const container = document.getElementById('islemContainer');
+    if (!container) return;
+    container.innerHTML = ''; // Önce temizle
+    
+    if (islem === 'ekle') {
+        container.innerHTML = `<div style="text-align:center; padding-top: 30px;">
+                                <button class="btn btn-primary" style="padding:15px 30px; font-size:16px;" onclick="openTalepModal()">
+                                    <i class="fas fa-plus"></i> Yeni Talep Girişi Yap
+                                </button>
+                               </div>`;
+    } else if (islem === 'guncelle') {
+        fetchUpdatableTalepler(); // Güncellenecek talepleri listele
+    } else {
+         container.innerHTML = '<div class="loading-text" style="padding-top: 30px;">Lütfen bir işlem türü seçiniz.</div>';
+    }
+}
+ 
+/**
+ * Yeni talep giriş modalını açar ve hazırlar.
+ */
+function openTalepModal() {
+    const modal = document.getElementById('yeniTalepModal');
+    const form = document.getElementById('yeniTalepForm');
+    if (!modal || !form) return;
+    
+    // Modal içeriğini dinamik olarak oluştur (her açıldığında sıfırlansın)
+    form.innerHTML = `
+        <div class="modal-grid">
+            <div><label>Tarih</label><input type="text" id="modalTarih" class="form-control" readonly></div>
+            <div><label>Kullanıcı</label><input type="text" id="modalKullanici" class="form-control" readonly></div>
+        </div>
+        
+        <div style="margin: 15px 0; text-align:center;">
+            <button type="button" class="btn btn-sm" id="btnModalOrtakIci" onclick="modalToggleMusteriTipi('ortak-ici')">Ortak İçi</button> 
+            <button type="button" class="btn btn-sm" id="btnModalOrtakDisi" onclick="modalToggleMusteriTipi('ortak-disi')">Ortak Dışı</button>
+        </div>
+        
+        <div id="modalOrtakIciPanel" style="display:none;">
+            <div class="modal-grid">
+                <div><label>Ortak No</label><select id="modalOrtakNo" class="form-select"></select></div>
+                <div><label>Adı Soyadı</label><select id="modalOrtakAdSoyad" class="form-select"></select></div>
+                <div style="grid-column: 1 / -1;"><label>Telefon</label><input type="text" id="modalOrtakTelefon" class="form-control" readonly></div>
+            </div>
+        </div>
+        
+        <div id="modalOrtakDisiPanel" style="display:none;">
+            <div class="modal-grid">
+                <div><label>Adı Soyadı</label><input type="text" id="modalOdAdSoyad" class="form-control"></div>
+                <div><label>Telefon</label><input type="text" id="modalOdTelefon" class="form-control"></div>
+            </div>
+        </div>
+        
+        <div style="border-top:1px solid #eee; margin-top:20px; padding-top:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                <h4>Ürünler</h4>
+                <button type="button" class="btn-sm btn-primary" onclick="addUrunRow()"><i class="fas fa-plus"></i> Ürün Ekle</button>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 2fr 1fr auto; gap:10px; font-weight:bold; font-size:12px; padding-bottom:5px; border-bottom:1px solid #ccc; margin-bottom: 10px;">
+                <label>Ürün Grubu</label><label>Ürün Adı</label><label>Miktar</label><span></span>
+            </div>
+            <div id="modalUrunlerContainer"></div>
+        </div>
+        
+        <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeTalepModal()">İptal</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Kaydet</button>
+        </div>
+    `;
+    
+    // Tarih ve kullanıcıyı ayarla
+    const tarihInput = document.getElementById('modalTarih');
+    if(tarihInput) tarihInput.value = new Date().toLocaleDateString('tr-TR');
+    const kullaniciInput = document.getElementById('modalKullanici');
+    if(kullaniciInput) kullaniciInput.value = currentUserEmail || 'Bilinmiyor'; // Global değişkenden al
+    
+    // Varsayılan olarak Ortak İçi seçili gelsin
+    modalToggleMusteriTipi('ortak-ici'); 
+    // İlk ürün satırını ekle
+    addUrunRow(); 
+
+    // Ortak listesini yükle (eğer daha önce yüklenmediyse)
+    if (modalOrtakListesi.length === 0) {
+        console.log("Modal için ortak listesi yükleniyor...");
+        // TODO: API Çağrısı: getOrtakListesi(); (Ortak No, AdSoyad, Telefon içeren)
+        // --- Simülasyon ---
+        setTimeout(() => {
+            modalOrtakListesi = [
+                { numara: '123', adsoyad: 'Ali Veli', telefon: '555...' },
+                { numara: '456', adsoyad: 'Zeynep Su', telefon: '533...' },
+            ];
+            populateModalOrtakDropdowns();
+        }, 500);
+        // --- --- ---
+    } else {
+        populateModalOrtakDropdowns(); // Liste zaten varsa doldur
+    }
+    
+    if(modal) modal.style.display = 'flex'; // Modalı göster
+}
+
+/**
+ * Yeni talep modalını kapatır.
+ */
+function closeTalepModal() { 
+    const modal = document.getElementById('yeniTalepModal');
+    if (modal) modal.style.display = 'none'; 
+}
+
+/**
+ * Modal içinde müşteri tipini değiştirir (Ortak İçi / Ortak Dışı).
+ * @param {string} tip Seçilen tip.
+ */
+function modalToggleMusteriTipi(tip) {
+    const btnIci = document.getElementById('btnModalOrtakIci');
+    const btnDisi = document.getElementById('btnModalOrtakDisi');
+    const panelIci = document.getElementById('modalOrtakIciPanel');
+    const panelDisi = document.getElementById('modalOrtakDisiPanel');
+
+    if(btnIci) btnIci.style.backgroundColor = (tip==='ortak-ici' ? 'var(--tkk-green)' : '#6c757d');
+    if(btnDisi) btnDisi.style.backgroundColor = (tip==='ortak-disi' ? 'var(--tkk-green)' : '#6c757d');
+    if(panelIci) panelIci.style.display = (tip==='ortak-ici' ? 'block' : 'none');
+    if(panelDisi) panelDisi.style.display = (tip==='ortak-disi' ? 'block' : 'none');
+}
+
+/**
+ * Modal içindeki Ortak No ve Ad Soyad select kutularını doldurur.
+ */
+function populateModalOrtakDropdowns() {
+    const noSelect = document.getElementById('modalOrtakNo');
+    const adSelect = document.getElementById('modalOrtakAdSoyad');
+    if (!noSelect || !adSelect) return;
+    
+    noSelect.innerHTML = '<option value="">Numara Seç...</option>';
+    adSelect.innerHTML = '<option value="">Ad Soyad Seç...</option>';
+    
+    modalOrtakListesi.forEach((ortak, index) => {
+        noSelect.add(new Option(ortak.numara, index));
+        adSelect.add(new Option(ortak.adsoyad, index));
+    });
+    
+    // Seçim değiştiğinde diğerini ve telefonu güncelle
+    noSelect.onchange = () => updateModalOrtakDetails(noSelect.value);
+    adSelect.onchange = () => updateModalOrtakDetails(adSelect.value);
+}
+
+/**
+ * Modal içinde ortak seçildiğinde diğer select'i ve telefon numarasını günceller.
+ * @param {string} selectedIndex Seçilen ortağın `modalOrtakListesi` içindeki index'i.
+ */
+function updateModalOrtakDetails(selectedIndex) {
+    if(selectedIndex === "") { // "Seçiniz" seçildiyse
+         document.getElementById('modalOrtakNo').value = "";
+         document.getElementById('modalOrtakAdSoyad').value = "";
+         document.getElementById('modalOrtakTelefon').value = "";
+         return;
+    }
+    const ortak = modalOrtakListesi[selectedIndex];
+    if (ortak) {
+        document.getElementById('modalOrtakNo').value = selectedIndex;
+        document.getElementById('modalOrtakAdSoyad').value = selectedIndex;
+        document.getElementById('modalOrtakTelefon').value = ortak.telefon || '';
+    }
+}
+
+/**
+ * Modal içine yeni bir ürün satırı ekler.
+ */
+function addUrunRow() {
+    const container = document.getElementById('modalUrunlerContainer');
+    if (!container) return;
+    
+    const urunRow = document.createElement('div');
+    const rowId = 'urunRow-' + Date.now(); // Benzersiz ID
+    urunRow.id = rowId;
+    urunRow.className = 'urun-row'; // CSS için class
+    
+    const urunGruplari = ['Gübre', 'Tohum', 'Motorin', 'Zirai İlaç', 'Yem', 'Diğer'];
+    let optionsHtml = urunGruplari.map(g => `<option value="${g}">${g}</option>`).join('');
+    
+    urunRow.innerHTML = `
+        <select class="form-select urun-grup"><option value="">Grup Seç...</option>${optionsHtml}</select>
+        <input type="text" class="form-control urun-ad" placeholder="Ürün Adı...">
+        <input type="text" class="form-control urun-miktar" placeholder="Miktar + Birim...">
+        <button type="button" class="btn-sm btn-secondary" style="background-color:#dc3545;" onclick="removeDynamicRow('${rowId}')">
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+    container.appendChild(urunRow);
+}
+
+/**
+ * Dinamik olarak eklenmiş bir satırı ID'sine göre siler.
+ * @param {string} rowId Silinecek satırın ID'si.
+ */
+function removeDynamicRow(rowId) {
+    const row = document.getElementById(rowId);
+    if (row) {
+        row.remove();
+    }
+}
+
+/**
+ * Yeni talep formundaki verileri toplar ve kaydeder.
+ */
+function saveNewTalep() {
+    const talepData = {
+        tarih: document.getElementById('modalTarih')?.value,
+        kullanici: document.getElementById('modal
