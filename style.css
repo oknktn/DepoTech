@@ -621,3 +621,58 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .reprint-container .form-group {
   margin-bottom: 20px;
 }
+
+/* ======================================== */
+/* 11. iptal.html (Fiş İptal) STİLLERİ */
+/* ======================================== */
+
+/* Bu sayfanın konteyner'ı da dar */
+.cancel-container {
+  max-width: 600px; 
+  background-color: var(--white); 
+  border-radius: 8px; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+
+/* Form etiketleri (tekrar.html ile aynı) */
+.cancel-container .form-label {
+  display: block; 
+  font-weight: 600; 
+  margin-bottom: 8px; 
+  color: var(--green);
+}
+
+/* Form elemanları (select ve textarea) */
+.cancel-container .form-control {
+  width: 100%; 
+  padding: 10px; 
+  border: 1px solid var(--border-color); 
+  border-radius: 4px; 
+  font-size: 14px;
+}
+
+/* Fiş içeriği alanı */
+.cancel-textarea {
+  min-height: 120px; /* Tekrar yazdırmadan biraz daha kısa */
+  resize: vertical; 
+  background-color: #f9f9f9; 
+  white-space: pre-wrap; /* Satır sonlarını koru */
+  font-family: monospace; /* Eşit aralıklı font */
+}
+
+/* İptal butonu */
+.btn-danger { background-color: var(--tkk-red); color: var(--tkk-white); }
+.btn-danger:hover { background-color: #c82333; }
+
+.cancel-button {
+  padding: 12px 30px; 
+  font-size: 16px; 
+  gap: 8px; 
+  width: 100%; /* Tam genişlik */
+}
+
+/* Form grupları arası boşluk */
+.cancel-container .form-group {
+  margin-bottom: 20px;
+}
