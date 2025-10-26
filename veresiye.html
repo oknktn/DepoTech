@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DepoTech - Veresiye Yönetim Paneli</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay"><div class="loading-text">İşleniyor...</div></div>
+
+    <div class="header">
+        <button class="header-button back-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Ana Menü</button>
+        <h1>Veresiye Yönetim Paneli</h1>
+        <button class="header-button save-button" onclick="kaydetTumDegisiklikleri()"><i class="fas fa-save"></i> Değişiklikleri Kaydet</button>
+    </div>
+
+    <div class="container credit-table-container"> <table>
+            <thead>
+                <tr>
+                    <th>Tarih</th><th>Fiş No</th><th>Kullanıcı</th><th>Satış Türü</th><th>Müşteri Tipi</th><th>Ortak No</th><th>Ad Soyad</th>
+                    <th>Stok Kodu</th><th>Stok Adı</th><th>Miktar</th><th>Birim</th><th>Açıklama</th>
+                    </tr>
+            </thead>
+            <tbody id="veresiyeTableBody">
+                <tr><td colspan="12" class="loading-text">Veresiye kayıtları yükleniyor...</td></tr>
+                </tbody>
+        </table>
+    </div>
+</body>
+</html>
