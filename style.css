@@ -899,3 +899,161 @@ input:read-only { background-color: #f0f0f0; color: #333; }
     color: var(--tkk-green);
     font-weight: bold;
 }
+
+/* ======================================== */
+/* 15. giris.html (Depo Giriş) STİLLERİ */
+/* ======================================== */
+
+.entry-container {
+  max-width: 1000px; /* Geniş konteyner */
+}
+
+/* Müşteri bilgileri paneli için ızgara */
+.panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* İki sütun */
+  gap: 20px;
+}
+
+/* Form grupları (etiket üstte, input altta) */
+.entry-container .form-group {
+  display: flex;
+  flex-direction: column; /* Dikey dizilim */
+}
+
+.entry-container .form-label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.entry-container .form-control {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  height: 36px;
+}
+
+/* Müşteri tipi butonları */
+.entry-customer-type {
+  justify-content: center; /* Ortala */
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-toggle {
+  padding: 8px 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: var(--white);
+  transition: background-color 0.3s, color 0.3s;
+}
+.btn-toggle.active {
+  background-color: var(--light-green);
+  color: white;
+  border-color: var(--tkk-green);
+}
+
+/* Ortak içi panelindeki yan yana grup */
+.yan-yana-grup {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* İki sütun */
+  gap: 20px;
+}
+
+/* Stok ekleme paneli */
+.entry-stock-header {
+  display: flex;
+  justify-content: space-between; /* Başlık sola, buton sağa */
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.stock-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--tkk-green);
+}
+
+.btn-add-stock {
+  background-color: var(--light-green);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex; /* İkonla metni hizala */
+  align-items: center;
+  gap: 5px;
+}
+.btn-add-stock:hover {
+    background-color: var(--green);
+}
+.btn-add-stock:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+/* Stok satırı başlıkları */
+.entry-stock-row-header {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 1fr auto; /* Sütun genişlikleri */
+  gap: 10px;
+  padding: 0 10px 5px 10px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--tkk-green);
+  border-bottom: 2px solid var(--tkk-light-green);
+  margin-bottom: 10px;
+}
+
+/* Stok satırları */
+.stock-row { /* Bu class cikis.html'den geliyordu, stilini birleştirelim */
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 1fr auto; /* Başlıkla aynı sütunlar */
+  gap: 10px;
+  align-items: center; /* Dikeyde ortala */
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: var(--tkk-light-gray);
+  border-radius: 4px;
+}
+
+/* Satır silme butonu */
+.btn-remove {
+  background: none;
+  border: none;
+  color: var(--tkk-red); /* Yeni renk değişkeni */
+  font-size: 18px;
+  cursor: pointer;
+  padding: 5px; /* Tıklama alanını artır */
+}
+.btn-remove:hover {
+    color: #c82333;
+}
+
+/* Ana Kaydet butonu */
+.btn-save {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--green);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px; /* Panelle arasında boşluk */
+}
+.btn-save:hover {
+    background-color: var(--light-green);
+}
