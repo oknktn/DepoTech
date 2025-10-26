@@ -911,3 +911,105 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchAllData(); // Başlangıçta tüm verileri yükle
   }
 });
+
+/* ======================================== */
+/* 15. giris.html (Depo Giriş) FONKSİYONLARI */
+/* ======================================== */
+
+/**
+ * Müşteri tipini (Ortak İçi / Ortak Dışı) değiştirir (Giriş sayfası için).
+ * @param {string} tip Seçilen tip ('ortak-ici' veya 'ortak-disi').
+ * @param {HTMLElement} clickedButton Tıklanan buton.
+ */
+function toggleMusteriTipiGiris(tip, clickedButton) {
+  const ortakIciPanel = document.getElementById('ortakIciPanel');
+  const ortakDisiPanel = document.getElementById('ortakDisiPanel');
+  const btnOrtakIci = document.getElementById('btnOrtakIci');
+  const btnOrtakDisi = document.getElementById('btnOrtakDisi');
+
+  // Önce tüm butonlardan 'active' sınıfını kaldır
+  btnOrtakIci.classList.remove('active');
+  btnOrtakDisi.classList.remove('active');
+  // Tıklanan butona 'active' sınıfını ekle
+  clickedButton.classList.add('active');
+
+  if (tip === 'ortak-ici') {
+    ortakIciPanel.style.display = 'block';
+    ortakDisiPanel.style.display = 'none';
+  } else {
+    ortakIciPanel.style.display = 'none';
+    ortakDisiPanel.style.display = 'block';
+  }
+}
+
+/**
+ * Giriş yapılacak stoklar bölümüne yeni bir satır ekler.
+ */
+function addStockRowGiris() {
+  const container = document.getElementById('stockRowsContainer');
+  const newRow = document.createElement('div');
+  newRow.className = 'stock-row'; // cikis.html ile aynı class
+
+  // TODO: Stok listesi API'den çekilecek
+  newRow.innerHTML = `
+      <select class="form-control">
+          <option value="">Stok Kodu Seç...</option>
+          <option value="STK001">STK001</option>
+      </select>
+      <select class="form-control">
+          <option value="">Stok Adı Seç...</option>
+          <option value="ÜRÜN A">ÜRÜN A</option>
+      </select>
+      <input type="number" class="form-control" placeholder="0">
+      <select class="form-control">
+          <option value="Kg">Kg</option>
+          <option value="Ton">Ton</option>
+          <option value="Lt">Lt</option>
+          <option value="Adet">Adet</option>
+      </select>
+      <button class="btn-remove" onclick="removeStockRow(this)"><i class="fas fa-trash"></i></button>
+  `; // Silme butonu için cikis.html'deki removeStockRow() kullanılabilir
+  container.appendChild(newRow);
+}
+
+
+/**
+ * Depo giriş kaydını kaydeder.
+ */
+function saveGirisKaydi() {
+  console.log('Depo giriş kaydı kaydediliyor...');
+  // TODO: Formdaki verileri topla (Müşteri tipi, no/ad, stok satırları)
+  // TODO: Google Sheets API'ye verileri gönder
+  
+  alert('Giriş kaydı kaydediliyor... (Henüz API bağlı değil)');
+}
+
+
+// Bu sayfa yüklendiğinde ilk verileri ayarlamak için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'giris.html' sayfasındaysak
+  if (document.querySelector(".entry-container")) {
+    initGirisSayfasi();
+  }
+});
+
+/**
+ * Depo Giriş sayfasını başlatır (Tarih, Kullanıcı, Stok Listesi).
+ */
+function initGirisSayfasi() {
+  // Tarih ve Kullanıcıyı ayarla
+  document.getElementById('tarih').value = new Date().toLocaleDateString('tr-TR');
+  document.getElementById('kullanici').value = 'Okan KOTAN'; // Örnek
+
+  // Stok listesini yükle ve butonu aktifleştir
+  console.log('Stok listesi yükleniyor (Giriş)...');
+  // TODO: API'den stok listesini çekip select kutularına doldur
+  setTimeout(() => { // API çağrısını simüle et
+      const btnAddStock = document.getElementById('btnAddStock');
+      btnAddStock.innerHTML = '<i class="fas fa-plus"></i> Stok Ekle';
+      btnAddStock.disabled = false;
+      
+      // TODO: Ortak listelerini de yükle (ortakNo, ortakAdSoyad select'leri)
+      
+  }, 1500); // 1.5 saniye bekle
+}
