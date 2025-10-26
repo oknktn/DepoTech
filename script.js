@@ -1013,3 +1013,156 @@ function initGirisSayfasi() {
       
   }, 1500); // 1.5 saniye bekle
 }
+
+/* ======================================== */
+/* 16. cikis-kayit.html (Depo Çıkış) FONKSİYONLARI */
+/* ======================================== */
+
+/**
+ * Seçilen müşterinin bekleyen çıkış detaylarını yükler.
+ */
+function getDetaylar() {
+  const musteriSelect = document.getElementById('musteriSelect');
+  const selectedMusteri = musteriSelect.value;
+  const detayTablosuDiv = document.getElementById('detaylarTablosu');
+  const tableBody = document.getElementById('dataTableBody');
+
+  if (!selectedMusteri) {
+    detayTablosuDiv.style.display = 'none'; // Müşteri seçili değilse tabloyu gizle
+    tableBody.innerHTML = ''; // İçeriği temizle
+    return;
+  }
+  
+  detayTablosuDiv.style.display = 'block'; // Tabloyu göster
+  tableBody.innerHTML = '<tr><td colspan="8" class="loading-text">Müşteri detayları yükleniyor...</td></tr>'; 
+  
+  console.log(`Müşteri ${selectedMusteri} için çıkış detayları yükleniyor...`);
+  // TODO: Google Sheets API'den seçilen müşterinin bekleyen siparişlerini çek
+  
+  // Örnek Veri
+  setTimeout(() => { 
+    // Örnek: Müşterinin 'Veresiye' sayfasındaki eşleşen kayıtları
+    const data = [
+      { id: 'satir1', tarih: '27.10.2025', kod: 'STK001', ad: 'Gübre A', siparis: 500, birim: 'Kg', cikan: 200 },
+      { id: 'satir2', tarih: '26.10.2025', kod: 'STK005', ad: 'Yem B', siparis: 2, birim: 'Ton', cikan: 0 },
+      { id: 'satir3', tarih: '25.10.2025', kod: 'STK001', ad: 'Gübre A', siparis: 100, birim: 'Kg', cikan: 100 }, // Bu tamamlanmış
+    ];
+    
+    tableBody.innerHTML = ''; 
+    
+    const relevantData = data.filter(item => (item.siparis || 0) > (item.cikan || 0)); // Sadece kalanı olanları göster
+
+    if (relevantData.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="8" class="loading-text">Seçilen müşteri için bekleyen çıkış kaydı bulunamadı.</td></tr>';
+      return;
+    }
+
+    relevantData.forEach(item => {
+      const row = tableBody.insertRow();
+      row.dataset.rowId = item.id; // Satırı Sheets'teki ID ile ilişkilendir
+      
+      const siparisMiktari = parseFloat(item.siparis || 0);
+      const toplamCikan = parseFloat(item.cikan || 0);
+      const kalan = siparisMiktari - toplamCikan;
+
+      row.insertCell().textContent = item.tarih || '';
+      row.insertCell().textContent = item.kod || '';
+      row.insertCell().textContent = item.ad || '';
+      row.insertCell().textContent = siparisMiktari; // Sipariş Miktarı
+      row.insertCell().textContent = item.birim || '';
+      row.insertCell().textContent = toplamCikan; // Toplam Çıkan
+      row.insertCell().textContent = kalan; // Kalan
+      row.cells[6].classList.add('kalan-td'); // Kalan hücresine stil ekle
+      
+      // Bu Sefer Çıkan Miktar input'u
+      const cikanInputCell = row.insertCell();
+      cikanInputCell.innerHTML = `<input type="number" class="cikan-miktar-input" placeholder="0" max="${kalan}">`;
+      
+      // Tamamlanmış satırları (kalan=0) pasif yap (opsiyonel)
+      if (kalan <= 0) {
+          row.style.opacity = "0.6";
+          row.querySelector('.cikan-miktar-input').disabled = true;
+          row.querySelector('.cikan-miktar-input').value = ''; 
+      }
+    });
+  }, 1000); 
+}
+
+/**
+ * Girilen çıkış miktarlarını kaydeder.
+ */
+function kaydetCikis() {
+    const tableBody = document.getElementById('dataTableBody');
+    const rows = tableBody.querySelectorAll('tr');
+    const dataToSave = [];
+
+    rows.forEach(row => {
+        const rowId = row.dataset.rowId; // Sheets'teki satır ID'si
+        const inputElement = row.querySelector('.cikan-miktar-input');
+        
+        if (inputElement && !inputElement.disabled) {
+            const cikanMiktar = parseFloat(inputElement.value) || 0;
+            if (cikanMiktar > 0) {
+                // Kaydedilecekler listesine ekle
+                dataToSave.push({
+                    id: rowId, // Hangi satırın güncelleneceği
+                    miktar: cikanMiktar // Ne kadar çıkış yapıldığı
+                });
+            }
+        }
+    });
+
+    if (dataToSave.length === 0) {
+        alert('Kaydedilecek bir çıkış miktarı girilmedi.');
+        return;
+    }
+
+    console.log('Kaydedilecek Çıkışlar:', dataToSave);
+    // TODO: Google Sheets API'ye 'dataToSave' dizisini gönder.
+    // API tarafında:
+    // 1. İlgili satırları ID ile bul.
+    // 2. 'Toplam Çıkan' sütununu güncelle (eski değer + yeni miktar).
+    // 3. İsteğe bağlı: Ayrı bir 'Çıkış Hareketleri' sayfasına yeni kayıt ekle.
+    
+    alert('Çıkışlar kaydediliyor... (Henüz API bağlı değil)');
+    
+    // Başarılı kayıttan sonra tabloyu yenilemek iyi olabilir
+    getDetaylar(); 
+}
+
+
+// Bu sayfa yüklendiğinde müşteri listesini çekmek için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'cikis-kayit.html' sayfasındaysak
+  if (document.getElementById("musteriSelect") && document.getElementById("detaylarTablosu")) {
+    loadMusteriListesiCikis();
+  }
+});
+
+/**
+ * Müşteri listesini yükler (çıkış kaydı sayfası için).
+ */
+function loadMusteriListesiCikis() {
+  const selectElement = document.getElementById('musteriSelect');
+  selectElement.innerHTML = '<option value="">Yükleniyor...</option>'; 
+  
+  console.log('Müşteri listesi yükleniyor (Çıkış Kaydı)...');
+  // TODO: Google Sheets API'den bekleyen çıkışı olan müşterilerin listesini çek
+  // (Hem Ortak İçi hem Ortak Dışı olabilir)
+  
+  // Örnek Veri
+  setTimeout(() => { 
+    const musteriler = [
+        { value: 'OID-123', text: 'Ali Veli (Ortak İçi - 123)' },
+        { value: 'OD-Ayse', text: 'Ayşe Fatma (Ortak Dışı)' },
+        { value: 'OID-456', text: 'Zeynep Su (Ortak İçi - 456)' }
+    ]; 
+    selectElement.innerHTML = '<option value="">-- Müşteri Seçiniz --</option>'; 
+    musteriler.forEach(musteri => {
+      const option = document.createElement('option');
+      option.value = musteri.value; // Belki müşteri ID'si veya AdSoyad olabilir
+      option.textContent = musteri.text;
+      selectElement.appendChild(option);
+    });
+  }, 1000); 
+}
