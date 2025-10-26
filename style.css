@@ -1523,3 +1523,138 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 #yeniKayitModal .form-group {
     margin-bottom: 15px;
 }
+
+/* ======================================== */
+/* 23. sayim.html (Stok Sayım) STİLLERİ */
+/* ======================================== */
+
+/* Header kontrol alanı */
+.stock-count-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Excel yükleme etiketi */
+.file-label {
+  background-color: var(--light-green);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600; /* Eklendi */
+}
+.file-label:hover { background-color: #256d48; }
+#fileInput { display: none; } /* Gizli dosya inputu */
+
+/* Excel durumu metni */
+#excelStatus {
+  font-size: 12px; /* Küçük */
+  font-style: italic;
+  margin-left: 5px;
+  color: var(--white); /* Header'da beyaz görünsün */
+}
+
+/* Stok türü filtresi */
+.stock-count-select {
+  padding: 6px 10px; /* İç boşluk */
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  font-size: 13px;
+  min-width: 180px; /* Genişlik */
+}
+
+/* Başlat ve Yazdır butonları */
+.btn-start {
+  background-color: var(--orange);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600; /* Eklendi */
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.btn-start:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+.print-button {
+    background-color: var(--light-green); /* Yazdır butonu yeşil */
+}
+.print-button:hover {
+    background-color: var(--green);
+}
+
+
+/* Tablo Konteyneri */
+.stock-count-container {
+  max-width: 98%; 
+  background-color: var(--white); 
+  border-radius: 8px; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+  overflow-x: auto; /* Yatay scroll */
+}
+
+/* Tablo Stilleri */
+.stock-count-container table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  margin-top: 0;
+}
+.stock-count-container th, 
+.stock-count-container td { 
+  padding: 6px 8px; /* Daha sıkışık */
+  border: 1px solid var(--border-color); 
+  font-size: 11px; /* Çok küçük font */
+  text-align: left; 
+  vertical-align: middle; 
+  white-space: nowrap; 
+}
+.stock-count-container thead th { 
+  background-color: var(--light-green); 
+  color: var(--white); 
+  position: sticky; 
+  top: 0; 
+  z-index: 10; 
+}
+.stock-count-container tbody tr:nth-child(even) { 
+  background-color: var(--tkk-light-gray); 
+}
+
+/* Düzenlenebilir "Mevcut" inputu */
+.editable-input {
+  width: 100%;
+  min-width: 70px; /* Minimum genişlik */
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  text-align: right; /* Sağa yaslı */
+  font-size: 11px;
+}
+
+/* Salt okunur hücreler */
+.read-only-cell {
+  background-color: #f8f9fa;
+}
+
+/* Durum renkleri */
+.status-noksan { color: var(--tkk-red); font-weight: bold; }
+.status-fazla { color: #007bff; font-weight: bold; } /* Mavi */
+.status-tam { color: var(--green); }
+
+/* Yükleniyor / Başlangıç Mesajı */
+.stock-count-container .loading-text,
+.stock-count-container .initial-message {
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+    color: var(--tkk-green);
+}
