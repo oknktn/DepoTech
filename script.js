@@ -26,6 +26,12 @@ window.addEventListener('load', () => {
     }, 1000); // 1s bekleme süresi
   }
 });
+
+// --- Global Değişkenler (Stok Ekleme için) ---
+const birimListesiStokEkle = ['Adet', 'Kg', 'Koli', 'Lt', 'Metre', 'Paket', 'Ton'];
+// ambalajListesi, stokTuruListesi, birimKosullari zaten stok-guncelle için tanımlanmıştı, tekrar gerek yok.
+// --- --- ---
+
 /**
  * Menü linklerinden tıklandığında sayfaya yönlendirme yapar.
  * @param {string} page Gidilecek sayfanın adı (örn: 'pesin.html').
@@ -1587,3 +1593,112 @@ document.addEventListener("DOMContentLoaded", () => {
     loadStokYonetimData(); 
   }
 });
+
+/* ======================================== */
+/* 20. stok-ekle.html (Yeni Stok Ekle) FONKSİYONLARI */
+/* ======================================== */
+
+/**
+ * Belirli bir select kutusunu verilen seçeneklerle doldurur.
+ * @param {string} selectId Doldurulacak select elementinin ID'si.
+ * @param {Array} options Seçenekler dizisi.
+ */
+function populateSelect(selectId, options) {
+    const select = document.getElementById(selectId);
+    if (!select) return; // Element yoksa çık
+    
+    select.innerHTML = '<option value="">Seçiniz</option>'; // Önce temizle
+    options.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt;
+        option.textContent = opt;
+        select.appendChild(option);
+    });
+}
+
+/**
+ * Hamaliye Ambalajı değiştiğinde Hamaliye Birimi listesini günceller (Stok Ekle sayfası için).
+ * @param {string} yeniAmbalaj Seçilen yeni ambalaj değeri.
+ */
+function guncelleBirimListesiStokEkle(yeniAmbalaj) {
+    const birimSelect = document.getElementById('hamaliyeBirim');
+    if (!birimSelect) return; // Element yoksa çık
+    
+    // birimKosullari global değişkenini kullan (stok-guncelle'den)
+    const yeniBirimler = birimKosullari[yeniAmbalaj] || []; 
+    birimSelect.innerHTML = '<option value="">Seçiniz</option>'; // Temizle
+    
+    yeniBirimler.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt;
+        option.textContent = opt;
+        birimSelect.appendChild(option);
+    });
+}
+
+/**
+ * Yeni stok kaydını kaydeder.
+ */
+function saveNewStok() {
+    const stokData = {
+        kod: document.getElementById('stokKodu').value.trim(),
+        ad: document.getElementById('stokAdi').value.trim(),
+        birim: document.getElementById('birim').value,
+        hamaliyeAmbalaj: document.getElementById('hamaliyeAmbalaj').value,
+        hamaliyeBirim: document.getElementById('hamaliyeBirim').value,
+        stokTuru: document.getElementById('stokTuru').value
+    };
+    
+    // Zorunlu alan kontrolü
+    if (!stokData.kod || !stokData.ad) {
+        alert("Stok Kodu ve Stok Adı alanları zorunludur.");
+        return;
+    }
+    
+    console.log('Yeni Stok Kaydediliyor:', stokData);
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) loadingOverlay.style.display = 'flex';
+    
+    // TODO: Google Sheets API'ye yeni stok verisini gönder
+    // API Çağrısı: addNewStok(stokData);
+    
+    // --- Örnek API Yanıt Simülasyonu ---
+    setTimeout(() => { 
+        const success = Math.random() > 0.1; // %90 başarılı olsun
+        const message = success ? `Stok "${stokData.kod}" başarıyla eklendi.` : `Hata: Stok "${stokData.kod}" eklenemedi!`;
+        
+        if (loadingOverlay) loadingOverlay.style.display = 'none';
+        alert(message); // Basit alert ile bildirim
+        
+        if (success) {
+            // Formu sıfırla
+            const form = document.getElementById('stokEkleForm');
+            if (form) form.reset();
+            // Hamaliye Birimi listesini de sıfırla
+            guncelleBirimListesiStokEkle(''); 
+        }
+    }, 1000); // 1 saniye bekle
+    // --- --- ---
+}
+
+
+// Bu sayfa yüklendiğinde select kutularını doldurmak için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'stok-ekle.html' sayfasındaysak (form ID'si varsa)
+  if (document.getElementById("stokEkleForm")) {
+    initStokEkleSayfasi();
+  }
+});
+
+/**
+ * Yeni Stok Ekle sayfasını başlatır (Select kutularını doldurur).
+ */
+function initStokEkleSayfasi() {
+    // Global listeleri kullanarak select'leri doldur
+    populateSelect('birim', birimListesiStokEkle);
+    populateSelect('stokTuru', stokTuruListesi); // stok-guncelle'den gelen global liste
+    populateSelect('hamaliyeAmbalaj', ambalajListesi); // stok-guncelle'den gelen global liste
+    
+    // Başlangıçta Hamaliye Birimi'ni boşalt/güncelle
+    guncelleBirimListesiStokEkle(''); 
+}
