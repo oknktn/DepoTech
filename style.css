@@ -1890,24 +1890,66 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .btn-kaydet { background-color: var(--tkk-orange); color: white; }
 
 
-/* Toplamlar paneli */
+/* Toplamlar paneli - YENİ GRID DÜZENİ */
 .toplam-container {
-  display: flex;
-  align-items: flex-end; /* Öğeleri alta hizala */
+  display: grid;
+  /* 3 Sütun: Toplamlar (geniş), Genel Toplam (orta), Kaydet (dar) */
+  grid-template-columns: 4fr 3fr 1fr; 
   gap: 20px;
+  align-items: end; /* Öğeleri (özellikle butonu) dikeyde alta hizala */
 }
-.toplam-grup { flex: 4; } /* Toplamlar daha geniş */
-.genel-toplam-grup { flex: 3; } /* Genel toplam orta */
-.kaydet-grup { flex: 1; display: flex; align-items: center; } /* Kaydet butonu dar */
 
-.toplam-container .panel-title { text-align: center; font-size: 18px; }
-.toplam-container .form-group { text-align: center; }
-.toplam-container .form-control { font-weight: bold; } /* Toplamlar kalın */
+/* Sütun grupları için ek stil gerekmiyor (grid hallediyor) */
+/* .toplam-grup, .genel-toplam-grup, .kaydet-grup { ... } kuralları silindi */
 
+/* Toplamlar ve Genel Toplam içindeki alt ızgara (Yem/Gübre/Diğer ve Tonaj/Tutar) */
+/* .fiyat-grid'i burada da kullanmaya devam edebiliriz, sorun olmamalı */
+.toplam-container .fiyat-grid {
+    display: flex; /* İçerikleri yan yana dizer */
+    gap: 10px; /* İçerikler arası boşluk */
+    justify-content: center; /* İçerikleri ortala */
+}
+.toplam-container .fiyat-grid .form-group {
+    flex: 1; /* Inputlar eşit genişlesin */
+}
+
+
+/* Başlıklar */
+.toplam-container .panel-title { 
+  text-align: center; 
+  font-size: 18px; 
+  /* Altındaki yeşil çizgiyi ekleyelim */
+  border-bottom: 2px solid var(--tkk-light-green); 
+  padding-bottom: 5px;
+  margin-bottom: 15px; /* Başlıkla içerik arası boşluk */
+}
+
+/* Toplam input etiketleri ve inputları */
+.toplam-container .form-group { 
+    text-align: center; 
+}
+.toplam-container .form-label { /* Etiketler için eklenen stil */
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+.toplam-container .form-control { 
+    font-weight: bold; /* Toplamlar kalın */
+    text-align: center; /* Toplamları ortala */
+}
+
+/* Kaydet Butonu */
+.kaydet-grup {
+    display: flex; /* Butonun dikey hizalaması için */
+    align-items: center;
+    height: 100%; /* Sütunun tüm yüksekliğini kapla */
+}
 .btn-toplam-kaydet {
   width: 100%;
-  height: 78px; /* Yüksek buton */
-  font-size: 16px; /* Büyük yazı */
+  /* Yüksekliği otomatik ayarlansın veya inputlarla aynı yapalım */
+  height: 78px; /* İsteğiniz üzerine */
+  font-size: 16px; 
 }
 
 /* Fiş Hesaplama Paneli */
