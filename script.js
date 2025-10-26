@@ -1,32 +1,30 @@
-// script.js
-
-// --- YERİNE BU YENİ KODU EKLEYİN ---
-
+// GÜNCELLENMİŞ YÜKLEME FONKSİYONU
 window.addEventListener('load', () => {
-  // Önce elementlerin var olup olmadığını kontrol et
   const loadingScreen = document.getElementById('loadingScreen');
   const mainScreen = document.getElementById('mainScreen');
 
-  // EĞER bu elementler sayfada VARSA (yani index.html'deysek),
-  // yükleme ekranı animasyonunu çalıştır.
+  // Önce yükleme animasyonunu her iki sayfada da çalıştır
   if (loadingScreen && mainScreen) {
-    
-    // Sadece index.html'de çalışacak kod
     setTimeout(() => {
       loadingScreen.style.opacity = '0';
-
       setTimeout(() => {
         loadingScreen.style.display = 'none';
         mainScreen.style.display = 'block';
         
-        // Bu fonksiyonlar da sadece index'te çalışsın
-        updateDate();
-        loadInfoPanelData();
-      }, 500);
-    }, 1500);
+        // ŞİMDİ HANGİ SAYFADA OLDUĞUMUZU KONTROL EDELİM
+        if (document.querySelector('.menu-column')) {
+            // Sadece index.html'de ise bunları çalıştır
+            updateDate();
+            loadInfoPanelData();
+        } 
+        else if (document.getElementById('fisNo')) {
+            // Sadece cikis.html'de ise bunları çalıştır
+            initCikisFisi(); 
+        }
+
+      }, 500); // 0.5s animasyon süresi
+    }, 1000); // 1s bekleme süresi
   }
-  
-  // (pesin.html'deysek bu 'if' bloğu atlanacak ve hata oluşmayacak)
 });
 /**
  * Menü linklerinden tıklandığında sayfaya yönlendirme yapar.
@@ -319,4 +317,126 @@ function runAllCalculations() {
           kasaDurumAciklama.classList.add("kasa-fazla");
       }
   }
+}
+/* ======================================== */
+/* 8. cikis.html (Çıkış Fişi) FONKSİYONLARI */
+/* ======================================== */
+
+/**
+ * Çıkış fişi sayfası yüklendiğinde ilk verileri ayarlar.
+ */
+function initCikisFisi() {
+  // TODO: Fiş No, Tarih ve Kullanıcı API'den çekilecek
+  document.getElementById('tarih').value = new Date().toLocaleDateString('tr-TR');
+  document.getElementById('fisNo').value = 'CF-2025-001'; // Örnek
+  document.getElementById('kullanici').value = 'Okan KotAN'; // Örnek
+  
+  // TODO: Ortak ve Stok listeleri API'den çekilecek
+}
+
+/**
+ * Müşteri tipini (Ortak İçi / Ortak Dışı) değiştirir.
+ */
+function toggleCustomerType() {
+  const btn = document.getElementById('customerTypeBtn');
+  const ortakIci = document.getElementById('ortakIciDetails');
+  const ortakDisi = document.getElementById('ortakDisiDetails');
+  const newCustomerBtn = document.getElementById('newCustomerBtn');
+
+  if (btn.classList.contains('ortak-disi')) {
+    // Ortak İçi'ne geç
+    btn.classList.remove('ortak-disi');
+    btn.classList.add('ortak-ici');
+    btn.textContent = 'Ortak İçi';
+    
+    ortakDisi.classList.remove('active');
+    ortakIci.classList.add('active');
+    
+    newCustomerBtn.textContent = 'Yeni Ortak Kayıt';
+    newCustomerBtn.onclick = openOrtakModal; // Onclick fonksiyonunu değiştir
+  } else {
+    // Ortak Dışı'na geç
+    btn.classList.remove('ortak-ici');
+    btn.classList.add('ortak-disi');
+    btn.textContent = 'Ortak Dışı';
+    
+    ortakIci.classList.remove('active');
+    ortakDisi.classList.add('active');
+    
+    newCustomerBtn.textContent = 'Yeni Ortak Dışı Kayıt';
+    newCustomerBtn.onclick = openOrtakDisiModal; // Onclick fonksiyonunu değiştir
+  }
+}
+
+/**
+ * Stok bilgileri bölümüne yeni bir satır ekler.
+ */
+function addStockRow() {
+  const container = document.getElementById('stockRowsContainer');
+  const newRow = document.createElement('div');
+  newRow.className = 'stock-row';
+  
+  // TODO: Stok listesi API'den çekilecek
+  newRow.innerHTML = `
+    <div>
+        <span class="stock-label">Stok Kodu</span>
+        <select class="form-control"><option value="">Seç...</option><option value="STK001">STK001</option></select>
+    </div>
+    <div>
+        <span class="stock-label">Stok Adı</span>
+        <select class="form-control"><option value="">Seç...</option><option value="GÜBRE">GÜBRE</option></select>
+    </div>
+    <div>
+        <span class="stock-label">Miktar</span>
+        <input type="number" class="form-control" placeholder="0">
+    </div>
+    <div>
+        <span class="stock-label">Birim</span>
+        <select class="form-control"><option value="Kg">Kg</option><option value="Ton">Ton</option><option value="Lt">Lt</option><option value="Adet">Adet</option></select>
+    </div>
+    <button class="remove-stock-btn" onclick="removeStockRow(this)"><i class="fas fa-trash"></i></button>
+  `;
+  container.appendChild(newRow);
+}
+
+/**
+ * Bir stok satırını kaldırır.
+ * @param {HTMLElement} button Tıklanan silme butonu.
+ */
+function removeStockRow(button) {
+  button.parentElement.remove(); // Tüm .stock-row elementini sil
+}
+
+/**
+ * Formu kaydetme işlemini başlatır.
+ */
+function saveForm() {
+  // TODO: Google Sheets API'ye veri gönderme
+  alert('Form Kaydediliyor... (Henüz API bağlı değil)');
+}
+
+/* === Modal (Açılır Pencere) Fonksiyonları === */
+
+function openOrtakModal() {
+  document.getElementById('yeniOrtakModal').style.display = 'flex';
+}
+function closeOrtakModal() {
+  document.getElementById('yeniOrtakModal').style.display = 'none';
+}
+function saveNewOrtakFromCikis() {
+  // TODO: API'ye yeni ortak kaydı
+  alert('Yeni Ortak Kaydediliyor...');
+  closeOrtakModal();
+}
+
+function openOrtakDisiModal() {
+  document.getElementById('yeniOrtakDisiModal').style.display = 'flex';
+}
+function closeOrtakDisiModal() {
+  document.getElementById('yeniOrtakDisiModal').style.display = 'none';
+}
+function saveNewOrtakDisiFromCikis() {
+  // TODO: API'ye yeni ortak dışı kaydı
+  alert('Yeni Ortak Dışı Kaydediliyor...');
+  closeOrtakDisiModal();
 }
