@@ -192,10 +192,9 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .top-grid {
   display: grid;
   /* 3 sütunlu ızgara, her biri en az 300px, 
-     alan yetmezse alt alta geçerler */
+     alan yetmezse alt alta geçerler (mobil için) */
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
-  /* margin-bottom: 20px; 'panel' zaten margin-bottom: 20px alıyor */
 }
 
 /* 'top-grid' içindeki panellerin alt boşluğunu kaldır */
@@ -203,7 +202,7 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   margin-bottom: 0;
 }
 
-/* Minimalize stil (sol sütun için değil, tüm paneller için) */
+/* Minimalize stil */
 .panel-title { font-size: 16px; margin-bottom: 8px; padding-bottom: 4px; }
 .form-control { height: 26px; padding: 4px 6px; font-size: 12px; }
 .kasa-durum-grid label { font-size: 12px; }
@@ -266,12 +265,12 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 }
 
 /* PANEL İÇİ KAYDIRMA ÇUBUKLARI (GEREKİRSE) */
-/* Artık paneller esnemediği için 'boşluk' sorunu olmaz */
+/* "Ciddi Boşluk" sorununu çözmek için flex-grow: 0 */
 #paraSayiContainer,
 #duzeltmeContainer,
 #satisKayitlariContainer {
   overflow-y: auto; 
-  flex-grow: 0; /* BÜYÜMEYİ ENGELLE */
+  flex-grow: 0; /* BOŞLUK SORUNUNU ÇÖZER */
   max-height: 300px; /* Sığmazsa kaysın (5 satır sığar) */
 }
 
@@ -299,7 +298,6 @@ input:read-only { background-color: #f0f0f0; color: #333; }
     box-sizing: border-box; 
   }
   
-  /* pesin.html'deki .top-grid'in (zaten auto-fit) 
-     düzgün çalışması için ekstra kurala gerek yok,
+  /* pesin.html'deki .top-grid (auto-fit) 
      otomatik olarak alt alta geçecektir. */
 }
