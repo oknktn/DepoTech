@@ -794,3 +794,120 @@ document.addEventListener("DOMContentLoaded", () => {
     loadVeresiyeData();
   }
 });
+
+/* ======================================== */
+/* 14. liste.html (Çıkış Listesi) FONKSİYONLARI */
+/* ======================================== */
+
+/**
+ * Tarih filtreleme alanını gösterir/gizler.
+ */
+function toggleDateFilter() {
+  const filterDiv = document.getElementById('dateFilter');
+  if (filterDiv.style.display === 'flex') {
+    filterDiv.style.display = 'none';
+  } else {
+    filterDiv.style.display = 'flex';
+    // Açıldığında tarih inputlarına bugünü ata (opsiyonel)
+    const today = new Date().toISOString().split('T')[0];
+    if (!document.getElementById('startDate').value) {
+        document.getElementById('startDate').value = today;
+    }
+     if (!document.getElementById('endDate').value) {
+        document.getElementById('endDate').value = today;
+    }
+  }
+}
+
+/**
+ * Belirtilen tarih aralığındaki verileri yükler.
+ */
+function fetchFilteredData() {
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+  
+  if (!startDate || !endDate) {
+    alert('Lütfen başlangıç ve bitiş tarihlerini seçiniz.');
+    return;
+  }
+  
+  console.log(`Veriler ${startDate} ile ${endDate} arası için filtreleniyor...`);
+  loadGenericListData({ startDate: startDate, endDate: endDate }); // Genel yükleme fonksiyonunu çağır
+}
+
+/**
+ * Tüm verileri yükler (filtresiz).
+ */
+function fetchAllData() {
+  console.log('Tüm veriler yükleniyor...');
+  loadGenericListData({}); // Genel yükleme fonksiyonunu filtresiz çağır
+}
+
+/**
+ * Genel liste verilerini yükler ve tabloyu doldurur.
+ * @param {object} filter Filtreleme seçenekleri (örn: {startDate, endDate})
+ */
+function loadGenericListData(filter = {}) {
+  const tableBody = document.getElementById('dataTableBody');
+  if (!tableBody) return; // Yanlış sayfadaysak çık
+  
+  tableBody.innerHTML = '<tr><td colspan="12" class="loading-text">Liste yükleniyor...</td></tr>'; 
+  
+  console.log('Liste verileri yükleniyor... Filtre:', filter);
+  // TODO: Google Sheets API'den Çıkış Listesi verilerini çek (filter objesini kullanarak)
+  
+  // Örnek Veri (veresiye ile aynı)
+  setTimeout(() => { 
+    const data = [
+      { tarih: '27.10.2025', fisNo: 'CF-001', kullanici: 'Okan K.', satisTuru: 'Peşin', musteriTipi: 'Ortak Dışı', ortakNo: '', adSoyad: 'Deniz Can', stokKodu: 'STK002', stokAdi: 'Tohum C', miktar: 100, birim: 'Kg', aciklama: 'Ödendi' },
+      { tarih: '26.10.2025', fisNo: 'CF-002', kullanici: 'Okan K.', satisTuru: 'Veresiye', musteriTipi: 'Ortak İçi', ortakNo: '456', adSoyad: 'Zeynep Su', stokKodu: 'STK001', stokAdi: 'Gübre A', miktar: 1, birim: 'Ton', aciklama: '' },
+      // ... daha fazla satır
+    ];
+
+    // Örnek Filtreleme (API bunu sunucu tarafında yapmalı)
+    const filteredData = data.filter(item => {
+        if (filter.startDate && item.tarih) {
+            // Tarih formatını YYYY-MM-DD'ye çevirip karşılaştırma (Basit örnek)
+            const itemDate = item.tarih.split('.').reverse().join('-'); 
+            if (itemDate < filter.startDate) return false;
+        }
+        if (filter.endDate && item.tarih) {
+             const itemDate = item.tarih.split('.').reverse().join('-'); 
+             if (itemDate > filter.endDate) return false;
+        }
+        return true;
+    });
+    
+    tableBody.innerHTML = ''; 
+    
+    if (filteredData.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="12" class="loading-text">Belirtilen kriterlere uygun kayıt bulunamadı.</td></tr>';
+      return;
+    }
+
+    filteredData.forEach(item => {
+      const row = tableBody.insertRow(); 
+      row.insertCell().textContent = item.tarih || '';
+      row.insertCell().textContent = item.fisNo || '';
+      row.insertCell().textContent = item.kullanici || '';
+      row.insertCell().textContent = item.satisTuru || '';
+      row.insertCell().textContent = item.musteriTipi || '';
+      row.insertCell().textContent = item.ortakNo || '';
+      row.insertCell().textContent = item.adSoyad || '';
+      row.insertCell().textContent = item.stokKodu || '';
+      row.insertCell().textContent = item.stokAdi || '';
+      row.insertCell().textContent = item.miktar || '';
+      row.insertCell().textContent = item.birim || '';
+      row.insertCell().textContent = item.aciklama || '';
+    });
+  }, 1000); // 1 saniye bekle
+}
+
+
+// Bu sayfa yüklendiğinde varsayılan olarak tüm listeyi çekmek için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'liste.html' sayfasındaysak listeyi yükle
+  if (document.getElementById("dataTableBody")) {
+    fetchAllData(); // Başlangıçta tüm verileri yükle
+  }
+});
