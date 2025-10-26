@@ -1259,3 +1259,54 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 /* Durum Sütunu için renkler (Opsiyonel) */
 .status-devam { color: var(--orange); font-weight: bold; }
 .status-tamam { color: var(--green); font-weight: bold; }
+
+/* ======================================== */
+/* 18. stok-gor.html (Stok Görüntüle) STİLLERİ */
+/* ======================================== */
+
+.stock-view-container {
+  max-width: 95%; /* Geniş konteyner */
+  background-color: var(--white); 
+  border-radius: 8px; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+  overflow-x: auto; /* Yatay scroll */
+}
+
+/* Tablo stilleri (öncekilerle benzer, font biraz daha büyük) */
+.stock-view-container table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  margin-top: 0; 
+}
+.stock-view-container th, 
+.stock-view-container td { 
+  padding: 12px 15px; /* Daha fazla dikey boşluk */
+  border: 1px solid var(--border-color); 
+  text-align: left; 
+  font-size: 14px; /* Standart font boyutu */
+  vertical-align: middle;
+  white-space: normal; /* Uzun stok adları alta kayabilir */
+}
+.stock-view-container thead th { 
+  background-color: var(--light-green); 
+  color: var(--white); 
+  font-weight: 600; 
+  position: sticky; 
+  top: 0; 
+  z-index: 1;
+}
+.stock-view-container tbody tr:nth-child(even) { 
+  background-color: var(--tkk-light-gray); 
+}
+.stock-view-container tbody tr:hover { 
+  background-color: #e9ecef; /* Hover efekti */
+}
+
+/* Yükleniyor... metni */
+.stock-view-container .loading-text {
+    text-align: center;
+    padding: 20px;
+    color: var(--tkk-green);
+    font-weight: bold;
+    font-size: 16px; /* Daha büyük */
+}
