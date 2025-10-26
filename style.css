@@ -1310,3 +1310,86 @@ input:read-only { background-color: #f0f0f0; color: #333; }
     font-weight: bold;
     font-size: 16px; /* Daha büyük */
 }
+
+/* ======================================== */
+/* 19. stok-guncelle.html (Stok Güncelle) STİLLERİ */
+/* ======================================== */
+
+.stock-update-container {
+  max-width: 95%; 
+  background-color: var(--white); 
+  border-radius: 8px; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+  overflow-x: auto; /* Yatay scroll */
+}
+
+/* Tablo stilleri (stok-gor ile benzer) */
+.stock-update-container table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  margin-top: 0; 
+}
+.stock-update-container th, 
+.stock-update-container td { 
+  padding: 8px 10px; /* Biraz daha sıkışık */
+  border: 1px solid var(--border-color); 
+  text-align: left; 
+  font-size: 13px; /* Biraz daha küçük */
+  vertical-align: middle;
+}
+.stock-update-container thead th { 
+  background-color: var(--light-green); 
+  color: var(--white); 
+  font-weight: 600; 
+  position: sticky; 
+  top: 0; 
+  z-index: 1;
+}
+.stock-update-container tbody tr:nth-child(even) { 
+  background-color: var(--tkk-light-gray); 
+}
+
+/* Tablo içindeki Select kutuları */
+.stock-update-container .form-select {
+  width: 100%;
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  font-size: 13px; /* Tablo fontuyla aynı */
+  min-width: 100px; /* Minimum genişlik */
+}
+
+/* Yükleniyor... metni */
+.stock-update-container .loading-text {
+    text-align: center;
+    padding: 20px;
+    color: var(--tkk-green);
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Satır vurgulama stilleri */
+.row-success { 
+  transition: background-color 0.2s; 
+  background-color: var(--success-color) !important; 
+}
+.row-fail { 
+  transition: background-color 0.2s; 
+  background-color: var(--fail-color) !important; 
+}
+
+/* Bildirim stilleri */
+.notification { 
+  position: fixed; 
+  top: 20px; 
+  right: 20px; 
+  padding: 10px 20px; 
+  border-radius: 5px; 
+  color: white; 
+  z-index: 1000; 
+  display: none; 
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  font-weight: 600;
+}
+.notification.success { background-color: var(--green); }
+.notification.error { background-color: var(--tkk-red); } /* Kırmızı renk */
