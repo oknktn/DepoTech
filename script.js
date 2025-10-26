@@ -371,27 +371,27 @@ function toggleCustomerType() {
 /**
  * Stok bilgileri bölümüne yeni bir satır ekler.
  */
+/**
+ * Stok bilgileri bölümüne yeni bir satır ekler. (BAŞLIKSIZ)
+ */
 function addStockRow() {
   const container = document.getElementById('stockRowsContainer');
   const newRow = document.createElement('div');
   newRow.className = 'stock-row';
   
+  // DÜZELTİLMİŞ: <span class="stock-label"> başlıkları kaldırıldı.
   // TODO: Stok listesi API'den çekilecek
   newRow.innerHTML = `
     <div>
-        <span class="stock-label">Stok Kodu</span>
         <select class="form-control"><option value="">Seç...</option><option value="STK001">STK001</option></select>
     </div>
     <div>
-        <span class="stock-label">Stok Adı</span>
         <select class="form-control"><option value="">Seç...</option><option value="GÜBRE">GÜBRE</option></select>
     </div>
     <div>
-        <span class="stock-label">Miktar</span>
         <input type="number" class="form-control" placeholder="0">
     </div>
     <div>
-        <span class="stock-label">Birim</span>
         <select class="form-control"><option value="Kg">Kg</option><option value="Ton">Ton</option><option value="Lt">Lt</option><option value="Adet">Adet</option></select>
     </div>
     <button class="remove-stock-btn" onclick="removeStockRow(this)"><i class="fas fa-trash"></i></button>
