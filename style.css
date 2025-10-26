@@ -676,3 +676,64 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .cancel-container .form-group {
   margin-bottom: 20px;
 }
+
+/* ======================================== */
+/* 12. fiyat.html (Fiyat Listesi) STİLLERİ */
+/* ======================================== */
+
+.price-list-container {
+  max-width: 1100px; /* Diğerlerinden biraz daha geniş olabilir */
+}
+
+/* Fiyat listesi ızgara yapısı */
+.price-list-header,
+.price-list-row {
+  display: grid;
+  /* Stok Kodu, Adı, Satış, Maliyet, Kar */
+  grid-template-columns: 1fr 3fr 1fr 1fr 1fr; 
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Başlık satırı stili */
+.price-list-header {
+  font-weight: 600;
+  padding: 10px;
+  background-color: var(--gray);
+  border-radius: 4px;
+  margin-bottom: 15px;
+  color: var(--dark);
+}
+
+/* Satırlardaki inputlar için ek stiller */
+.price-list-row .form-control {
+  height: 30px; /* Standart yükseklik */
+  font-size: 13px;
+}
+
+/* Salt okunur alanları biraz daha soluk yapalım */
+.price-list-row input[readonly] {
+  background-color: #e9ecef;
+  border-color: transparent; /* Kenarlığı gizle */
+}
+
+/* Fiyat ve Maliyet inputları için (düzenlenebilir) */
+.price-list-row .price-input {
+  background-color: var(--white); /* Düzenlenebilir olduğunu belirt */
+  border: 1px solid var(--border-color);
+}
+
+/* Kar oranı inputu */
+.price-list-row .profit-margin {
+   font-weight: 600;
+   text-align: right;
+   padding-right: 15px; /* % işareti için yer */
+}
+
+/* Fiyat listesi satırları için scroll (gerekirse) */
+#priceListRowsContainer {
+  max-height: 60vh; /* Ekran yüksekliğinin %60'ı kadar */
+  overflow-y: auto;
+  padding-right: 5px; /* Scrollbar için küçük boşluk */
+}
