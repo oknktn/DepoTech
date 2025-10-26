@@ -521,3 +521,82 @@ function loadFisNumaralari() {
     });
   }, 1000); // 1 saniye bekle
 }
+
+/* ======================================== */
+/* 11. iptal.html (Fiş İptal) FONKSİYONLARI */
+/* ======================================== */
+
+/**
+ * İptal sebebi "Diğer" seçildiğinde özel sebep alanını gösterir/gizler.
+ */
+function toggleOzelSebep() {
+  const sebepSelect = document.getElementById('iptalSebebiSelect');
+  const ozelSebepContainer = document.getElementById('ozelSebepContainer');
+  
+  if (sebepSelect.value === 'Diğer') {
+    ozelSebepContainer.style.display = 'block';
+  } else {
+    ozelSebepContainer.style.display = 'none';
+    document.getElementById('ozelSebepInput').value = ''; // Gizlenince içeriği temizle
+  }
+}
+
+/**
+ * Fiş iptal işlemini kaydeder.
+ */
+function kaydetIptal() {
+  const selectedFisNo = document.getElementById('fisNoSelect').value;
+  const sebepSelect = document.getElementById('iptalSebebiSelect');
+  const ozelSebepInput = document.getElementById('ozelSebepInput');
+  
+  if (!selectedFisNo) {
+    alert('Lütfen iptal edilecek fiş numarasını seçiniz.');
+    return;
+  }
+  
+  let iptalSebebi = sebepSelect.value;
+  if (iptalSebebi === '') {
+     alert('Lütfen bir iptal sebebi seçiniz.');
+     sebepSelect.focus();
+     return; 
+  }
+  
+  if (iptalSebebi === 'Diğer') {
+    iptalSebebi = ozelSebepInput.value.trim();
+    if (iptalSebebi === '') {
+      alert('Lütfen "Diğer" iptal sebebini detaylı olarak yazınız.');
+      ozelSebepInput.focus();
+      return;
+    }
+  }
+  
+  // Onay istemek iyi bir fikir olabilir
+  if (!confirm(`"${selectedFisNo}" numaralı fişi "${iptalSebebi}" sebebiyle iptal etmek istediğinizden emin misiniz? Bu işlem geri alınamaz!`)) {
+      return;
+  }
+
+  console.log(`Fiş ${selectedFisNo} iptal ediliyor. Sebep: ${iptalSebebi}`);
+  // TODO: Google Sheets API'ye iptal işlemini kaydet
+  
+  alert('Fiş başarıyla iptal edildi.');
+  // İptal sonrası formu temizle veya başka bir sayfaya yönlendir
+  document.getElementById('fisNoSelect').value = '';
+  document.getElementById('fisDetaylari').value = '';
+  document.getElementById('iptalSebebiSelect').value = '';
+  toggleOzelSebep(); // Özel sebebi gizle
+}
+
+
+// Bu sayfa yüklendiğinde de fiş listesini çekmek lazım
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'iptal.html' sayfasındaysak fiş listesini yükle
+  // (Hem select ID'si hem de iptal sebebi ID'si varsa bu sayfadayızdır)
+  if (document.getElementById("fisNoSelect") && document.getElementById("iptalSebebiSelect")) {
+    loadFisNumaralari(); // Fiş Tekrar ile aynı fonksiyonu kullanabiliriz
+  }
+});
+
+/* NOT: loadFisDetaylari() ve loadFisNumaralari() fonksiyonları 
+zaten bir önceki adımda (tekrar.html için) script.js'e eklenmişti. 
+Bu sayfa da aynı fonksiyonları kullanacak.
+*/
