@@ -1057,3 +1057,87 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .btn-save:hover {
     background-color: var(--light-green);
 }
+
+/* ======================================== */
+/* 16. cikis-kayit.html (Depo Çıkış) STİLLERİ */
+/* ======================================== */
+
+.dispatch-container {
+  max-width: 95%; /* Geniş konteyner */
+  background-color: var(--white); 
+  border-radius: 8px; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+
+.dispatch-label {
+  display: block; 
+  font-weight: 600; 
+  margin-bottom: 8px; 
+  font-size: 16px; /* Biraz daha büyük */
+  color: var(--green);
+}
+
+.dispatch-container .form-control {
+  width: 100%; 
+  padding: 10px; 
+  border: 1px solid var(--border-color); 
+  border-radius: 4px;
+  font-size: 14px; /* Standart font boyutu */
+}
+
+/* Detay tablosu */
+#detaylarTablosu {
+    margin-top: 20px;
+}
+#detaylarTablosu table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  margin-top: 20px; 
+}
+#detaylarTablosu th, 
+#detaylarTablosu td { 
+  padding: 8px 12px; 
+  border: 1px solid var(--border-color); 
+  text-align: left; 
+  font-size: 12px; 
+  vertical-align: middle; 
+  white-space: nowrap; /* Satırların alta kaymasını engelle */
+}
+#detaylarTablosu thead th { 
+  background-color: var(--light-green); 
+  color: white; 
+  position: sticky; 
+  top: 0; 
+  z-index: 1;
+}
+
+/* Tablo içindeki input */
+.cikan-miktar-input { 
+  width: 100px; 
+  padding: 5px 8px; /* Biraz daha boşluk */
+  text-align: right; 
+  border-radius: 4px; 
+  border: 1px solid #999; 
+  font-size: 12px;
+}
+
+/* Salt okunur ve Kalan hücreleri */
+.read-only-td { 
+  background-color: #f8f9fa; 
+  color: #555; 
+}
+.kalan-td { 
+  font-weight: bold; 
+  font-size: 13px !important; 
+  color: var(--tkk-red); /* Fiş iptalindeki kırmızı */
+  text-align: center; /* Ortala */
+}
+
+/* Kaydet butonu */
+.dispatch-save-button {
+  width: 100%; 
+  margin-top: 20px; 
+  padding: 12px; 
+  background-color: var(--green); /* Ana kaydet butonu rengi */
+}
