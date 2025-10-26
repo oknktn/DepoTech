@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DepoTech - Hamaliye Hesaplama</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay"><div class="loading-text">Kaydediliyor...</div></div>
+    
+    <div class="header">
+        <button class="back-button header-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Ana Menü</button>
+        <h1 id="pageTitle">Yükleniyor...</h1> <div style="width: 120px;"></div> </div>
+
+    <div class="container hamaliye-container"> <div class="panel">
+            <div class="fiyat-grid">
+                <div class="form-group"><label class="form-label">Yem Fiyatı (TL/Ton)</label><input type="number" step="0.01" id="yemFiyati" class="form-control price-input" readonly oninput="hesaplaTumToplamlari()"></div>
+                <div class="form-group"><label class="form-label">Gübre Fiyatı (TL/Ton)</label><input type="number" step="0.01" id="gubreFiyati" class="form-control price-input" readonly oninput="hesaplaTumToplamlari()"></div>
+                <div class="form-group"><label class="form-label">Diğer Fiyat (TL/Lt,Ad)</label><input type="number" step="0.01" id="digerFiyati" class="form-control price-input" readonly oninput="hesaplaTumToplamlari()"></div>
+                <button id="btnToggleUpdate" class="btn btn-guncelle" data-state="view" onclick="togglePriceEdit(this)">Güncelle</button>
+            </div>
+        </div>
+        
+        <div class="panel toplam-container">
+            <div class="toplam-grup">
+                <h3 class="panel-title">TOPLAMLAR</h3>
+                <div class="fiyat-grid">
+                    <div class="form-group"><label>Yem (Ton)</label><input id="toplamYem" class="form-control" readonly></div>
+                    <div class="form-group"><label>Gübre (Ton)</label><input id="toplamGubre" class="form-control" readonly></div>
+                    <div class="form-group"><label>Diğer (Lt/Ad)</label><input id="toplamDiger" class="form-control" readonly></div>
+                </div>
+            </div>
+            <div class="genel-toplam-grup">
+                <h3 class="panel-title">GENEL TOPLAM</h3>
+                <div class="fiyat-grid">
+                    <div class="form-group"><label>Tonaj (Ton)</label><input id="genelTonaj" class="form-control" readonly></div>
+                    <div class="form-group"><label>Tutar (TL)</label><input id="genelTutar" class="form-control" readonly></div>
+                </div>
+            </div>
+            <div class="kaydet-grup">
+                <button class="btn btn-kaydet btn-toplam-kaydet" onclick="kaydetHesaplama()">Kaydet & Yazdır</button>
+            </div>
+        </div>
+        
+        <div class="panel fis-hesaplama-paneli">
+            <div class="fis-header">
+                <h3 class="panel-title" style="margin:0;">Fiş Detayları</h3>
+                <button id="btnAddFis" class="btn-add-fis" onclick="addFisRow()" disabled><i class="fas fa-spinner fa-spin"></i> Fişler Yükleniyor...</button>
+            </div>
+            <div class="fis-grid-layout fis-table-header">
+                <div>Fiş No</div><div style="text-align: center;">Çift/Tek</div><div>Stok Kodu</div><div>Stok Adı</div><div style="text-align: right;">Miktar</div><div>Stok Türü</div><div style="text-align: right;">Toplam</div><div></div>
+            </div>
+            <div id="fisRowsContainer">
+                 </div>
+        </div>
+    </div>
+</body>
+</html>
