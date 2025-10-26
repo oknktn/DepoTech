@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DepoTech - Fiş Tekrar Yazdır</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-text">İşleniyor...</div>
+    </div>
+
+    <div class="header">
+        <button class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>&nbsp;Ana Menü
+        </button>
+        <h1>Fiş Tekrar Yazdır</h1>
+        <div style="width: 80px;"></div> </div>
+
+    <div class="container reprint-container"> <div class="form-group">
+            <label for="fisNoSelect" class="form-label">Fiş Numarası Seçiniz</label>
+            <select id="fisNoSelect" class="form-control" onchange="loadFisDetaylari()">
+                <option value="">Yükleniyor...</option>
+                </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="fisDetaylari" class="form-label">Fiş İçeriği</label>
+            <textarea id="fisDetaylari" class="form-control reprint-textarea" readonly></textarea>
+        </div>
+        
+        <div class="form-group">
+            <button class="btn btn-primary reprint-button" onclick="tekrarYazdir()">
+                <i class="fas fa-print"></i> Tekrar Yazdır
+            </button>
+        </div>
+    </div>
+</body>
+</html>
