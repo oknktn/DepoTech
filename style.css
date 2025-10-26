@@ -1881,10 +1881,25 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .fiyat-grid input:read-only {
   background-color: #e9ecef;
 }
-.fiyat-grid .btn { /* Güncelle/Kaydet butonu */
-    height: 36px; /* Inputlarla aynı yükseklik */
-    flex-shrink: 0; /* Küçülmesin */
+.fiyat-grid .btn { /* Fiyat Paneli - Güncelle/Kaydet butonu */
+    height: 36px; 
+    flex-shrink: 0; 
     padding: 8px 20px;
+    font-size: 14px; /* Standart buton fontu */
+    font-weight: 600;
+    cursor: pointer;
+    border: none; /* Kenarlık yok */
+    border-radius: 4px;
+    /* Başlangıçta Güncelle (Yeşil) */
+    background-color: var(--tkk-light-green); 
+    color: white; 
+}
+.fiyat-grid .btn.btn-kaydet { /* Kaydet modundayken Turuncu */
+     background-color: var(--tkk-orange); 
+     color: white; 
+}
+.fiyat-grid .btn:hover { /* Hover efekti */
+    opacity: 0.9;
 }
 .btn-guncelle { background-color: var(--tkk-light-green); color: white; }
 .btn-kaydet { background-color: var(--tkk-orange); color: white; }
@@ -1947,9 +1962,23 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 }
 .btn-toplam-kaydet {
   width: 100%;
-  /* Yüksekliği otomatik ayarlansın veya inputlarla aynı yapalım */
-  height: 78px; /* İsteğiniz üzerine */
+  height: 78px; 
   font-size: 16px; 
+  /* Renk (Turuncu) */
+  background-color: var(--tkk-orange);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  /* İkon ve metni ortala */
+  display: inline-flex; 
+  align-items: center;
+  justify-content: center;
+  gap: 8px; 
+}
+.btn-toplam-kaydet:hover {
+    background-color: #e67e22; /* Turuncunun koyusu */
 }
 
 /* Fiş Hesaplama Paneli */
