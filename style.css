@@ -206,12 +206,39 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .panel-title { font-size: 16px; margin-bottom: 8px; padding-bottom: 4px; }
 .form-control { height: 26px; padding: 4px 6px; font-size: 12px; }
 .kasa-durum-grid label { font-size: 12px; }
-.kasa-buton-grup .btn { padding: 6px 10px; font-size: 13px; }
+/* Butonların yeni yüksekliği ve stili */
+.kasa-buton-grup .btn {
+  /* 1. YÜKSEKLİK: 26px'lik mevcut yüksekliğin 2.5 katı = 65px */
+  height: 65px; 
+  
+  /* 2. GENİŞLİK: 4 birim (%40) */
+  flex: 0 0 40%; /* Büyüme yok, küçülme yok, genişlik %40 */
+  
+  /* 3. İkon ve yazıyı ortalamak için */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Diğer stil ayarları */
+  padding: 0; /* Padding'i sıfırla, yüksekliği 'height' ile verdik */
+  font-size: 16px; /* Yazı tipini büyüt */
+  font-weight: 600;
+}
+
+/* Buton konteynerinin yeni düzeni */
 .kasa-buton-grup { 
+  display: flex; /* YAN YANA DİZMEK İÇİN */
   flex-shrink: 0; 
-  margin-top: auto; /* Butonları panelin dibine iter */
-  padding-top: 5px; 
-  border-top: 1px solid #eee;
+  margin-top: auto; /* Panelin dibine iter */
+  border-top: 1px solid #eee; 
+  
+  /* 4. İsteğiniz üzerine BOŞLUK ayarları (0.8 - 0.4 - 0.8) */
+  /* Üst/Alt 10px, Sağ/Sol %8 (0.8 birim) */
+  padding: 10px 8% 10px 8%; 
+  /* Orta boşluk %4 (0.4 birim) */
+  gap: 4%; 
+  
+  box-sizing: border-box; /* Padding'i genişliğe dahil et */
 }
 
 
