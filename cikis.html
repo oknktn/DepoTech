@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DepoTech - Çıkış Fişi</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-text">Çıkış Fişi Yükleniyor...</div>
+    </div>
+
+    <div id="mainScreen" style="display: none;">
+        <div class="header">
+            <button class="back-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Geri</button>
+            <h1>DepoTech - Depo Çıkış Fişi</h1>
+            <div style="width: 60px;"></div> </div>
+        
+        <div class="container">
+            <div class="form-content">
+                <div class="left-panel">
+                    <div class="form-group"><span class="form-label">Tarih:</span><input type="text" id="tarih" class="form-control" readonly></div>
+                    <div class="form-group"><span class="form-label">Fiş Numarası:</span><input type="text" id="fisNo" class="form-control" readonly></div>
+                    <div class="form-group"><span class="form-label">Kullanıcı:</span><input type="text" id="kullanici" class="form-control" readonly></div>
+                    <div class="form-group">
+                        <span class="form-label">Satış Türü:</span>
+                        <select id="satisTuru" class="form-control">
+                            <option value="">Seçiniz</option><option value="Peşin">Peşin</option><option value="Havale">Havale</option><option value="Kredi Kartı">Kredi Kartı</option><option value="Senetli">Senetli</option><option value="Veresiye">Veresiye</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="right-panel">
+                    <div class="customer-type-section">
+                        <button id="customerTypeBtn" class="customer-type-btn ortak-disi" onclick="toggleCustomerType()">Ortak Dışı</button>
+                        <button id="newCustomerBtn" class="mini-btn mini-btn-secondary" style="margin-left: 10px;" onclick="openOrtakDisiModal()"><i class="fas fa-plus"></i> Yeni Ortak Dışı Kayıt</button>
+                    </div>
+                    
+                    <div id="ortakIciDetails" class="customer-details">
+                        <div class="form-group"><span class="form-label">Ortak Numarası:</span><select id="ortakNo" class="form-control"><option value="">Seçiniz</option></select></div>
+                        <div class="form-group"><span class="form-label">Adı Soyadı:</span><select id="ortakAdSoyad" class="form-control"><option value="">Seçiniz</option></select></div>
+                        <div class="form-group"><span class="form-label">Telefon Numarası:</span><input type="text" id="ortakTelefon" class="form-control" readonly></div>
+                    </div>
+                    
+                    <div id="ortakDisiDetails" class="customer-details active">
+                        <div class="form-group">
+                            <span class="form-label">Adı Soyadı:</span>
+                            <div class="autocomplete-container"><input type="text" id="ortakDisiAdSoyad" class="form-control" placeholder="Ad Soyad giriniz..." autocomplete="off"><div id="ortakDisiAutocompleteList" class="autocomplete-list"></div></div>
+                        </div>
+                        <div class="form-group"><span class="form-label">Telefon Numarası:</span><input type="text" id="ortakDisiTelefon" class="form-control"></div>
+                    </div>
+                    
+                    <div class="form-group"><span class="form-label">Açıklama:</span><textarea id="aciklama" class="form-control" rows="3" placeholder="Sevkiyat ile ilgili notlarınızı buraya yazınız..."></textarea></div>
+                </div>
+            </div>
+            
+            <div class="stock-section">
+                <div class="stock-header"><span class="stock-title">Stok Bilgileri</span><button class="add-stock-btn" onclick="addStockRow()"><i class="fas fa-plus"></i></button></div>
+                <div id="stockRowsContainer">
+                    <div class="stock-row" id="stockRow_headers" style="background-color: transparent; font-weight: 600; padding: 0 10px;">
+                        <div><span class="stock-label">Stok Kodu</span></div>
+                        <div><span class="stock-label">Stok Adı</span></div>
+                        <div><span class="stock-label">Miktar</span></div>
+                        <div><span class="stock-label">Birim</span></div>
+                        <div></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="saveForm()"><i class="fas fa-save"></i> Kaydet</button>
+                <button class="btn btn-secondary" onclick="goBack()"><i class="fas fa-times"></i> İptal</button>
+            </div>
+        </div>
+        
+        <div class="footer"><p>DepoTech © Okan KOTAN 2025 - 1890 Sayılı Bünyan Tarım Kredi Kooperatifi</p></div>
+    </div>
+
+    <div class="modal-overlay" id="yeniOrtakModal">
+        <div class="modal-content">
+            <div class="modal-header">Yeni Ortak Kaydı</div>
+            <form id="yeniOrtakFormInCikis" onsubmit="event.preventDefault(); saveNewOrtakFromCikis();">
+                <div class="form-group" style="flex-direction: column; align-items: flex-start;"><label class="form-label">Ortak Numarası</label><input type="text" id="modalOrtakNumarasi" class="form-control" required></div>
+                <div class="form-group" style="flex-direction: column; align-items: flex-start;"><label class="form-label">TCKN</label><input type="text" id="modalTckn" class="form-control"></div>
+                <div class="form-group" style="flex-direction: column; align-items: flex-start;"><label class="form-label">Adı Soyadı</label><input type="text" id="modalAdSoyadi" class="form-control" required></div>
+                <div class="form-group" style="flex-direction: column; align-items: flex-start;"><label class="form-label">Telefon Numarası</label><input type="text" id="modalTelefon" class="form-control"></div>
+                <div class="form-group" style="flex-direction: column; align-items: flex-start;"><label class="form-label">Mahallesi</label><input type="text" id="modalMahalle" class="form-control"></div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeOrtakModal()">İptal</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="yeniOrtakDisiModal">
+        <div class="modal-content">
+            <div class="modal-header">Yeni Ortak Dışı Kayıt</div>
+            <form id="yeniOrtakDisiFormInCikis" onsubmit="event.preventDefault(); saveNewOrtakDisiFromCikis();">
+                <div class="form-group" style="flex-direction: column; align-items: flex-start;"><label class="form-label">Adı Soyadı</label><input type="text" id="modalOdAdSoyadi" class="form-control" required></div>
+                <div class="form-group" style="flex-direction: column; align-items: flex-start;"><label class="form-label">Telefon Numarası</label><input type="text" id="modalOdTelefon" class="form-control"></div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeOrtakDisiModal()">İptal</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div> 
+</body>
+</html>
