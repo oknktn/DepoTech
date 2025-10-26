@@ -1333,3 +1333,57 @@ document.addEventListener("DOMContentLoaded", () => {
     loadMusteriFiltreListesi(); // Müşteri filtresini doldur
   }
 });
+
+/* ======================================== */
+/* 18. stok-gor.html (Stok Görüntüle) FONKSİYONLARI */
+/* ======================================== */
+
+/**
+ * Stok listesi verilerini yükler ve tabloyu doldurur.
+ */
+function loadStokListData() {
+  const tableBody = document.getElementById('stokTableBody');
+  if (!tableBody) return; // Yanlış sayfadaysak çık
+  
+  tableBody.innerHTML = '<tr><td colspan="6" class="loading-text">Stok verileri yükleniyor...</td></tr>'; 
+  
+  console.log('Stok listesi yükleniyor...');
+  // TODO: Google Sheets API'den 'Stok Kartları' sayfasındaki verileri çek
+  
+  // Örnek Veri
+  setTimeout(() => { 
+    const data = [
+      { kod: 'STK001', ad: 'Gübre A - DAP 18-46-0', birim: 'Kg', ham_amb: '50', ham_birim: 'Kg', tur: 'Gübre' },
+      { kod: 'STK002', ad: 'Tohum C - Buğday Sertifikalı', birim: 'Kg', ham_amb: '1000', ham_birim: 'Kg', tur: 'Tohum' },
+      { kod: 'STK005', ad: 'Yem B - Süt Yemi 19 Protein', birim: 'Ton', ham_amb: '1', ham_birim: 'Ton', tur: 'Yem' },
+      { kod: 'MTR001', ad: 'Motorin (Petrol Ofisi)', birim: 'Lt', ham_amb: '1', ham_birim: 'Lt', tur: 'Akaryakıt' },
+      // ... daha fazla satır
+    ];
+    
+    tableBody.innerHTML = ''; 
+    
+    if (data.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="6" class="loading-text">Gösterilecek stok kaydı bulunamadı.</td></tr>';
+      return;
+    }
+
+    data.forEach(item => {
+      const row = tableBody.insertRow(); 
+      row.insertCell().textContent = item.kod || '';
+      row.insertCell().textContent = item.ad || '';
+      row.insertCell().textContent = item.birim || '';
+      row.insertCell().textContent = item.ham_amb || '';
+      row.insertCell().textContent = item.ham_birim || '';
+      row.insertCell().textContent = item.tur || '';
+    });
+  }, 1000); // 1 saniye bekle
+}
+
+
+// Bu sayfa yüklendiğinde stok listesini çekmek için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'stok-gor.html' sayfasındaysak listeyi yükle
+  if (document.getElementById("stokTableBody")) {
+    loadStokListData(); 
+  }
+});
