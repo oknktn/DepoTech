@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DepoTech - Fiş İptali</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-text">İşleniyor...</div>
+    </div>
+
+    <div class="header">
+        <button class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>&nbsp;Ana Menü
+        </button>
+        <h1>Fiş İptal Formu</h1>
+        <div style="width: 80px;"></div> </div>
+
+    <div class="container cancel-container"> <div class="form-group">
+            <label for="fisNoSelect" class="form-label">İptal Edilecek Fiş Numarası</label>
+            <select id="fisNoSelect" class="form-control" onchange="loadFisDetaylari()">
+                <option value="">Yükleniyor...</option>
+                </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="fisDetaylari" class="form-label">Fiş İçeriği</label>
+            <textarea id="fisDetaylari" class="form-control cancel-textarea" readonly></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="iptalSebebiSelect" class="form-label">İptal Sebebi</label>
+            <select id="iptalSebebiSelect" class="form-control" onchange="toggleOzelSebep()">
+                <option value="">-- Sebep Seçiniz --</option>
+                <option value="Hatalı alımdan dolayı iade">Hatalı alımdan dolayı iade</option>
+                <option value="Hatalı düzenlenen fiş">Hatalı düzenlenen fiş</option>
+                <option value="Müşteri vazgeçti">Müşteri vazgeçti</option>
+                <option value="Ürün stokta yok">Ürün stokta yok</option>
+                <option value="Sevkiyat problemi">Sevkiyat problemi</option>
+                <option value="Diğer">Diğer</option>
+            </select>
+        </div>
+        
+        <div class="form-group" id="ozelSebepContainer" style="display: none;">
+            <label for="ozelSebepInput" class="form-label">Diğer İptal Sebebi</label>
+            <textarea id="ozelSebepInput" class="form-control" placeholder="Lütfen iptal sebebini detaylı olarak yazınız..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <button class="btn btn-danger cancel-button" onclick="kaydetIptal()">
+                <i class="fas fa-trash-alt"></i> Fişi İptal Et
+            </button>
+        </div>
+    </div>
+</body>
+</html>
