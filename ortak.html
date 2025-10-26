@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DepoTech - Ortak Listesi</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="header">
+        <button class="header-button back-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Ana Menü</button>
+        <h1>Ortak Listesi</h1>
+        <button class="header-button add-button" onclick="openModal()"><i class="fas fa-plus"></i> Yeni Kayıt</button> </div>
+
+    <div class="container partner-list-container"> <table>
+            <thead>
+                <tr>
+                    <th>Ortak No</th><th>TCKN</th><th>Adı Soyadı</th><th>Telefon</th><th>Mahallesi</th>
+                </tr>
+            </thead>
+            <tbody id="dataTableBody">
+                <tr><td colspan="5" class="loading-text">Ortak listesi yükleniyor...</td></tr>
+                </tbody>
+        </table>
+    </div>
+
+    <div class="modal-overlay" id="yeniKayitModal">
+        <div class="modal-content">
+            <div class="modal-header">Yeni Ortak Kaydı</div>
+            <form id="yeniOrtakForm" onsubmit="event.preventDefault(); saveNewOrtak();">
+                <div class="form-group">
+                    <label for="ortakNumarasi" class="form-label">Ortak Numarası</label>
+                    <input type="text" id="ortakNumarasi" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="tckn" class="form-label">TCKN</label>
+                    <input type="text" id="tckn" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="adSoyadi" class="form-label">Adı Soyadı</label>
+                    <input type="text" id="adSoyadi" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefon" class="form-label">Telefon Numarası</label>
+                    <input type="text" id="telefon" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="mahalle" class="form-label">Mahallesi</label>
+                    <input type="text" id="mahalle" class="form-control">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">İptal</button> <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Kaydet</button> </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
