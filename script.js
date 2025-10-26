@@ -1166,3 +1166,170 @@ function loadMusteriListesiCikis() {
     });
   }, 1000); 
 }
+
+/* ======================================== */
+/* 17. kayitlar.html (Kayıt Görüntüle) FONKSİYONLARI */
+/* ======================================== */
+
+let currentFilter = { status: 'Tümü', musteri: 'Tümü' }; // Mevcut filtre durumunu sakla
+
+/**
+ * Tabloya filtre uygular ve verileri yeniden yükler.
+ * @param {string|null} status Durum filtresi ('Tümü', 'Devam Ediyor', 'Tamamlandı'). null ise değişmez.
+ * @param {HTMLElement} element Filtreyi tetikleyen element (buton veya select).
+ */
+function applyFilter(status, element) {
+  if (element.tagName === 'BUTTON') {
+      // Durum filtresi butonu tıklandı
+      currentFilter.status = status;
+      // Aktif butonu güncelle
+      document.querySelectorAll('.filter-bar .btn-filter').forEach(btn => btn.classList.remove('active'));
+      element.classList.add('active');
+  } else if (element.tagName === 'SELECT') {
+      // Müşteri filtresi değişti
+      currentFilter.musteri = element.value;
+  }
+  
+  // Verileri yeni filtreyle yükle
+  loadKayitlarData(currentFilter);
+}
+
+/**
+ * Depo Kayıtlarını yükler ve tabloyu doldurur.
+ * @param {object} filter Filtreleme seçenekleri (örn: {status, musteri})
+ */
+function loadKayitlarData(filter = { status: 'Tümü', musteri: 'Tümü' }) {
+  const tableBody = document.getElementById('dataTableBody');
+  if (!tableBody) return; // Yanlış sayfadaysak çık
+  
+  tableBody.innerHTML = `<tr><td colspan="13" class="loading-text">Kayıtlar yükleniyor (${filter.status}, ${filter.musteri})...</td></tr>`; 
+  
+  console.log('Kayıtlar yükleniyor... Filtre:', filter);
+  // TODO: Google Sheets API'den Depo Kayıtları verilerini çek (filter objesini kullanarak)
+  
+  // Örnek Veri
+  setTimeout(() => { 
+    const data = [
+      { id: 'kayit1', tarih: '27.10.2025', kullanici: 'Okan K.', ortakNo: '123', adSoyad: 'Ali Veli', kod: 'STK001', ad: 'Gübre A', alinan: 500, birim: 'Kg', sonCikan: '50 Kg (27.10)', toplamCikan: 250, kalan: 250, durum: 'Devam Ediyor' },
+      { id: 'kayit2', tarih: '26.10.2025', kullanici: 'Okan K.', ortakNo: '', adSoyad: 'Ayşe Fatma', kod: 'STK005', ad: 'Yem B', alinan: 2, birim: 'Ton', sonCikan: '2 Ton (26.10)', toplamCikan: 2, kalan: 0, durum: 'Tamamlandı' },
+      { id: 'kayit3', tarih: '25.10.2025', kullanici: 'Diğer', ortakNo: '456', adSoyad: 'Zeynep Su', kod: 'STK001', ad: 'Gübre A', alinan: 100, birim: 'Kg', sonCikan: '100 Kg (25.10)', toplamCikan: 100, kalan: 0, durum: 'Tamamlandı' },
+      { id: 'kayit4', tarih: '28.10.2025', kullanici: 'Okan K.', ortakNo: '', adSoyad: 'Deniz Can', kod: 'STK002', ad: 'Tohum C', alinan: 100, birim: 'Kg', sonCikan: '', toplamCikan: 0, kalan: 100, durum: 'Devam Ediyor' }
+    ];
+
+    // Örnek Filtreleme (API bunu sunucu tarafında yapmalı)
+    const filteredData = data.filter(item => {
+        // Durum filtresi
+        if (filter.status !== 'Tümü' && item.durum !== filter.status) {
+            return false;
+        }
+        // Müşteri filtresi (AdSoyad veya OrtakNo ile eşleşme - basit örnek)
+        if (filter.musteri !== 'Tümü' && item.adSoyad !== filter.musteri && item.ortakNo !== filter.musteri) {
+             // Gerçekte daha karmaşık eşleştirme gerekebilir (value'lar ID olabilir)
+             return false;
+        }
+        return true;
+    });
+    
+    tableBody.innerHTML = ''; 
+    
+    if (filteredData.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="13" class="loading-text">Belirtilen kriterlere uygun kayıt bulunamadı.</td></tr>';
+      return;
+    }
+
+    filteredData.forEach(item => {
+      const row = tableBody.insertRow(); 
+      row.dataset.recordId = item.id; // Kayıt ID'sini satıra ekle
+      
+      row.insertCell().textContent = item.tarih || '';
+      row.insertCell().textContent = item.kullanici || '';
+      row.insertCell().textContent = item.ortakNo || '';
+      row.insertCell().textContent = item.adSoyad || '';
+      row.insertCell().textContent = item.kod || '';
+      row.insertCell().textContent = item.ad || '';
+      row.insertCell().textContent = item.alinan || '';
+      row.insertCell().textContent = item.birim || '';
+      row.insertCell().textContent = item.sonCikan || '';
+      row.insertCell().textContent = item.toplamCikan || '0';
+      row.insertCell().textContent = item.kalan || '0';
+      
+      // Durum hücresi ve stili
+      const durumCell = row.insertCell();
+      durumCell.textContent = item.durum || '';
+      if (item.durum === 'Devam Ediyor') durumCell.classList.add('status-devam');
+      else if (item.durum === 'Tamamlandı') durumCell.classList.add('status-tamam');
+      
+      // İşlem hücresi (İptal butonu)
+      const islemCell = row.insertCell();
+      if (item.durum !== 'Tamamlandı') { // Sadece tamamlanmamışlar iptal edilebilir
+           islemCell.innerHTML = `<button class="btn-cancel" onclick="cancelRecord('${item.id}', '${item.adSoyad}', '${item.ad}')">
+                                      <i class="fas fa-times"></i> İptal
+                                  </button>`;
+      } else {
+           islemCell.innerHTML = ''; // Tamamlanmışsa boş
+      }
+    });
+  }, 1000); 
+}
+
+/**
+ * Bir depo kaydını iptal etme işlemini başlatır.
+ * @param {string} recordId İptal edilecek kaydın ID'si.
+ * @param {string} musteriAdi Onay mesajı için müşteri adı.
+ * @param {string} stokAdi Onay mesajı için stok adı.
+ */
+function cancelRecord(recordId, musteriAdi, stokAdi) {
+    if (!confirm(`"${musteriAdi}" müşterisinin "${stokAdi}" kaydını iptal etmek istediğinizden emin misiniz? Bu işlem ilişkili çıkışları etkileyebilir ve geri alınamaz!`)) {
+        return;
+    }
+    
+    console.log(`Kayıt ${recordId} iptal ediliyor...`);
+    // TODO: Google Sheets API'ye iptal isteği gönder
+    // API tarafında:
+    // 1. Kaydı bul (ID ile).
+    // 2. Durumunu 'İptal Edildi' yap veya satırı sil/arşivle.
+    // 3. İlişkili çıkış kayıtlarını (varsa) güncelle/işaretle.
+    
+    alert(`Kayıt ${recordId} iptal ediliyor... (Henüz API bağlı değil)`);
+    
+    // Başarılı iptal sonrası tabloyu yenile
+    loadKayitlarData(currentFilter);
+}
+
+
+/**
+ * Müşteri listesini yükler (filtre için).
+ */
+function loadMusteriFiltreListesi() {
+  const selectElement = document.getElementById('musteriFiltre');
+  // <option value="Tümü"> korunsun
+  
+  console.log('Müşteri filtre listesi yükleniyor...');
+  // TODO: Google Sheets API'den tüm müşterilerin (Ortak+OrtakDışı) listesini çek
+  
+  // Örnek Veri
+  setTimeout(() => { 
+    const musteriler = [
+        { value: 'Ali Veli', text: 'Ali Veli' },
+        { value: 'Ayşe Fatma', text: 'Ayşe Fatma' },
+        { value: 'Zeynep Su', text: 'Zeynep Su' },
+        { value: 'Deniz Can', text: 'Deniz Can' }
+    ]; 
+    musteriler.forEach(musteri => {
+      const option = document.createElement('option');
+      option.value = musteri.value; // Veya müşteri ID'si
+      option.textContent = musteri.text;
+      selectElement.appendChild(option);
+    });
+  }, 500); // Filtre daha hızlı yüklenebilir
+}
+
+
+// Bu sayfa yüklendiğinde varsayılan olarak tüm listeyi ve filtreyi çekmek için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'kayitlar.html' sayfasındaysak
+  if (document.querySelector(".records-table-container")) {
+    loadKayitlarData(currentFilter); // Başlangıçta tüm verileri yükle
+    loadMusteriFiltreListesi(); // Müşteri filtresini doldur
+  }
+});
