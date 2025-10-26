@@ -495,3 +495,49 @@ input:read-only { background-color: #f0f0f0; color: #333; }
     flex-direction: column;
   }
 }
+
+/* ======================================== */
+/* 9. cikis.html - YENİ YERLEŞİM DÜZELTMELERİ */
+/* ======================================== */
+
+/* Sol sütundaki panelleri (Fiş ve Müşteri) minimalize et */
+.left-column .panel {
+  padding: 12px;
+}
+.left-column .panel-title {
+  font-size: 16px;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+}
+
+/* Sol sütundaki form elemanları */
+.left-column .form-label {
+  min-width: 90px; /* "120px" idi, küçülttük */
+  font-size: 13px;
+}
+.left-column .form-control {
+  height: 30px; /* "36px" idi, küçülttük */
+  font-size: 13px;
+}
+.left-column textarea.form-control {
+    height: auto;
+}
+
+/* Stok satırları arasındaki boşluğu azalt */
+.stock-row {
+  margin-bottom: 8px; /* "15px" idi, azalttık */
+}
+
+/* Sağ sütundaki Stok panelini, kalan tüm yüksekliği dolduracak
+   şekilde esnet (pesin.html'deki gibi) */
+.right-column .panel.stock-section {
+  flex-grow: 1;
+  min-height: 0;
+}
+
+/* Stok listesinin panel içinde kaymasını sağla */
+#stockRowsContainer {
+  overflow-y: auto;
+  flex-grow: 1;
+  min-height: 150px; /* Minimum yükseklik */
+}
