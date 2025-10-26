@@ -1922,3 +1922,141 @@ document.addEventListener("DOMContentLoaded", () => {
     loadOrtakDisiListesi(); 
   }
 });
+
+/* ======================================== */
+/* 22. ortak-disi.html (Ortak Dışı Listesi) FONKSİYONLARI (Güncellenmiş) */
+/* ======================================== */
+
+/**
+ * Yeni ortak dışı kaydı modal penceresini açar.
+ */
+function openModalOrtakDisi() {
+  const modal = document.getElementById('yeniKayitModalOrtakDisi');
+  if (modal) {
+      const form = document.getElementById('yeniOrtakDisiForm');
+      if (form) form.reset(); // Formu temizle
+      modal.style.display = 'flex';
+  }
+}
+
+/**
+ * Yeni ortak dışı kaydı modal penceresini kapatır.
+ */
+function closeModalOrtakDisi() {
+  const modal = document.getElementById('yeniKayitModalOrtakDisi');
+  if (modal) {
+      modal.style.display = 'none';
+  }
+}
+
+/**
+ * Yeni ortak dışı kaydını kaydeder.
+ */
+function saveNewOrtakDisi() {
+  const adSoyadInput = document.getElementById('odAdSoyadi');
+  const telefonInput = document.getElementById('odTelefon');
+  
+  const ortakDisiData = {
+      adSoyad: adSoyadInput ? adSoyadInput.value.trim() : '',
+      telefon: telefonInput ? telefonInput.value.trim() : ''
+  };
+
+  // Zorunlu alan kontrolü
+  if (!ortakDisiData.adSoyad || !ortakDisiData.telefon) {
+    alert("Adı Soyadı ve Telefon Numarası alanları zorunludur.");
+    return;
+  }
+
+  console.log('Yeni Ortak Dışı Kaydediliyor:', ortakDisiData);
+  const tableBody = document.getElementById('dataTableBody');
+  if(tableBody) tableBody.innerHTML = '<tr><td colspan="2" class="loading-text">Kaydediliyor...</td></tr>';
+  
+  // Modal kapatılır (isteğe bağlı, API yanıtını bekleyebilir)
+  // closeModalOrtakDisi(); 
+
+  // TODO: Google Sheets API'ye yeni ortak dışı verisini gönder
+  // API Çağrısı: addNewExternalPartner(ortakDisiData);
+  
+  // --- Örnek API Yanıt Simülasyonu ---
+  setTimeout(() => { 
+    const success = Math.random() > 0.1; 
+    const message = success ? `Ortak Dışı "${ortakDisiData.adSoyad}" başarıyla eklendi.` : `Hata: Ortak Dışı eklenemedi!`;
+    
+    alert(message); 
+    
+    if (success) {
+      closeModalOrtakDisi(); // Başarılıysa modalı kapat
+    }
+    loadOrtakDisiListesi(); // Listeyi her durumda yenile (başarılı veya başarısız)
+
+  }, 1000); 
+  // --- --- ---
+}
+
+/**
+ * Ortak Dışı listesini yükler ve tabloyu doldurur.
+ */
+function loadOrtakDisiListesi() {
+  const tableBody = document.getElementById('dataTableBody');
+  // Sadece ortak-disi.html'de olduğumuzdan emin olmak için ekstra kontrol
+  const container = document.querySelector('.partner-ext-list-container'); 
+  if (!tableBody || !container) return; 
+  
+  tableBody.innerHTML = '<tr><td colspan="2" class="loading-text">Ortak Dışı listesi yükleniyor...</td></tr>'; 
+  
+  console.log('Ortak Dışı listesi yükleniyor...');
+  // TODO: Google Sheets API'den 'Ortak Dışı' sayfasındaki verileri çek
+  // API Çağrısı: getExternalPartnersList();
+  
+  // Örnek Veri
+  setTimeout(() => { 
+    // const data = [ { adSoyad: 'Ayşe Fatma', telefon: '544...' }, ... ]; // API'den gelen veri
+     const data = [
+      { adSoyad: 'Ayşe Fatma', telefon: '544...' },
+      { adSoyad: 'Deniz Can', telefon: '532...' },
+      { adSoyad: 'Mehmet Öztürk', telefon: '505...' },
+    ];
+    
+    tableBody.innerHTML = ''; // Temizle
+    
+    if (!data || data.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="2" class="loading-text">Gösterilecek ortak dışı kayıt bulunamadı.</td></tr>';
+      return;
+    }
+
+    data.forEach(item => {
+      const row = tableBody.insertRow(); 
+      row.insertCell().textContent = item.adSoyad || '';
+      row.insertCell().textContent = item.telefon || '';
+    });
+  }, 1000); // 1 saniye bekle
+}
+
+
+// Bu sayfa yüklendiğinde ortak dışı listesini çekmek için
+// (Bu event listener zaten bir önceki adımda eklenmişti, tekrar eklemeye gerek yok)
+/*
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.getElementById("yeniKayitModalOrtakDisi")) {
+    loadOrtakDisiListesi(); 
+  }
+});
+*/
+
+// safeJsonParse fonksiyonu (Eğer script.js'de henüz yoksa ekleyin)
+/**
+ * String JSON verisini güvenli bir şekilde parse eder.
+ * @param {*} response Parse edilecek veri (string veya obje olabilir).
+ * @returns {object} Parse edilmiş obje veya hata objesi.
+ */
+function safeJsonParse(response) {
+   if (typeof response === 'string') {
+       try { return JSON.parse(response); } 
+       catch (e) { 
+           console.error("JSON Parse Hatası:", e, "Gelen Veri:", response);
+           return { success: false, message: "Sunucudan gelen veri formatı hatalı." }; 
+       }
+   }
+   // Zaten obje ise direkt döndür
+   return response; 
+}
