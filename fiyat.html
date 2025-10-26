@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DepoTech - Fiyat Listesi</title>
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-text">Fiyat Listesi Yükleniyor...</div>
+    </div>
+
+    <div class="header">
+        <button class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>&nbsp;Ana Menü
+        </button>
+        <h1>Fiyat Listesi Yönetimi</h1>
+        <div style="width: 80px;"></div> </div>
+
+    <div class="container price-list-container"> <div class="panel">
+            <h3 class="panel-title">Ürün Fiyatları</h3>
+            
+            <div class="price-list-header">
+                <div>Stok Kodu</div>
+                <div>Stok Adı</div>
+                <div>Satış Fiyatı</div>
+                <div>Maliyet</div>
+                <div>Kar Oranı (%)</div>
+            </div>
+            
+            <div id="priceListRowsContainer">
+                </div>
+
+            <div class="form-actions" style="justify-content: flex-end; margin-top: 20px;">
+                 <button class="btn btn-primary" onclick="savePriceList()">
+                     <i class="fas fa-save"></i> Değişiklikleri Kaydet
+                 </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
