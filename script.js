@@ -2060,3 +2060,345 @@ function safeJsonParse(response) {
    // Zaten obje ise direkt döndür
    return response; 
 }
+
+/* ======================================== */
+/* 23. sayim.html (Stok Sayım) FONKSİYONLARI */
+/* ======================================== */
+
+let selectedFileContent = null; // Yüklenen Excel içeriğini tutar
+let excelProcessed = false;     // Excel'in işlenip işlenmediğini belirtir
+
+/**
+ * Dosya seçildiğinde Excel dosyasını okur ve işler.
+ * @param {Event} event Dosya seçim eventi.
+ */
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    const statusDisplay = document.getElementById('excelStatus');
+    const startButton = document.getElementById('startButton');
+    selectedFileContent = null;
+    excelProcessed = false;
+    if (statusDisplay) statusDisplay.textContent = '';
+    if (startButton) startButton.disabled = true; 
+    
+    if (file) {
+        if (statusDisplay) statusDisplay.textContent = `Okunuyor: ${file.name}`;
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            selectedFileContent = e.target.result;
+            processExcelFile(); // Okuma bitince dosyayı işle
+        };
+        reader.onerror = () => { if (statusDisplay) statusDisplay.textContent = "Dosya okuma hatası!"; }
+        
+        reader.readAsArrayBuffer(file);
+    }
+}
+
+/**
+ * Okunan Excel dosyasını işler ve verileri API'ye gönderir.
+ */
+function processExcelFile() {
+    if (!selectedFileContent) return;
+    const statusDisplay = document.getElementById('excelStatus');
+    if (statusDisplay) statusDisplay.textContent = "Excel işleniyor...";
+    
+    try {
+        // XLSX kütüphanesi ile Excel'i oku
+        const workbook = XLSX.read(selectedFileContent, { type: 'buffer' });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        // Tüm satırları JSON olarak al (başlık satırı dahil değil)
+        const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: null, range: 1 }); 
+        
+        let extractedData = [];
+        // Satırları gez, E sütunu (index 4) doluysa veriyi al
+        sheetData.forEach(row => {
+            const valueE = row[4]; // E Sütunu (Miktar)
+            // Sadece E sütunu dolu ve sayısal bir değerse al (veya 0 ise de al)
+            if (valueE !== null && valueE !== undefined && (valueE === 0 || !isNaN(parseFloat(valueE)))) {
+                extractedData.push([
+                    row[0] || '', // A Sütunu (Stok Kodu)
+                    row[1] || '', // B Sütunu (Stok Adı) - Opsiyonel, sadece kodu gönderebiliriz
+                    parseFloat(valueE) // E Sütunu (Miktar) - Sayı olarak
+                ]);
+            }
+        });
+        
+        if (extractedData.length === 0) {
+           if (statusDisplay) statusDisplay.textContent = "Excel'de geçerli (E sütunu dolu) satır bulunamadı."; 
+           resetFileInput();
+           return;
+        }
+
+        console.log("Excel'den çıkarılan veri:", extractedData);
+        if (statusDisplay) statusDisplay.textContent = `${extractedData.length} satır bulundu, sunucuya gönderiliyor...`;
+
+        // TODO: Google Sheets API'ye 'extractedData' dizisini gönder
+        // API Çağrısı: processExcelData(extractedData);
+        // API tarafında: Bu veriler geçici bir sayfaya (örn: 'ExcelSayim') yazılabilir.
+
+        // --- Örnek API Yanıt Simülasyonu ---
+        setTimeout(() => {
+            const success = Math.random() > 0.1;
+            const message = success ? `${extractedData.length} satır başarıyla işlendi.` : "Excel verisi işlenirken hata oluştu!";
+            if (statusDisplay) statusDisplay.textContent = message;
+            
+            if (success) {
+                excelProcessed = true; // Excel işlendi olarak işaretle
+                const startButton = document.getElementById('startButton');
+                if (startButton) startButton.disabled = false; // Sayıma başla butonunu aktifleştir
+                sayimaBasla(); // Otomatik olarak sayımı başlat
+            } else {
+                 resetFileInput(); // Başarısızsa inputu sıfırla
+            }
+        }, 1500);
+        // --- --- ---
+
+    } catch (error) {
+        if (statusDisplay) statusDisplay.textContent = "Excel işleme hatası: " + error.message;
+        resetFileInput();
+    } 
+}
+
+/**
+ * Dosya inputunu sıfırlar.
+ */
+function resetFileInput() {
+    selectedFileContent = null;
+    excelProcessed = false;
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) fileInput.value = null; // Seçili dosyayı temizle
+    const startButton = document.getElementById('startButton');
+     if (startButton) startButton.disabled = true; // Başlat butonunu pasifleştir
+}
+
+/**
+ * Seçilen filtreye göre stok sayım verilerini çeker ve tabloyu oluşturur.
+ */
+function sayimaBasla() {
+    const filterSelect = document.getElementById('stokTuruFiltre');
+    const filterValue = filterSelect ? filterSelect.value : 'Tümü';
+    const tableBody = document.getElementById('dataTableBody');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = `<tr><td colspan="9" class="loading-text">"${filterValue}" için sayım verileri yükleniyor...</td></tr>`;
+    
+    console.log(`Sayım başlatılıyor... Filtre: ${filterValue}, Excel İşlendi mi: ${excelProcessed}`);
+    
+    // TODO: Google Sheets API'den stok sayım verilerini çek
+    // API Çağrısı: getStokSayimData(filterValue, excelProcessed); 
+    // API tarafında:
+    // 1. Gerekirse 'Stok Kartları'nı filtrele.
+    // 2. Her stok için 'Veresiye', 'PesinKK', 'Cikacak' miktarlarını hesapla.
+    // 3. Eğer excelProcessed=true ise, 'ExcelSayim' sayfasından Miktar (Excel)'i al.
+    // 4. Tüm verileri birleştirip geri gönder.
+    
+    // --- Örnek API Yanıt Simülasyonu ---
+    setTimeout(() => {
+        const data = [
+            { originalRow: 2, stokKodu: 'STK001', stokAdi: 'Gübre A', miktarExcel: excelProcessed ? 150 : 0, mevcut: 200, veresiye: 50, pesinKK: 10, cikacak: 30 },
+            { originalRow: 3, stokKodu: 'STK002', stokAdi: 'Tohum C', miktarExcel: excelProcessed ? 80 : 0, mevcut: 100, veresiye: 0, pesinKK: 0, cikacak: 10 },
+            { originalRow: 5, stokKodu: 'STK005', stokAdi: 'Yem B', miktarExcel: excelProcessed ? 1.5 : 0, mevcut: 2, veresiye: 0, pesinKK: 0, cikacak: 0.5 },
+        ];
+        renderSayimTable(data); // Tabloyu çiz
+    }, 1000);
+    // --- --- ---
+}
+
+/**
+ * Stok sayım verileriyle tabloyu oluşturur.
+ * @param {Array} data Stok sayım verileri dizisi.
+ */
+function renderSayimTable(data) {
+    const tableBody = document.getElementById('dataTableBody');
+    tableBody.innerHTML = ''; // Temizle
+    
+    if (!data || data.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="9" class="loading-text">Bu kriterlere uygun stok bulunamadı.</td></tr>';
+      return;
+    }
+    
+    data.forEach(item => {
+        const row = tableBody.insertRow();
+        // Orijinal satır numarasını (Sheets'teki) sakla
+        row.dataset.originalRow = item.originalRow; 
+        
+        row.innerHTML = `
+            <td class="read-only-cell">${item.stokKodu || ''}</td>
+            <td class="read-only-cell">${item.stokAdi || ''}</td>
+            <td class="read-only-cell miktar-excel-cell">${item.miktarExcel || 0}</td>
+            <td><input type="number" value="${item.mevcut || 0}" class="editable-input mevcut-input" oninput="recalculateRow(this.closest('tr'))" onblur="saveCellChange(${item.originalRow}, 'D', this.value)"></td>
+            <td class="read-only-cell veresiye-cell">${item.veresiye || 0}</td>
+            <td class="read-only-cell pesinKK-cell">${item.pesinKK || 0}</td>
+            <td class="read-only-cell cikacak-cell">${item.cikacak || 0}</td>
+            <td class="kalan-cell"></td> <td class="durum-cell"></td> `;
+        recalculateRow(row); // Kalan ve Durumu hesapla
+    });
+}
+ 
+/**
+ * Bir satırdaki Kalan ve Durum değerlerini yeniden hesaplar.
+ * @param {HTMLTableRowElement} trElement Hesaplama yapılacak TR elementi.
+ */
+function recalculateRow(trElement) {
+    if (!trElement) return;
+    try {
+        const miktarExcel = parseFloat(trElement.querySelector('.miktar-excel-cell')?.textContent || 0);
+        const mevcutInput = trElement.querySelector('.mevcut-input');
+        const mevcut = parseFloat(mevcutInput?.value || 0);
+        const veresiye = parseFloat(trElement.querySelector('.veresiye-cell')?.textContent || 0); 
+        const pesinKK = parseFloat(trElement.querySelector('.pesinKK-cell')?.textContent || 0); 
+        const cikacak = parseFloat(trElement.querySelector('.cikacak-cell')?.textContent || 0);
+        
+        // Kalan = (Mevcut Depo + Veresiye + Peşin/KK) - Çıkacak - Excel Miktarı
+        const kalan = (mevcut + veresiye + pesinKK) - cikacak - miktarExcel;
+        
+        const kalanCell = trElement.querySelector('.kalan-cell');
+        const durumCell = trElement.querySelector('.durum-cell');
+        
+        if (kalanCell) kalanCell.textContent = kalan.toFixed(2); 
+        
+        if (durumCell) {
+            durumCell.className = 'durum-cell'; // Önceki sınıfları temizle
+            if (kalan === 0) {
+                durumCell.textContent = "Stok Tam"; durumCell.classList.add('status-tam');
+            } else if (kalan < 0) {
+                durumCell.textContent = "Stok Noksan"; durumCell.classList.add('status-noksan');
+            } else {
+                durumCell.textContent = "Stok Fazla"; durumCell.classList.add('status-fazla');
+            }
+        }
+    } catch (e) {
+        console.error("Hesaplama hatası:", e, "Satır:", trElement);
+    }
+}
+ 
+/**
+ * "Mevcut" sütunundaki değişikliği kaydeder (API çağrısı yapar).
+ * @param {number} rowNum Değiştirilen satırın Sheets'teki numarası.
+ * @param {string} colName Değiştirilen sütun adı ('D').
+ * @param {string} newValue Yeni değer.
+ */
+function saveCellChange(rowNum, colName, newValue) {
+   if (colName === 'D' && rowNum) { // Sadece D sütunu ve satır numarası varsa
+        console.log(`Kaydediliyor: Satır=${rowNum}, Sütun=${colName}, Değer=${newValue}`);
+        // TODO: Google Sheets API'ye güncelleme isteği gönder
+        // API Çağrısı: updateSayimCell(rowNum, colName, newValue);
+        
+        // --- Örnek API Yanıt Simülasyonu ---
+         setTimeout(() => {
+            console.log(`Satır ${rowNum} güncellendi (simülasyon).`);
+            // Başarı/hata bildirimi veya satır vurgulama eklenebilir
+         }, 500);
+        // --- --- ---
+   }
+}
+ 
+/**
+ * Tablodaki mevcut verilerle bir PDF oluşturur ve açar.
+ */
+function yazdirGuncelListeyi() {
+    const tableBody = document.getElementById('dataTableBody');
+    const rows = tableBody ? tableBody.querySelectorAll('tr') : [];
+    
+    if (rows.length === 0 || rows[0].cells.length <= 1) { // Veri yoksa veya sadece 'yükleniyor' mesajı varsa
+        alert("Yazdırılacak veri bulunamadı. Lütfen önce 'Sayıma Başla' butonuna tıklayın.");
+        return;
+    }
+    
+    const loading = document.getElementById('loadingOverlay');
+    const loadingText = loading ? loading.querySelector('.loading-text') : null;
+    if (loading && loadingText) {
+        loadingText.textContent = "PDF Oluşturuluyor...";
+        loading.style.display = 'flex';
+    }
+
+    // Başlıkları al
+    const headers = [
+        "Stok Kodu", "Stok Adı", "Miktar (Excel)", "Mevcut", 
+        "Veresiye", "Peşin/K.Kartı", "Çıkacak", "Kalan", "Durum"
+    ];
+    let dataToPrint = [headers];
+
+    // Görünen satır verilerini topla
+    rows.forEach(row => {
+        // Hücrelerin varlığını kontrol et
+        const mevcutInput = row.querySelector('.mevcut-input');
+        if (row.cells.length < 9 || !mevcutInput) return; // Eksik hücreli satırı atla
+
+        const rowData = [
+            row.cells[0].textContent, // Stok Kodu
+            row.cells[1].textContent, // Stok Adı
+            row.cells[2].textContent, // Miktar (Excel)
+            mevcutInput.value,        // Mevcut (Güncel değer)
+            row.cells[4].textContent, // Veresiye
+            row.cells[5].textContent, // Peşin/KK
+            row.cells[6].textContent, // Çıkacak
+            row.cells[7].textContent, // Kalan
+            row.cells[8].textContent  // Durum
+        ];
+        dataToPrint.push(rowData);
+    });
+
+    console.log("PDF için gönderilecek veri:", dataToPrint);
+
+    // TODO: Google Sheets API'ye PDF oluşturma isteği gönder
+    // API Çağrısı: createSayimPdf(dataToPrint);
+    
+    // --- Örnek API Yanıt Simülasyonu ---
+    setTimeout(() => {
+        if (loading) loading.style.display = 'none';
+        const success = Math.random() > 0.1;
+        if (success) {
+            // Başarılıysa, PDF URL'sini yeni sekmede aç (Örnek URL)
+            const pdfUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"; 
+            window.open(pdfUrl, '_blank');
+        } else {
+            alert("PDF oluşturulamadı!");
+        }
+    }, 2000); // 2 saniye bekle
+    // --- --- ---
+}
+
+
+// Bu sayfa yüklendiğinde stok türü filtresini doldurmak için
+document.addEventListener("DOMContentLoaded", () => {
+  // Sadece 'sayim.html' sayfasındaysak
+  if (document.getElementById("resultsTable")) {
+    loadStokTurleriFiltre();
+  }
+});
+
+/**
+ * Stok türleri listesini yükler ve filtre select kutusunu doldurur.
+ */
+function loadStokTurleriFiltre() {
+    const select = document.getElementById('stokTuruFiltre');
+    if (!select) return;
+
+    console.log('Stok türleri yükleniyor (Filtre)...');
+    // TODO: Google Sheets API'den stok türlerini çek
+    // API Çağrısı: getStokTurleri();
+
+    // Örnek Veri
+    setTimeout(() => {
+        const stokTurleri = ['Gübre', 'Tohum', 'Yem', 'Akaryakıt']; // API'den gelen liste
+        
+        // Mevcut seçenekleri temizle (ilk seçenek hariç)
+        while (select.options.length > 1) {
+            select.remove(1);
+        }
+
+        stokTurleri.forEach(tur => {
+            const option = document.createElement('option');
+            option.value = tur;
+            option.textContent = tur;
+            select.appendChild(option);
+        });
+        
+        select.disabled = false; // Select'i aktifleştir
+        const startButton = document.getElementById('startButton');
+        if (startButton) startButton.disabled = false; // Başlat butonunu da aktifleştir
+
+    }, 500); // Filtre hızlı yüklenebilir
+}
