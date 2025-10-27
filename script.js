@@ -1764,9 +1764,10 @@ function saveNewOrtak() {
     }
   }, 1000); 
 }
-document.getElementById("menuOrtakListesi").addEventListener("click", () => {
+if (window.location.pathname.endsWith("ortak.html")) {
     fetchOrtakListesi();
-});
+}
+
 
 
 /* ======================================== */
