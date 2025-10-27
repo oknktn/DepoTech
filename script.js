@@ -1714,6 +1714,7 @@ function closeModal() {
 }
 
 async function saveNewOrtak() {
+
   const ortakData = {
     ortakNo: document.getElementById('ortakNumarasi')?.value.trim(),
     tckn: document.getElementById('tckn')?.value.trim(),
@@ -1730,32 +1731,38 @@ async function saveNewOrtak() {
   showLoadingOverlay("Kaydediliyor...");
 
   try {
-    const res = await fetch(WEB_APP_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "saveNewOrtak",
-        data: ortakData
-      })
+    const body = new URLSearchParams({
+      action: "saveOrtak",
+      payload: JSON.stringify(ortakData)
     });
 
-    const result = await res.json();
+    const res = await fetch("https://script.google.com/macros/s/AKfycbxYIaZqRRgd5ByHJItSASVasIYOINM9edeBU5L3IfzpTVKK4Ql1T9a6LLWbgnf-tKLD/exec", {
+      method: "POST",
+      body: body
+      // *** DİKKAT: headers YOK, mode YOK → preflight ÇALIŞMAZ → CORS hatası olmaz
+    });
+
+    const resultText = await res.text(); // no-cors değil, okuyabiliriz
+    let result;
+    try { result = JSON.parse(resultText); } catch (_) { result = {}; }
+
     hideLoadingOverlay();
 
     if (result.success) {
       alert("Ortak başarıyla eklendi");
       closeModal();
-      fetchOrtakListesi(); // tabloyu yenile
+      fetchOrtakListesi();
     } else {
-      alert("Kayıt eklenemedi: " + (result.message || "Bilinmeyen hata"));
+      alert("Sunucu hatası: " + (result.message || "Bilinmiyor"));
     }
 
   } catch (err) {
     hideLoadingOverlay();
     alert("Kaydederken hata: " + err.message);
-    console.error("saveNewOrtak error:", err);
+    console.error(err);
   }
 }
+
 
 
 
