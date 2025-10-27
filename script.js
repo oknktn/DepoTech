@@ -1848,7 +1848,6 @@ async function saveNewOrtak() {
 
 /* Köprü: Eski çağrılar için */
 function loadOrtakListesi(){ fetchOrtakListesi(); }
- (GET)
 // =========================== */
 async function fetchOrtakListesi() {
   showLoadingOverlay("Ortaklar getiriliyor...");
