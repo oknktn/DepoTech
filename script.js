@@ -3379,3 +3379,130 @@ function initHamaliyeSayfasi() {
     }, 700);
      // --- --- ---
 }
+
+/* ======================================== */
+/* GOOGLE API KİMLİK DOĞRULAMA FONKSİYONLARI (GÜNCELLENDİ) */
+/* ======================================== */
+
+/**
+ * GAPI istemci kütüphanesi yüklendiğinde HTML'deki onload tarafından çağrılır.
+ */
+function handleGapiLoad() {
+    gapi.load('client', initializeGapiClient); // GAPI client'ı yükle ve başlat
+}
+
+/**
+ * GIS (Google Identity Services) kütüphanesi yüklendiğinde HTML'deki onload tarafından çağrılır.
+ */
+function handleGisLoad() {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: '', // Geri arama handleAuthClick içinde dinamik olarak ayarlanacak
+    });
+    gisInited = true;
+    checkApiInitComplete(); // API'lerin hazır olup olmadığını kontrol et
+}
+
+/**
+ * GAPI istemcisini başlatır (handleGapiLoad tarafından çağrılır).
+ */
+async function initializeGapiClient() {
+    try {
+        await gapi.client.init({
+            discoveryDocs: DISCOVERY_DOCS,
+        });
+        gapiInited = true;
+        checkApiInitComplete(); // API'lerin hazır olup olmadığını kontrol et
+        console.log("GAPI Client Başlatıldı.");
+    } catch (err) {
+        console.error("GAPI Client Başlatma Hatası:", err);
+        alert("Google API bağlantısında hata oluştu. Sayfayı yenileyin veya daha sonra tekrar deneyin.");
+    }
+}
+
+/**
+ * Hem GAPI hem de GIS yüklendiğinde butonları gösterir/gizler.
+ */
+function checkApiInitComplete() {
+    // Sadece iki kütüphane de hazırsa devam et
+    if (gapiInited && gisInited) {
+        console.log("API Kütüphaneleri Hazır.");
+        const authButton = document.getElementById(authButtonId);
+        const signoutButton = document.getElementById(signoutButtonId);
+        
+        // Başlangıçta Giriş Yap butonunu göster, Çıkış Yap butonunu gizle
+        if (authButton) {
+            authButton.style.visibility = 'visible';
+            authButton.style.display = 'block'; 
+        }
+         if(signoutButton) {
+            signoutButton.style.display = 'none';
+         }
+         // Başlangıçta API'ye bağlı butonları pasifleştir
+         enableApiButtons(false);
+    }
+}
+
+/**
+ * Kullanıcı "Giriş Yap" butonuna tıkladığında API erişimi için izin ister.
+ */
+function handleAuthClick() {
+  // Token alındığında veya hata oluştuğunda çalışacak fonksiyonu ayarla
+  tokenClient.callback = async (resp) => {
+    if (resp.error !== undefined) {
+      console.error("Yetkilendirme Hatası:", resp);
+      // Kullanıcı izin vermediyse veya başka bir hata olduysa
+      alert("Google Hesabınızla oturum açma veya izin verme sırasında bir hata oluştu: " + resp.error);
+      // Giriş başarısız olduğu için butonları eski haline getir
+      updateSigninStatus(false); 
+      throw (resp);
+    }
+    
+    // Başarılı token alındı, GAPI'ye set et
+    gapi.client.setToken(resp);
+    console.log("Giriş Yapıldı ve Token Alındı.");
+    
+    // Giriş yapıldıktan sonra arayüzü güncelle (Giriş->Çıkış butonu)
+    updateSigninStatus(true); 
+    
+    // GİRİŞ YAPILDIKTAN SONRA YAPILACAK İLK İŞLEM: Sayfaya özel veriyi yükle
+    const currentPageLoader = getCurrentPageLoadFunction();
+    if(currentPageLoader) {
+        console.log("Sayfaya özel veri yükleme fonksiyonu çalıştırılıyor:", currentPageLoader.name);
+        try {
+            await currentPageLoader(); // Veri yükleme fonksiyonunu çalıştır ve bitmesini bekle (eğer async ise)
+        } catch(loadError) {
+            console.error("Veri yükleme fonksiyonunda hata:", loadError);
+            alert("Veriler yüklenirken bir hata oluştu.");
+        }
+    } else {
+        console.warn("Giriş sonrası çalıştırılacak özel bir fonksiyon bulunamadı.");
+    }
+  };
+
+  // Eğer GAPI'de geçerli bir token yoksa, kullanıcıdan izin iste
+   tokenClient.requestAccessToken({prompt: 'consent'}); // İzin ekranını göster
+}
+
+// updateSigninStatus fonksiyonu BURADA BAŞLIYOR (önceki koddan devam ediyor)
+/**
+ * Giriş/Çıkış durumuna göre butonların görünürlüğünü ayarlar.
+ * @param {boolean} isSignedIn Kullanıcı giriş yapmışsa true.
+ */
+function updateSigninStatus(isSignedIn) {
+    const authButton = document.getElementById(authButtonId);
+    const signoutButton = document.getElementById(signoutButtonId);
+
+    if (isSignedIn) {
+        if(authButton) authButton.style.display = 'none';
+        if(signoutButton) signoutButton.style.display = 'block';
+        enableApiButtons(true); 
+    } else {
+        if(authButton) authButton.style.display = 'block';
+        if(signoutButton) signoutButton.style.display = 'none';
+        enableApiButtons(false);
+    }
+}
+
+// ... (handleSignoutClick, enableApiButtons, clearPageData, getCurrentPageLoadFunction vb. fonksiyonlar olduğu gibi kalacak) ...
