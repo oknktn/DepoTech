@@ -72,11 +72,6 @@ window.addEventListener('load', () => {
   }
 });
 
-// --- Global Değişkenler (Stok Ekleme için) ---
-const birimListesiStokEkle = ['Adet', 'Kg', 'Koli', 'Lt', 'Metre', 'Paket', 'Ton'];
-// ambalajListesi, stokTuruListesi, birimKosullari zaten stok-guncelle için tanımlanmıştı, tekrar gerek yok.
-// --- --- ---
-
 /**
  * Menü linklerinden tıklandığında sayfaya yönlendirme yapar.
  * @param {string} page Gidilecek sayfanın adı (örn: 'pesin.html').
