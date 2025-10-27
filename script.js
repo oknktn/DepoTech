@@ -48,7 +48,7 @@ async function sendData(action, data) {
      try {
         const response = await fetch(WEB_APP_URL, {
             method: 'POST',
-            mode: 'cors',
+            mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: action, data: data }) // Hem action hem de data gönder
         });
