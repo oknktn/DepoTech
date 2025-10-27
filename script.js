@@ -1764,6 +1764,10 @@ function saveNewOrtak() {
     }
   }, 1000); 
 }
+document.getElementById("menuOrtakListesi").addEventListener("click", () => {
+    fetchOrtakListesi();
+});
+
 
 /* ======================================== */
 /*  ortak.html (Ortak Listesi)  API ENTEGRESİ */
