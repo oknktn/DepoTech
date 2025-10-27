@@ -1,3 +1,33 @@
+// ========================================
+// 0. GOOGLE API AYARLARI
+// ========================================
+
+const CLIENT_ID = '74893450229-nkhr6i63650fegcitvpv8p9b1au262pd.apps.googleusercontent.com'; // BURAYA KENDİ CLIENT ID'NİZİ YAPIŞTIRIN
+const API_KEY = 'AIzaSyBM0vIZ15ygxdow0CLe1dlUyFC2M_An_m4'; // Genellikle Gerekmez, OAuth yeterlidir. Şimdilik boş bırakabilirsiniz veya isterseniz GCP'den API Key oluşturabilirsiniz.
+const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
+// Bu kapsam (scope) E-Tabloları okuma ve yazma izni verir.
+const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
+
+// BURAYA GOOGLE E-TABLONUZUN ID'SİNİ YAPIŞTIRIN
+// E-Tablonuzun URL'sindeki uzun kod: 
+// docs.google.com/spreadsheets/d/ SPREADSHEET_ID_BURADA /edit
+const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID'; 
+
+let tokenClient; // Google Auth Token Client
+let gapiInited = false; // GAPI Kütüphanesi yüklendi mi?
+let gisInited = false; // GIS Kütüphanesi yüklendi mi?
+
+// Yetkilendirme/Çıkış butonlarının ID'leri (HTML'e eklenecek)
+const authButtonId = 'authorize_button';
+const signoutButtonId = 'signout_button';
+
+// --- (Diğer global değişkenleriniz burada devam edebilir) ---
+// const birimListesiStokEkle = ...
+// const ambalajListesi = ...
+// ...
+
+
+
 // GÜNCELLENMİŞ YÜKLEME FONKSİYONU
 window.addEventListener('load', () => {
   const loadingScreen = document.getElementById('loadingScreen');
