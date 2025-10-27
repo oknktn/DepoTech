@@ -5,15 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DepoTech 2025</title>
   <link rel="stylesheet" href="style.css">
-<script async defer src="https://apis.google.com/js/api.js"></script>
-    <script async defer src="https://accounts.google.com/gsi/client"></script>
-    <script src="script.js" defer></script>
+  
+  <script async defer src="https://apis.google.com/js/api.js"></script>
+  <script async defer src="https://accounts.google.com/gsi/client"></script>
+  
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <script src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-    <script src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
-    
-    <div class="loading-overlay" id="loadingOverlay"><div class="loading-text">İşleniyor...</div></div>
+  <script src="https://apis.google.com/js/api.js" onload="handleGapiLoad()"></script>
+  <script src="https://accounts.google.com/gsi/client" onload="handleGisLoad()"></script>
+  
+  <div class="loading-overlay" id="loadingOverlay"><div class="loading-text">İşleniyor...</div></div>
   <div class="loading-screen" id="loadingScreen">
     <div class="logo-circle">DT</div>
     <div class="loading-text">DepoTech Yükleniyor...</div>
@@ -22,7 +24,7 @@
   <main id="mainScreen" style="display: none;">
     <header class="header">
       <h1>DepoTech - Depo Yönetim Sistemi</h1>
-    </header>
+      </header>
 
     <div class="main-layout">
       <aside class="info-column">
