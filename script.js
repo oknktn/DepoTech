@@ -1806,10 +1806,6 @@ async function loadOrtakListesi() {
   }
 }
 
-if (window.location.pathname.includes("ortak.html")) {
-    fetchOrtakListesi();
-}
-
 
 // ... (Diğer modal fonksiyonları aşağıda kalmaya devam etmeli: openModal, closeModal, saveNewOrtak) ...
 
@@ -2877,6 +2873,11 @@ document.addEventListener("DOMContentLoaded", () => {
 /* Paste this at end of script.js OR in a new sheets-integration.js loaded after script.js */
 
 const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbx3p39l2utqWQZv6ZvRCqu_A4l_QN3WVb5r0rUxEWALv81hkxt6BvHhYouxvxQ9jTJb/exec";
+
+if (window.location.pathname.includes("ortak.html")) {
+    fetchOrtakListesi();
+}
+
 
 // Utility: show / hide loading overlay (id: loadingOverlay)
 function showLoading(show = true, text) {
