@@ -1765,44 +1765,46 @@ function saveNewOrtak() {
   }, 1000); 
 }
 
+/* ======================================== */
+/*  ortak.html (Ortak Listesi)  API ENTEGRESİ */
+/* ======================================== */
+
 /**
  * 'ortak.html' - Ortak listesini yükler ve tabloyu doldurur.
  */
-function loadOrtakListesi() {
+async function loadOrtakListesi() {
   const tableBody = document.getElementById('dataTableBody');
-  // Sadece ortak.html'de olduğumuzdan emin olalım
   if (!tableBody || !document.querySelector('.partner-list-container')) return; 
   
+  // Tabloyu temizle ve yükleme mesajını göster
   tableBody.innerHTML = '<tr><td colspan="5" class="loading-text">Ortak listesi yükleniyor...</td></tr>'; 
   
-  console.log('Ortak listesi yükleniyor...');
-  // TODO: Google Sheets API'den 'Ortaklar' sayfasındaki verileri çek
-  
-  // Örnek Veri
-  setTimeout(() => { 
-    const data = [
-      { no: '123', tckn: '111...', adSoyad: 'Ali Veli', telefon: '555...', mahalle: 'Merkez' },
-      { no: '456', tckn: '222...', adSoyad: 'Zeynep Su', telefon: '544...', mahalle: 'Yeni Mah.' },
-    ];
+  try {
+    // Apps Script'teki 'getOrtaklar' fonksiyonunu çağır (Bölüm 8'de eklediğimiz)
+    const response = await fetchData('getOrtaklar');
+    const data = response.data; // Apps Script'ten gelen veri dizisi
     
-    tableBody.innerHTML = ''; 
-    if (data.length === 0) {
+    tableBody.innerHTML = ''; // Yükleniyor'u temizle
+    
+    if (!data || data.length === 0) {
       tableBody.innerHTML = '<tr><td colspan="5" class="loading-text">Gösterilecek ortak kaydı bulunamadı.</td></tr>';
       return;
     }
 
+    // Gelen veriyi tabloya ekle (Verinin Sheets'te sırasıyla No, TCKN, Ad, Tel, Mahalle olduğu varsayımıyla)
     data.forEach(item => {
       const row = tableBody.insertRow(); 
       row.innerHTML = `
-          <td>${item.no || ''}</td>
-          <td>${item.tckn || ''}</td>
-          <td>${item.adSoyad || ''}</td>
-          <td>${item.telefon || ''}</td>
-          <td>${item.mahalle || ''}</td>`;
+          <td>${item[0] || ''}</td>  <td>${item[1] || ''}</td>  <td>${item[2] || ''}</td>  <td>${item[3] || ''}</td>  <td>${item[4] || ''}</td>  `;
     });
-  }, 1000); 
+
+  } catch (error) {
+    console.error("Ortak Listesi Yükleme Hatası:", error);
+    tableBody.innerHTML = '<tr><td colspan="5" class="loading-text" style="color: red;">Veriler yüklenemedi. Konsolu kontrol edin.</td></tr>';
+  }
 }
 
+// ... (Diğer modal fonksiyonları aşağıda kalmaya devam etmeli: openModal, closeModal, saveNewOrtak) ...
 
 /* ======================================== */
 /* 19. ortak-disi.html (Ortak Dışı Listesi) FONKSİYONLARI */
