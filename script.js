@@ -1,3 +1,84 @@
+// ========================================
+// 0. POSTACI (APPS SCRIPT) AYARLARI
+// ========================================
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxsgjfD7IrO3U0fpUvaFKxC6Ocxya4gwDPjeWQCEHDjnc8XofRvXZezW3GMEqEs2j4E/exec';
+let currentUserEmail = localStorage.getItem('currentUserEmail') || 'Bilinmiyor';
+let lastLoginTime = localStorage.getItem('lastLoginTime');
+
+/**
+ * Apps Script'ten veri okumak için genel yardımcı fonksiyon.
+ * @param {string} action Apps Script'teki çağrılacak fonksiyon adı (Örn: 'getOrtaklar')
+ * @returns {Promise<Object>} API'den gelen veriyi döndürür
+ */
+async function fetchData(action) {
+    try {
+        const response = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'cors', // CORS modunu etkinleştir
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: action })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP Hata! Statü: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success === false) {
+             throw new Error(result.message || 'API tarafından başarısız yanıt geldi.');
+        }
+        
+        return result;
+
+    } catch (error) {
+        console.error(`Fetch Hatası - İşlem: ${action}`, error);
+        // Hata durumunda kullanıcıya görsel bildirim gösterilebilir
+        alert(`Veri yüklenemedi! Lütfen E-Tablo ve Apps Script bağlantısını kontrol edin. (${error.message})`);
+        return { success: false, data: [] };
+    }
+}
+
+/**
+ * Apps Script'e veri yazmak için genel yardımcı fonksiyon.
+ * @param {string} action Apps Script'teki çağrılacak fonksiyon adı (Örn: 'saveNewOrtak')
+ * @param {Object} data Kaydedilecek veri
+ * @returns {Promise<Object>} API'den gelen yanıtı döndürür
+ */
+async function sendData(action, data) {
+     try {
+        const response = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: action, data: data }) // Hem action hem de data gönder
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP Hata! Statü: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success === false) {
+             throw new Error(result.message || 'API tarafından başarısız yanıt geldi.');
+        }
+        
+        return result;
+
+    } catch (error) {
+        console.error(`Send Hatası - İşlem: ${action}`, error);
+        alert(`Kayıt işlemi BAŞARISIZ oldu! Hata: (${error.message})`);
+        return { success: false, message: 'Kayıt başarısız.' };
+    }
+}
+
+
+/* ======================================== */
+/* 1. GÜVENLİK KONTROLÜ (OTURUM KORUMA) */
+/* ======================================== */
+// ... (geri kalan kodlar) ...
+
 /* ======================================== */
 /* 1. GÜVENLİK KONTROLÜ (OTURUM KORUMA) */
 /* ======================================== */
