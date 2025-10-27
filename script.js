@@ -1,8 +1,8 @@
 // ========================================
 // 0. POSTACI (APPS SCRIPT) AYARLARI
 // ========================================
-const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbxYIaZqRRgd5ByHJItSASVasIYOINM9edeBU5L3IfzpTVKK4Ql1T9a6LLWbgnf-tKLD/exec";
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxYIaZqRRgd5ByHJItSASVasIYOINM9edeBU5L3IfzpTVKK4Ql1T9a6LLWbgnf-tKLD/exec';
+const GAS_URL = "https://script.google.com/macros/s/AKfycbydqERF2-9thnpdq8biORCDT3C0hjRN6wIjFciVPNE4izkjQoZ9VXB_VZYB_9S1V8zu/exec";
+
 let currentUserEmail = localStorage.getItem('currentUserEmail') || 'Bilinmiyor';
 let lastLoginTime = localStorage.getItem('lastLoginTime');
 
@@ -2939,93 +2939,65 @@ function escapeHtml(s) {
 
 // Fetch sheet data (GET)
 async function fetchOrtakListesi() {
-    showLoading(true);
+  showLoadingOverlay("Ortak listesi yükleniyor...");
   try {
-    const res = await fetch(SHEETS_API_URL);
-    if (!res.ok) throw new Error("Sunucudan veri alınamadı: " + res.status);
-    const data = await res.json();
-
-    // data is array of arrays. If first row is header, skip it.
-    let rows = Array.isArray(data) ? data : [];
-    if (rows.length && typeof rows[0][0] === "string") {
-      const firstRow = rows[0].map(c => (c || "").toString().toLowerCase());
-      if (firstRow.includes("ortak no") || firstRow.includes("tckn") || firstRow.includes("adı soyadı")) {
-        rows = rows.slice(1);
-      }
-    }
-
-    renderOrtakTable(rows);
+    const res = await fetch(GAS_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.message || "Sunucu başarısız yanıt");
+    renderOrtakTable(json.data || []);
   } catch (err) {
-    console.error("Veri çekme hatası:", err);
-
-    const tableHasData = document.getElementById("dataTableBody")?.rows.length > 0;
-    if (!tableHasData) {
-      alert("Veri yüklenemedi! Lütfen bağlantıyı kontrol edin.");
-      const tbody = document.getElementById("dataTableBody");
-      if (tbody) {
-        tbody.innerHTML = `<tr><td colspan="5" class="loading-text">Veri yüklenemedi: ${escapeHtml(err.message)}</td></tr>`;
-      }
-    } else {
-      console.warn("Geçici fetch hatası oluştu ama tablo zaten dolu, uyarı bastırıldı.");
-    }
+    const tbody = document.getElementById("dataTableBody");
+    if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="loading-text">Veri yüklenemedi: ${String(err.message)}</td></tr>`;
+    console.error(err);
   } finally {
-    showLoading(false);
+    hideLoadingOverlay();
   }
 }
+
 
 
 // Read form fields and POST new ortak
 async function saveNewOrtak() {
-  const ortakNumarasi = document.getElementById("ortakNumarasi")?.value.trim();
-  const tckn = document.getElementById("tckn")?.value.trim();
-  const adSoyadi = document.getElementById("adSoyadi")?.value.trim();
-  const telefon = document.getElementById("telefon")?.value.trim();
-  const mahalle = document.getElementById("mahalle")?.value.trim();
-
-  // Simple validation
-  if (!ortakNumarasi) {
-    alert("Ortak Numarası gerekli.");
-    return;
-  }
-  if (!adSoyadi) {
-    alert("Adı Soyadı gerekli.");
-    return;
-  }
-
-  const payload = {
-    ortakNo: ortakNumarasi,
-    tckn: tckn,
-    adSoyad: adSoyadi,
-    telefon: telefon,
-    mahalle: mahalle
+  const ortakData = {
+    ortakNo: document.getElementById('ortakNumarasi')?.value.trim(),
+    tckn:     document.getElementById('tckn')?.value.trim(),
+    adSoyad:  document.getElementById('adSoyadi')?.value.trim(),
+    telefon:  document.getElementById('telefon')?.value.trim(),
+    mahalle:  document.getElementById('mahalle')?.value.trim()
   };
 
+  if (!ortakData.ortakNo || !ortakData.adSoyad) {
+    alert("Ortak Numarası ve Adı Soyadı zorunludur.");
+    return;
+  }
+
+  showLoadingOverlay("Kaydediliyor...");
+
   try {
-    showLoading(true, "Kaydediliyor...");
-    const res = await fetch(SHEETS_API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    // Preflight'ı tamamen by-pass etmek için GET + querystring
+    const qs = new URLSearchParams({
+      action: "saveOrtak",
+      payload: JSON.stringify(ortakData)
+    }).toString();
 
-    if (!res.ok) throw new Error("Kaydetme isteği başarısız: " + res.status);
-    const text = await res.text();
-    if (text && text.toLowerCase().indexOf("ok") === -1) {
-      console.warn("Sunucudan beklenmeyen yanıt:", text);
-    }
+    const res = await fetch(`${GAS_URL}?${qs}`, { method: "GET", cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
 
-    // Success: temizle, modal kapat, listeyi yenile
-    clearNewOrtakForm();
+    const json = await res.json();
+    if (!json.success) throw new Error(json.message || "Sunucu başarısız yanıt");
+
+    alert("Ortak başarıyla eklendi.");
     closeModal();
     await fetchOrtakListesi();
-    alert("Yeni ortak eklendi.");
   } catch (err) {
-    console.error(err);
     alert("Kaydederken hata: " + err.message);
+    console.error("saveNewOrtak:", err);
   } finally {
-    showLoading(false);
+    hideLoadingOverlay();
   }
 }
+
 
 // Clear form inputs
 function clearNewOrtakForm() {
