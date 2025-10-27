@@ -1847,7 +1847,7 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 }
 
 /* ======================================== */
-/* 25. hamaliye.html (Hamaliye Hesaplama) STİLLERİ */
+/* 25. hamaliye.html (Hamaliye Hesaplama) STİLLERİ (Düzeltilmiş) */
 /* ======================================== */
 
 .hamaliye-container {
@@ -1881,7 +1881,8 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .fiyat-grid input:read-only {
   background-color: #e9ecef;
 }
-.fiyat-grid .btn { /* Fiyat Paneli - Güncelle/Kaydet butonu */
+/* Fiyat Paneli - Güncelle/Kaydet butonu */
+.fiyat-grid .btn { 
     height: 36px; 
     flex-shrink: 0; 
     padding: 8px 20px;
@@ -1891,87 +1892,78 @@ input:read-only { background-color: #f0f0f0; color: #333; }
     border: none; /* Kenarlık yok */
     border-radius: 4px;
     /* Başlangıçta Güncelle (Yeşil) */
-    background-color: var(--tkk-light-green); 
+    background-color: var(--light-green); /* <-- DOĞRU DEĞİŞKEN */
     color: white; 
 }
 .fiyat-grid .btn.btn-kaydet { /* Kaydet modundayken Turuncu */
-     background-color: var(--tkk-orange); 
+     background-color: var(--orange); /* <-- DOĞRU DEĞİŞKEN */
      color: white; 
 }
 .fiyat-grid .btn:hover { /* Hover efekti */
     opacity: 0.9;
 }
-.btn-guncelle { background-color: var(--tkk-light-green); color: white; }
-.btn-kaydet { background-color: var(--tkk-orange); color: white; }
+/* .btn-guncelle ve .btn-kaydet genel tanımları kaldırıldı, yukarıdakiler yeterli */
 
 
-/* Toplamlar paneli - YENİ GRID DÜZENİ */
+/* Toplamlar paneli - GRID DÜZENİ */
 .toplam-container {
   display: grid;
-  /* 3 Sütun: Toplamlar (geniş), Genel Toplam (orta), Kaydet (dar) */
   grid-template-columns: 4fr 3fr 1fr; 
   gap: 20px;
-  align-items: end; /* Öğeleri (özellikle butonu) dikeyde alta hizala */
+  align-items: end; 
 }
 
-/* Sütun grupları için ek stil gerekmiyor (grid hallediyor) */
-/* .toplam-grup, .genel-toplam-grup, .kaydet-grup { ... } kuralları silindi */
-
-/* Toplamlar ve Genel Toplam içindeki alt ızgara (Yem/Gübre/Diğer ve Tonaj/Tutar) */
-/* .fiyat-grid'i burada da kullanmaya devam edebiliriz, sorun olmamalı */
-.toplam-container .fiyat-grid {
-    display: flex; /* İçerikleri yan yana dizer */
-    gap: 10px; /* İçerikler arası boşluk */
-    justify-content: center; /* İçerikleri ortala */
+/* Toplamlar ve Genel Toplam içindeki alt ızgara */
+.toplam-container .fiyat-grid { /* Burada .fiyat-grid'i tekrar kullanıyoruz */
+    display: flex; 
+    gap: 10px; 
+    justify-content: center; 
 }
 .toplam-container .fiyat-grid .form-group {
-    flex: 1; /* Inputlar eşit genişlesin */
+    flex: 1; 
 }
-
 
 /* Başlıklar */
 .toplam-container .panel-title { 
   text-align: center; 
   font-size: 18px; 
-  /* Altındaki yeşil çizgiyi ekleyelim */
-  border-bottom: 2px solid var(--tkk-light-green); 
+  border-bottom: 2px solid var(--light-green); /* <-- DOĞRU DEĞİŞKEN */
   padding-bottom: 5px;
-  margin-bottom: 15px; /* Başlıkla içerik arası boşluk */
+  margin-bottom: 15px; 
 }
 
 /* Toplam input etiketleri ve inputları */
 .toplam-container .form-group { 
     text-align: center; 
 }
-.toplam-container .form-label { /* Etiketler için eklenen stil */
+.toplam-container .form-label { 
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 5px;
     display: block;
 }
 .toplam-container .form-control { 
-    font-weight: bold; /* Toplamlar kalın */
-    text-align: center; /* Toplamları ortala */
+    font-weight: bold; 
+    text-align: center; 
 }
 
-/* Kaydet Butonu */
+/* Kaydet Butonu (Toplamlar Panelindeki) */
 .kaydet-grup {
-    display: flex; /* Butonun dikey hizalaması için */
+    display: flex; 
     align-items: center;
-    height: 100%; /* Sütunun tüm yüksekliğini kapla */
+    height: 100%; 
 }
 .btn-toplam-kaydet {
   width: 100%;
   height: 78px; 
   font-size: 16px; 
   /* Renk (Turuncu) */
-  background-color: var(--tkk-orange);
+  background-color: var(--orange); /* <-- DOĞRU DEĞİŞKEN */
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-weight: 600;
-  /* İkon ve metni ortala */
   display: inline-flex; 
   align-items: center;
   justify-content: center;
@@ -1988,74 +1980,65 @@ input:read-only { background-color: #f0f0f0; color: #333; }
 .fis-header {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Başlık sola, buton sağa */
+  justify-content: space-between; 
   margin-bottom: 10px;
 }
-.btn-add-fis { /* Zaten tanımlıydı, hover ekleyelim */
-    background: none; border: none; color: var(--tkk-green); font-size: 16px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+.btn-add-fis { 
+    background: none; border: none; color: var(--green); font-size: 16px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
 }
-.btn-add-fis:hover { color: var(--tkk-light-green); }
+.btn-add-fis:hover { color: var(--light-green); }
 .btn-add-fis:disabled { color: #aaa; cursor: not-allowed; }
 
 /* Fiş Satırı Izgarası */
 .fis-grid-layout {
   display: grid;
-  /* FişNo, C/T, Kod, Ad, Miktar, Tür, Toplam, Sil */
   grid-template-columns: 120px 80px 1fr 2fr 1fr 1fr 1fr auto; 
   gap: 5px;
   align-items: center;
-  padding: 0 8px; /* Kenar boşlukları */
+  padding: 0 8px; 
 }
 
 /* Fiş Başlık Satırı */
 .fis-table-header {
   font-weight: bold;
-  background-color: var(--tkk-light-green);
+  background-color: var(--light-green); /* <-- DOĞRU DEĞİŞKEN */
   color: white;
   border-radius: 4px 4px 0 0;
-  padding: 8px; /* Başlığa özel padding */
-  margin-bottom: 10px; /* Başlıkla ilk satır arası boşluk */
+  padding: 8px; 
+  margin-bottom: 10px; 
 }
-/* Başlık hücre hizalamaları */
-.fis-table-header div:nth-child(2), /* Çift/Tek */
-.fis-table-header div:nth-child(9)  /* Durum (ileride?) */
- { text-align: center; } 
-.fis-table-header div:nth-child(5), /* Miktar */
-.fis-table-header div:nth-child(7)  /* Toplam */
- { text-align: right; } 
+.fis-table-header div:nth-child(2), .fis-table-header div:nth-child(9) { text-align: center; } 
+.fis-table-header div:nth-child(5), .fis-table-header div:nth-child(7) { text-align: right; } 
 
-/* Fiş Satırı Konteyneri (Select + İçerik) */
+/* Fiş Satırı Konteyneri */
 .fis-row-container {
   margin-bottom: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  background-color: var(--tkk-light-gray); /* Hafif arka plan */
+  background-color: var(--light-gray); 
 }
-/* Fiş Seçim Satırı (İlk satır) */
 .fis-row-container > .fis-grid-layout:first-child {
-    padding: 8px; /* Seçim satırına boşluk */
-    border-bottom: 1px solid #ddd; /* Ayırıcı çizgi */
+    padding: 8px; 
+    border-bottom: 1px solid #ddd; 
 }
 
 /* Fiş İçerik Satırları */
 .fis-item-row {
-  border-top: 1px dashed #ccc; /* İçerik satırları arası çizgi */
-  padding: 4px 8px; /* İçerik satırı boşluğu */
-  background-color: var(--white); /* İçerik arka planı beyaz */
+  border-top: 1px dashed #ccc; 
+  padding: 4px 8px; 
+  background-color: var(--white); 
 }
-/* Satır içindeki elemanlar için genel stil */
 .fis-grid-layout > div, 
 .fis-grid-layout select, 
 .fis-grid-layout button,
 .fis-grid-layout input { 
     padding: 4px 6px; 
-    font-size: 12px; /* Küçük font */
+    font-size: 12px; 
     height: 30px; 
     display: flex; 
     align-items: center; 
-    box-sizing: border-box; /* Önemli */
+    box-sizing: border-box; 
 }
-/* Fiş Select Kutusu */
 .fis-select {
   width: 100%;
   height: 30px;
@@ -2064,27 +2047,24 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   border: 1px solid var(--border-color);
   font-size: 12px;
 }
-/* Çift/Tek Checkbox */
 .fis-grid-layout input[type="checkbox"] {
-  margin: auto; /* Ortala */
-  height: 18px; /* Boyut */
+  margin: auto; 
+  height: 18px; 
   width: 18px;
 }
-/* Miktar ve Toplam Hücreleri */
 .item-miktar, .item-toplam {
-  justify-content: flex-end; /* Sağa yasla */
+  justify-content: flex-end; 
   font-weight: 500;
 }
 .item-toplam {
   background-color: #f0f0f0;
   border-radius: 3px;
-  padding-right: 8px; /* Sağa boşluk */
+  padding-right: 8px; 
 }
-/* Silme Butonu */
 .btn-remove-item {
   background: none;
   border: none;
-  color: var(--tkk-red);
+  color: var(--tkk-red); /* Kırmızı renk değişkeni */
   font-size: 14px;
   cursor: pointer;
   padding: 4px;
