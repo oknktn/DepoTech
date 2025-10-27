@@ -1863,8 +1863,7 @@ async function fetchOrtakListesi() {
   }
 }
 
-//* ===========================
-   KAYDET (GET ile write)
+//* ===========================KAYDET (GET ile write)
 // =========================== */
 async function saveNewOrtak() {
   const d = {
