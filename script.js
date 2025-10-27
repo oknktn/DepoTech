@@ -1,8 +1,7 @@
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbydqERF2-9thnpdq8biORCDT3C0hjRN6wIjFciVPNE4izkjQoZ9VXB_VZYB_9S1V8zu/exec";
 // ========================================
 // 0. POSTACI (APPS SCRIPT) AYARLARI
 // ========================================
-const GAS_URL = "https://script.google.com/macros/s/AKfycbydqERF2-9thnpdq8biORCDT3C0hjRN6wIjFciVPNE4izkjQoZ9VXB_VZYB_9S1V8zu/exec";
-
 let currentUserEmail = localStorage.getItem('currentUserEmail') || 'Bilinmiyor';
 let lastLoginTime = localStorage.getItem('lastLoginTime');
 
@@ -1716,8 +1715,6 @@ function closeModal() {
 /* ===========================
    CONFIG
 =========================== */
-const GAS_URL = "https://script.google.com/macros/s/AKfycbydqERF2-9thnpdq8biORCDT3C0hjRN6wIjFciVPNE4izkjQoZ9VXB_VZYB_9S1V8zu/exec";
-
 /* ===========================
    UI HELPERS
 =========================== */
@@ -1735,30 +1732,128 @@ function hideLoadingOverlay() {
 /* ===========================
    TABLOYA YAZDIR
 =========================== */
+
+
+/* ===========================
+   LİSTE GETİR (GET)
+=========================== */
+
+
+/* ===========================
+   KAYDET (GET ile write)
+=========================== */
+
+
+/* ===========================
+   SAYFA AÇILINCA ÇALIŞTIR
+=========================== */
+window.addEventListener("load", () => {
+  if (document.getElementById("dataTableBody")) {
+    fetchOrtakListesi();
+  }
+});
+
+
+/* ======================================== */
+
+
+/* ===========================
+   TABLOYA YAZDIR (Ortak)
+=========================== */
 function renderOrtakTable(rows) {
   const tbody = document.getElementById("dataTableBody");
+  if (!tbody) return;
   tbody.innerHTML = "";
-
-  rows.forEach(r => {
+  if (!rows || !rows.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="loading-text">Kayıt yok.</td></tr>';
+    return;
+  }
+  // Başlık satırı varsa çıkar
+  let data = rows;
+  if (typeof data[0][0] === "string") {
+    const hdr = data[0].map(c => (c || '').toString().toLowerCase());
+    if (hdr.includes("ortak no") || hdr.includes("tckn") || hdr.includes("adı soyadı")) {
+      data = data.slice(1);
+    }
+  }
+  data.forEach(r => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${r[0] ?? ""}</td>
       <td>${r[1] ?? ""}</td>
       <td>${r[2] ?? ""}</td>
       <td>${r[3] ?? ""}</td>
-      <td>${r[4] ?? ""}</td>
-    `;
+      <td>${r[4] ?? ""}</td>`;
     tbody.appendChild(tr);
   });
 }
 
 /* ===========================
-   LİSTE GETİR (GET)
+   ORTAK — LİSTE GETİR (GET)
+=========================== */
+async function fetchOrtakListesi() {
+  if (!document.getElementById("dataTableBody")) return;
+  showLoadingOverlay?.("Ortaklar getiriliyor...");
+  try {
+    const res = await fetch(WEB_APP_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const json = await res.json();
+    if (!json.success && !Array.isArray(json.data)) {
+      throw new Error(json.message || "Sunucu başarısız yanıt");
+    }
+    renderOrtakTable(json.data || []);
+  } catch (err) {
+    const tbody = document.getElementById("dataTableBody");
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="5" class="loading-text">Veri yüklenemedi: ${String(err.message)}</td></tr>`;
+    }
+    console.error("fetchOrtakListesi:", err);
+  } finally {
+    hideLoadingOverlay?.();
+  }
+}
+
+/* ===========================
+   ORTAK — KAYDET (GET ile write)
+=========================== */
+async function saveNewOrtak() {
+  const d = {
+    ortakNo: document.getElementById('ortakNumarasi')?.value.trim(),
+    tckn:    document.getElementById('tckn')?.value.trim(),
+    adSoyad: document.getElementById('adSoyadi')?.value.trim(),
+    telefon: document.getElementById('telefon')?.value.trim(),
+    mahalle: document.getElementById('mahalle')?.value.trim(),
+  };
+  if (!d.ortakNo || !d.adSoyad) {
+    alert("Ortak No ve Ad Soyad zorunlu!");
+    return;
+  }
+  showLoadingOverlay?.("Kaydediliyor...");
+  try {
+    const qs = new URLSearchParams({ action:"saveOrtak", payload: JSON.stringify(d) }).toString();
+    const res = await fetch(`${WEB_APP_URL}?${qs}`, { method: "GET", cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.message || "Kaydedilemedi.");
+    closeModal?.();
+    await fetchOrtakListesi();
+    alert("Kayıt eklendi.");
+  } catch (err) {
+    alert("Hata: " + err.message);
+    console.error("saveNewOrtak:", err);
+  } finally {
+    hideLoadingOverlay?.();
+  }
+}
+
+/* Köprü: Eski çağrılar için */
+function loadOrtakListesi(){ fetchOrtakListesi(); }
+ (GET)
 =========================== */
 async function fetchOrtakListesi() {
   showLoadingOverlay("Ortaklar getiriliyor...");
   try {
-    const res = await fetch(GAS_URL);
+    const res = await fetch(WEB_APP_URL);
     const json = await res.json();
     renderOrtakTable(json.data || []);
   } catch (err) {
@@ -1793,7 +1888,7 @@ async function saveNewOrtak() {
       payload: JSON.stringify(d)
     }).toString();
 
-    const res = await fetch(`${GAS_URL}?${qs}`);
+    const res = await fetch(`${WEB_APP_URL}?${qs}`);
     const json = await res.json();
 
     if (!json.success) throw new Error(json.message || "Kaydedilemedi.");
@@ -2950,7 +3045,7 @@ function escapeHtml(s) {
 async function fetchOrtakListesi() {
   showLoadingOverlay("Ortak listesi yükleniyor...");
   try {
-    const res = await fetch(GAS_URL, { cache: "no-store" });
+    const res = await fetch(WEB_APP_URL, { cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const json = await res.json();
     if (!json.success) throw new Error(json.message || "Sunucu başarısız yanıt");
@@ -2990,7 +3085,7 @@ async function saveNewOrtak() {
       payload: JSON.stringify(ortakData)
     }).toString();
 
-    const res = await fetch(`${GAS_URL}?${qs}`, { method: "GET", cache: "no-store" });
+    const res = await fetch(`${WEB_APP_URL}?${qs}`, { method: "GET", cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
 
     const json = await res.json();
@@ -3045,4 +3140,3 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 });
-
