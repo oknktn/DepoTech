@@ -34,8 +34,6 @@ async function fetchData(action) {
 
     } catch (error) {
         console.error(`Fetch Hatası - İşlem: ${action}`, error);
-        // Hata durumunda kullanıcıya görsel bildirim gösterilebilir
-        alert(`Veri yüklenemedi! Lütfen E-Tablo ve Apps Script bağlantısını kontrol edin. (${error.message})`);
         return { success: false, data: [] };
     }
 }
