@@ -3039,8 +3039,5 @@ document.addEventListener("DOMContentLoaded", () => {
       saveNewOrtak();
     };
   }
-
-  // Load list on start
-  fetchOrtakListesi();
 });
 
