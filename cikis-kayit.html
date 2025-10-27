@@ -7,14 +7,16 @@
     <title>DepoTech - Depo Çıkış Kaydı</title>
     
     <link rel="stylesheet" href="style.css">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script async defer src="https://apis.google.com/js/api.js"></script>
     <script async defer src="https://accounts.google.com/gsi/client"></script>
+    
     <script src="script.js" defer></script>
 </head>
 <body>
+    <script src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-text">İşleniyor...</div></div>
     
     <div class="header">
@@ -22,11 +24,12 @@
         <h1>Depo Çıkış Kaydı</h1>
         <div style="width: 120px;"></div> </div>
 
-    <div class="container dispatch-container"> <div class="form-group">
+    <div class="container dispatch-container"> 
+        <div class="form-group">
             <label for="musteriSelect" class="form-label dispatch-label">Çıkış Kaydı Yapılacak Müşteriyi Seçiniz</label>
             <select id="musteriSelect" class="form-control" onchange="getDetaylar()">
                 <option value="">Yükleniyor...</option>
-                </select>
+            </select>
         </div>
         
         <div id="detaylarTablosu" style="display:none; overflow-x: auto;">
@@ -42,5 +45,6 @@
             <button class="btn btn-save dispatch-save-button" onclick="kaydetCikis()"><i class="fas fa-save"></i> Çıkışları Kaydet</button>
         </div>
     </div>
-</body>
+    
+    </body>
 </html>
