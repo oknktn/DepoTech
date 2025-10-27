@@ -11,7 +11,7 @@ const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 // BURAYA GOOGLE E-TABLONUZUN ID'SİNİ YAPIŞTIRIN
 // E-Tablonuzun URL'sindeki uzun kod: 
 // docs.google.com/spreadsheets/d/ SPREADSHEET_ID_BURADA /edit
-const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID'; 
+const SPREADSHEET_ID = '1nV0BXEUAakoSbhYWVFtDMcjB5COPTsdIyQNNTGtVQjQ'; 
 
 let tokenClient; // Google Auth Token Client
 let gapiInited = false; // GAPI Kütüphanesi yüklendi mi?
