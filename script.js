@@ -1764,7 +1764,7 @@ function saveNewOrtak() {
     }
   }, 1000); 
 }
-if (window.location.pathname.endsWith("ortak.html")) {
+if (window.location.pathname.includes("ortak.html")) {
     fetchOrtakListesi();
 }
 
