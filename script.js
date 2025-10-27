@@ -1744,19 +1744,25 @@ async function saveNewOrtak() {
   showLoadingOverlay("Kaydediliyor...");
 
   try {
-    const res = await fetch(SHEETS_API_URL, {
+    const res = await fetch(WEB_APP_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(ortakData)
+      body: JSON.stringify({
+        action: "saveNewOrtak",
+        data: ortakData
+      })
     });
 
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const text = await res.text();
-
+    const result = await res.json();
     hideLoadingOverlay();
-    alert("Ortak başarıyla eklendi");
-    closeModal();
-    fetchOrtakListesi(); // tabloyu yenile
+
+    if (result.success) {
+      alert("Ortak başarıyla eklendi");
+      closeModal();
+      fetchOrtakListesi(); // tabloyu yenile
+    } else {
+      alert("Kayıt eklenemedi: " + (result.message || "Bilinmeyen hata"));
+    }
 
   } catch (err) {
     hideLoadingOverlay();
@@ -1764,6 +1770,7 @@ async function saveNewOrtak() {
     console.error("saveNewOrtak error:", err);
   }
 }
+
 
 
 
