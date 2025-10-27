@@ -2889,7 +2889,7 @@ function renderOrtakTable(rows) {
   tbody.innerHTML = "";
 
   if (!rows || rows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="loading-text">Kayıt bulunamadı.</td></tr>';
+  //  tbody.innerHTML = '<tr><td colspan="5" class="loading-text">Kayıt bulunamadı.</td></tr>';
     return;
   }
 
