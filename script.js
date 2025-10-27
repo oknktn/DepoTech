@@ -130,7 +130,6 @@ const birimKosullari = {
 
 // --- Diğer Global Değişkenler (Tüm kodda kullanılacak) ---
 let modalOrtakListesi = [];
-let currentUserEmail = localStorage.getItem('currentUser') || ''; // Oturumdaki kullanıcıyı al
 let fisNumaralari = []; 
 let selectedFileContent = null;
 let excelProcessed = false;
