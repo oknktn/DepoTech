@@ -3668,7 +3668,7 @@ async function updateSheetData(range, values) {
 }
 
 // ========================================
-// DOMContentLoaded - SAYFA YÜKLENİNCE ÇALIŞAN KONTROLLER (SON HALİ)
+// DOMContentLoaded - SAYFA YÜKLENİNCE ÇALIŞAN KONTROLLER (SON HALİ - DÜZELTİLDİ)
 // ========================================
 document.addEventListener("DOMContentLoaded", () => {
     // API istemcileri HTML'deki onload ile yüklenecek (handleGapiLoad, handleGisLoad)
@@ -3689,31 +3689,36 @@ document.addEventListener("DOMContentLoaded", () => {
              }
         }
         
-        // Buton HTML'ini oluştur (başlangıçta giriş butonu gizli değil, görünür)
+        // Buton HTML'ini oluştur
         authDiv.innerHTML = `
             <button id="${authButtonId}" onclick="handleAuthClick()" style="visibility:hidden;" class="header-button"><i class="fab fa-google"></i> Google ile Giriş Yap</button>
             <button id="${signoutButtonId}" onclick="handleSignoutClick()" style="display:none;" class="header-button"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</button>
         `;
-        // Not: `visibility:hidden` butonu başlangıçta gizler, API hazır olunca `checkApiInitComplete` görünür yapar.
+        
+        // ================================================================
+        // ==== DEĞİŞİKLİK BURADA: ====
+        // Butonları HTML'e ekledikten hemen sonra API'nin hazır olup 
+        // olmadığını tekrar kontrol et. Eğer hazırsa, butonları görünür yap.
+        checkApiInitComplete();
+        // ================================================================
+
+        // Not: `visibility:hidden` butonu başlangıçta gizler...
     }
     
-    // Sayfaya özel başlangıç fonksiyonunu bul (API gerektirmeyenler burada çağrılabilir)
+    // Sayfaya özel başlangıç fonksiyonunu bul
     const initialLoadFunction = getCurrentPageLoadFunction();
     if(initialLoadFunction) {
         console.log("Sayfa başlangıç fonksiyonu bulundu (DOM Ready):", initialLoadFunction.name);
-        // Önemli Not: API gerektiren yükleme fonksiyonları (loadXxxData) 
-        // handleAuthClick içinde, giriş yapıldıktan sonra çağrılacak.
-        // API GEREKTİRMEYEN initXxx fonksiyonları burada çağrılabilir, 
-        // ama çoğu init fonksiyonu da API'den liste çektiği için
-        // onları da handleAuthClick sonrasına bırakmak daha güvenli olabilir.
-        // Şimdilik sadece sayfa yapısını hazırlayanlar burada kalabilir.
-        // Örneğin: initPesinPage (içindeki API çağrıları hariç)
-        //          initStokEkleSayfasi (select'leri doldurur)
-        //          initHamaliyeSayfasi (başlığı ayarlar)
         
         // Hangi sayfada olduğumuzu belirleyip API gerektirmeyen ilk ayarları yapalım:
-        if (document.getElementById("stokEkleForm")) { initStokEkleSayfasi(); }
-        else if (document.querySelector(".hamaliye-container")) { initHamaliyeSayfasi(); }
-        // Diğer init fonksiyonları API'den liste beklediği için handleAuthClick içinde çağrılacak.
+        if (document.getElementById("stokEkleForm")) { 
+            initStokEkleSayfasi(); 
+        }
+        else if (document.querySelector(".hamaliye-container")) { 
+            initHamaliyeSayfasi(); 
+        }
+        // Diğer tüm API gerektiren yüklemeler (loadOrtakListesi, fetchTalepler vb.)
+        // artık 'handleAuthClick' fonksiyonu içinde, kullanıcı giriş yaptıktan 
+        // sonra otomatik olarak çağrılacak.
     }
 });
