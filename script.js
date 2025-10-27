@@ -1713,102 +1713,111 @@ function closeModal() {
   }
 }
 
-async function saveNewOrtak() {
+/* ===========================
+   CONFIG
+=========================== */
+const GAS_URL = "https://script.google.com/macros/s/AKfycbydqERF2-9thnpdq8biORCDT3C0hjRN6wIjFciVPNE4izkjQoZ9VXB_VZYB_9S1V8zu/exec";
 
-  const ortakData = {
-    ortakNo: document.getElementById('ortakNumarasi')?.value.trim(),
-    tckn: document.getElementById('tckn')?.value.trim(),
-    adSoyad: document.getElementById('adSoyadi')?.value.trim(),
-    telefon: document.getElementById('telefon')?.value.trim(),
-    mahalle: document.getElementById('mahalle')?.value.trim()
+/* ===========================
+   UI HELPERS
+=========================== */
+function showLoadingOverlay(text = "Yükleniyor...") {
+  const overlay = document.getElementById("loadingOverlay");
+  if (!overlay) return;
+  overlay.style.display = "flex";
+  overlay.querySelector(".loading-text").textContent = text;
+}
+function hideLoadingOverlay() {
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+/* ===========================
+   TABLOYA YAZDIR
+=========================== */
+function renderOrtakTable(rows) {
+  const tbody = document.getElementById("dataTableBody");
+  tbody.innerHTML = "";
+
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r[0] ?? ""}</td>
+      <td>${r[1] ?? ""}</td>
+      <td>${r[2] ?? ""}</td>
+      <td>${r[3] ?? ""}</td>
+      <td>${r[4] ?? ""}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ===========================
+   LİSTE GETİR (GET)
+=========================== */
+async function fetchOrtakListesi() {
+  showLoadingOverlay("Ortaklar getiriliyor...");
+  try {
+    const res = await fetch(GAS_URL);
+    const json = await res.json();
+    renderOrtakTable(json.data || []);
+  } catch (err) {
+    alert("Liste alınamadı: " + err.message);
+  } finally {
+    hideLoadingOverlay();
+  }
+}
+
+/* ===========================
+   KAYDET (GET ile write)
+=========================== */
+async function saveNewOrtak() {
+  const d = {
+    ortakNo: document.getElementById('ortakNumarasi').value.trim(),
+    tckn: document.getElementById('tckn').value.trim(),
+    adSoyad: document.getElementById('adSoyadi').value.trim(),
+    telefon: document.getElementById('telefon').value.trim(),
+    mahalle: document.getElementById('mahalle').value.trim(),
   };
 
-  if (!ortakData.ortakNo || !ortakData.adSoyad) {
-    alert("Ortak Numarası ve Adı Soyadı zorunludur.");
+  if (!d.ortakNo || !d.adSoyad) {
+    alert("Ortak No ve Ad Soyad zorunlu!");
     return;
   }
 
   showLoadingOverlay("Kaydediliyor...");
 
   try {
-    const body = new URLSearchParams({
+    const qs = new URLSearchParams({
       action: "saveOrtak",
-      payload: JSON.stringify(ortakData)
-    });
+      payload: JSON.stringify(d)
+    }).toString();
 
-    const res = await fetch("https://script.google.com/macros/s/AKfycbxYIaZqRRgd5ByHJItSASVasIYOINM9edeBU5L3IfzpTVKK4Ql1T9a6LLWbgnf-tKLD/exec", {
-      method: "POST",
-      body: body
-      // *** DİKKAT: headers YOK, mode YOK → preflight ÇALIŞMAZ → CORS hatası olmaz
-    });
+    const res = await fetch(`${GAS_URL}?${qs}`);
+    const json = await res.json();
 
-    const resultText = await res.text(); // no-cors değil, okuyabiliriz
-    let result;
-    try { result = JSON.parse(resultText); } catch (_) { result = {}; }
+    if (!json.success) throw new Error(json.message || "Kaydedilemedi.");
 
-    hideLoadingOverlay();
-
-    if (result.success) {
-      alert("Ortak başarıyla eklendi");
-      closeModal();
-      fetchOrtakListesi();
-    } else {
-      alert("Sunucu hatası: " + (result.message || "Bilinmiyor"));
-    }
+    closeModal();
+    fetchOrtakListesi();
+    alert("Kayıt eklendi.");
 
   } catch (err) {
+    alert("Hata: " + err.message);
+  } finally {
     hideLoadingOverlay();
-    alert("Kaydederken hata: " + err.message);
-    console.error(err);
   }
 }
 
-
-
-
-
-
-/* ======================================== */
-/*  ortak.html (Ortak Listesi)  API ENTEGRESİ */
-/* ======================================== */
-
-/**
- * 'ortak.html' - Ortak listesini yükler ve tabloyu doldurur.
- */
-async function loadOrtakListesi() {
-  const tableBody = document.getElementById('dataTableBody');
-  if (!tableBody || !document.querySelector('.partner-list-container')) return; 
-  
-  // Tabloyu temizle ve yükleme mesajını göster
-  tableBody.innerHTML = '<tr><td colspan="5" class="loading-text">Ortak listesi yükleniyor...</td></tr>'; 
-  
-  try {
-    // Apps Script'teki 'getOrtaklar' fonksiyonunu çağır (Bölüm 8'de eklediğimiz)
-    const response = await fetchData('getOrtaklar');
-    const data = response.data; // Apps Script'ten gelen veri dizisi
-    
-    tableBody.innerHTML = ''; // Yükleniyor'u temizle
-    
-    if (!data || data.length === 0) {
-      tableBody.innerHTML = '<tr><td colspan="5" class="loading-text">Gösterilecek ortak kaydı bulunamadı.</td></tr>';
-      return;
-    }
-
-    // Gelen veriyi tabloya ekle (Verinin Sheets'te sırasıyla No, TCKN, Ad, Tel, Mahalle olduğu varsayımıyla)
-    data.forEach(item => {
-      const row = tableBody.insertRow(); 
-      row.innerHTML = `
-          <td>${item[0] || ''}</td>  <td>${item[1] || ''}</td>  <td>${item[2] || ''}</td>  <td>${item[3] || ''}</td>  <td>${item[4] || ''}</td>  `;
-    });
-
-  } catch (error) {
-    console.error("Ortak Listesi Yükleme Hatası:", error);
-    tableBody.innerHTML = '<tr><td colspan="5" class="loading-text" style="color: red;">Veriler yüklenemedi. Konsolu kontrol edin.</td></tr>';
+/* ===========================
+   SAYFA AÇILINCA ÇALIŞTIR
+=========================== */
+window.addEventListener("load", () => {
+  if (document.getElementById("dataTableBody")) {
+    fetchOrtakListesi();
   }
-}
+});
 
-
-// ... (Diğer modal fonksiyonları aşağıda kalmaya devam etmeli: openModal, closeModal, saveNewOrtak) ...
 
 /* ======================================== */
 /* 19. ortak-disi.html (Ortak Dışı Listesi) FONKSİYONLARI */
