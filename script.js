@@ -2875,9 +2875,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-if (window.location.pathname.includes("ortak.html")) {
-    fetchOrtakListesi();
-}
+// Ortak Listesi sayfasına özel yükleme
+window.addEventListener("load", () => {
+    if (window.location.pathname.includes("ortak.html")) {
+        fetchOrtakListesi();
+    }
+});
+
 
 
 // Utility: show / hide loading overlay (id: loadingOverlay)
@@ -2935,6 +2939,7 @@ function escapeHtml(s) {
 
 // Fetch sheet data (GET)
 async function fetchOrtakListesi() {
+    showLoading(true);
   try {
     const res = await fetch(SHEETS_API_URL);
     if (!res.ok) throw new Error("Sunucudan veri alınamadı: " + res.status);
