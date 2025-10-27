@@ -2927,7 +2927,6 @@ function escapeHtml(s) {
 // Fetch sheet data (GET)
 async function fetchOrtakListesi() {
   try {
-    showLoading(true, "Ortak listesi yükleniyor...");
     const res = await fetch(SHEETS_API_URL);
     if (!res.ok) throw new Error("Sunucudan veri alınamadı: " + res.status);
     const data = await res.json();
