@@ -1,7 +1,7 @@
 // ========================================
 // 0. POSTACI (APPS SCRIPT) AYARLARI
 // ========================================
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyBiDrGO4csazGeK0-XyZVkZzmMbeAGfykyy2vUCJQFkN7hzesUK71WysJi7mOGT77v/exec';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzuVU0c123w_ar72Sq-l8jLNGpXV8qKQkaNz6tVizigESHPPyHVxeC9sMBOt1scOWBj/exec';
 let currentUserEmail = localStorage.getItem('currentUserEmail') || 'Bilinmiyor';
 let lastLoginTime = localStorage.getItem('lastLoginTime');
 
