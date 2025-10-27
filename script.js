@@ -2865,3 +2865,183 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 });
+
+/* --- Google Sheets Integration for Ortak Listesi --- */
+/* Paste this at end of script.js OR in a new sheets-integration.js loaded after script.js */
+
+const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbx3p39l2utqWQZv6ZvRCqu_A4l_QN3WVb5r0rUxEWALv81hkxt6BvHhYouxvxQ9jTJb/exec";
+
+// Utility: show / hide loading overlay (id: loadingOverlay)
+function showLoading(show = true, text) {
+  const overlay = document.getElementById("loadingOverlay");
+  if (!overlay) return;
+  overlay.style.display = show ? "flex" : "none";
+  if (text) {
+    const t = overlay.querySelector(".loading-text");
+    if (t) t.textContent = text;
+  }
+}
+
+// Render rows into table body (id: dataTableBody)
+function renderOrtakTable(rows) {
+  const tbody = document.getElementById("dataTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  if (!rows || rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="loading-text">Kayıt bulunamadı.</td></tr>';
+    return;
+  }
+
+  rows.forEach(row => {
+    // Expect row as array: [Ortak No, TCKN, Adı Soyadı, Telefon, Mahallesi, ...]
+    const tr = document.createElement("tr");
+    const ortakNo = row[0] ?? "";
+    const tckn = row[1] ?? "";
+    const adSoyad = row[2] ?? "";
+    const telefon = row[3] ?? "";
+    const mahalle = row[4] ?? "";
+
+    tr.innerHTML = `
+      <td>${escapeHtml(ortakNo)}</td>
+      <td>${escapeHtml(tckn)}</td>
+      <td>${escapeHtml(adSoyad)}</td>
+      <td>${escapeHtml(telefon)}</td>
+      <td>${escapeHtml(mahalle)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Basic HTML-escape to avoid weird chars
+function escapeHtml(s) {
+  if (s == null) return "";
+  return String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+// Fetch sheet data (GET)
+async function fetchOrtakListesi() {
+  try {
+    showLoading(true, "Ortak listesi yükleniyor...");
+    const res = await fetch(SHEETS_API_URL);
+    if (!res.ok) throw new Error("Sunucudan veri alınamadı: " + res.status);
+    const data = await res.json();
+
+    // data is array of arrays. If first row is header, skip it.
+    let rows = Array.isArray(data) ? data : [];
+    if (rows.length && typeof rows[0][0] === "string") {
+      const firstRow = rows[0].map(c => (c || "").toString().toLowerCase());
+      if (firstRow.includes("ortak no") || firstRow.includes("tckn") || firstRow.includes("adı soyadı")) {
+        rows = rows.slice(1);
+      }
+    }
+
+    renderOrtakTable(rows);
+  } catch (err) {
+    console.error(err);
+    const tbody = document.getElementById("dataTableBody");
+    if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="loading-text">Veri yüklenirken hata: ${escapeHtml(err.message)}</td></tr>`;
+  } finally {
+    showLoading(false);
+  }
+}
+
+// Read form fields and POST new ortak
+async function saveNewOrtak() {
+  const ortakNumarasi = document.getElementById("ortakNumarasi")?.value.trim();
+  const tckn = document.getElementById("tckn")?.value.trim();
+  const adSoyadi = document.getElementById("adSoyadi")?.value.trim();
+  const telefon = document.getElementById("telefon")?.value.trim();
+  const mahalle = document.getElementById("mahalle")?.value.trim();
+
+  // Simple validation
+  if (!ortakNumarasi) {
+    alert("Ortak Numarası gerekli.");
+    return;
+  }
+  if (!adSoyadi) {
+    alert("Adı Soyadı gerekli.");
+    return;
+  }
+
+  const payload = {
+    ortakNo: ortakNumarasi,
+    tckn: tckn,
+    adSoyad: adSoyadi,
+    telefon: telefon,
+    mahalle: mahalle
+  };
+
+  try {
+    showLoading(true, "Kaydediliyor...");
+    const res = await fetch(SHEETS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error("Kaydetme isteği başarısız: " + res.status);
+    const text = await res.text();
+    if (text && text.toLowerCase().indexOf("ok") === -1) {
+      console.warn("Sunucudan beklenmeyen yanıt:", text);
+    }
+
+    // Success: temizle, modal kapat, listeyi yenile
+    clearNewOrtakForm();
+    closeModal();
+    await fetchOrtakListesi();
+    alert("Yeni ortak eklendi.");
+  } catch (err) {
+    console.error(err);
+    alert("Kaydederken hata: " + err.message);
+  } finally {
+    showLoading(false);
+  }
+}
+
+// Clear form inputs
+function clearNewOrtakForm() {
+  const ids = ["ortakNumarasi", "tckn", "adSoyadi", "telefon", "mahalle"];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+}
+
+// Modal open/close (HTML uses openModal/closeModal)
+function openModal() {
+  const m = document.getElementById("yeniKayitModal");
+  if (m) m.style.display = "flex";
+}
+function closeModal() {
+  const m = document.getElementById("yeniKayitModal");
+  if (m) m.style.display = "none";
+}
+
+// goBack is referenced in HTML header button
+function goBack() {
+  // Eğer projede özel yönlendirme varsa onu bozmayacak şekilde:
+  if (window.history.length > 1) window.history.back();
+  else window.location.href = "index.html";
+}
+
+/* Hook up form submit if not already connected in HTML */
+document.addEventListener("DOMContentLoaded", () => {
+  // if form already has onsubmit inline, it's fine; otherwise attach
+  const form = document.getElementById("yeniOrtakForm");
+  if (form) {
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      saveNewOrtak();
+    };
+  }
+
+  // Load list on start
+  fetchOrtakListesi();
+});
+
