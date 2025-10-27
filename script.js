@@ -1727,42 +1727,44 @@ function closeModal() {
   }
 }
 
-/**
- * 'ortak.html' - Yeni ortak kaydını kaydeder.
- */
-function saveNewOrtak() {
+async function saveNewOrtak() {
   const ortakData = {
-      no: document.getElementById('ortakNumarasi')?.value.trim(),
-      tckn: document.getElementById('tckn')?.value.trim(),
-      adSoyad: document.getElementById('adSoyadi')?.value.trim(),
-      telefon: document.getElementById('telefon')?.value.trim(),
-      mahalle: document.getElementById('mahalle')?.value.trim()
+    ortakNo: document.getElementById('ortakNumarasi')?.value.trim(),
+    tckn: document.getElementById('tckn')?.value.trim(),
+    adSoyad: document.getElementById('adSoyadi')?.value.trim(),
+    telefon: document.getElementById('telefon')?.value.trim(),
+    mahalle: document.getElementById('mahalle')?.value.trim()
   };
 
-  if (!ortakData.no || !ortakData.adSoyad) {
-    alert("Ortak Numarası ve Adı Soyadı alanları zorunludur.");
+  if (!ortakData.ortakNo || !ortakData.adSoyad) {
+    alert("Ortak Numarası ve Adı Soyadı zorunludur.");
     return;
   }
 
-  console.log('Yeni Ortak Kaydediliyor:', ortakData);
   showLoadingOverlay("Kaydediliyor...");
-  
-  // TODO: Google Sheets API'ye yeni ortak verisini gönder
-  // API Çağrısı: addNewPartner(ortakData);
-  
-  // --- Örnek API Yanıt Simülasyonu ---
-  setTimeout(() => { 
+
+  try {
+    const res = await fetch(SHEETS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(ortakData)
+    });
+
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const text = await res.text();
+
     hideLoadingOverlay();
-    const success = Math.random() > 0.1; 
-    const message = success ? `Ortak "${ortakData.adSoyad}" başarıyla eklendi.` : `Hata: Ortak eklenemedi!`;
-    alert(message); 
-    
-    if (success) {
-      closeModal(); // Modalı kapat
-      loadOrtakListesi(); // Listeyi yenile
-    }
-  }, 1000); 
+    alert("Ortak başarıyla eklendi");
+    closeModal();
+    fetchOrtakListesi(); // tabloyu yenile
+
+  } catch (err) {
+    hideLoadingOverlay();
+    alert("Kaydederken hata: " + err.message);
+    console.error("saveNewOrtak error:", err);
+  }
 }
+
 
 
 
