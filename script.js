@@ -3381,7 +3381,7 @@ function initHamaliyeSayfasi() {
 }
 
 /* ======================================== */
-/* GOOGLE API KİMLİK DOĞRULAMA FONKSİYONLARI (GÜNCELLENDİ) */
+/* GOOGLE API KİMLİK DOĞRULAMA VE ÇAĞRI FONKSİYONLARI */
 /* ======================================== */
 
 /**
@@ -3396,9 +3396,9 @@ function handleGapiLoad() {
  */
 function handleGisLoad() {
     tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        callback: '', // Geri arama handleAuthClick içinde dinamik olarak ayarlanacak
+        client_id: CLIENT_ID, // Dosyanın başındaki CLIENT_ID değişkenini kullanır
+        scope: SCOPES,       // Dosyanın başındaki SCOPES değişkenini kullanır
+        callback: '',       // Geri arama handleAuthClick içinde dinamik olarak ayarlanacak
     });
     gisInited = true;
     checkApiInitComplete(); // API'lerin hazır olup olmadığını kontrol et
@@ -3410,7 +3410,7 @@ function handleGisLoad() {
 async function initializeGapiClient() {
     try {
         await gapi.client.init({
-            discoveryDocs: DISCOVERY_DOCS,
+            discoveryDocs: DISCOVERY_DOCS, // Dosyanın başındaki DISCOVERY_DOCS'u kullanır
         });
         gapiInited = true;
         checkApiInitComplete(); // API'lerin hazır olup olmadığını kontrol et
@@ -3428,13 +3428,13 @@ function checkApiInitComplete() {
     // Sadece iki kütüphane de hazırsa devam et
     if (gapiInited && gisInited) {
         console.log("API Kütüphaneleri Hazır.");
-        const authButton = document.getElementById(authButtonId);
-        const signoutButton = document.getElementById(signoutButtonId);
-        
+        const authButton = document.getElementById(authButtonId); // authButtonId global değişkenden gelir
+        const signoutButton = document.getElementById(signoutButtonId); // signoutButtonId global değişkenden gelir
+
         // Başlangıçta Giriş Yap butonunu göster, Çıkış Yap butonunu gizle
         if (authButton) {
             authButton.style.visibility = 'visible';
-            authButton.style.display = 'block'; 
+            authButton.style.display = 'block';
         }
          if(signoutButton) {
             signoutButton.style.display = 'none';
@@ -3448,30 +3448,34 @@ function checkApiInitComplete() {
  * Kullanıcı "Giriş Yap" butonuna tıkladığında API erişimi için izin ister.
  */
 function handleAuthClick() {
+  if (!gisInited || !tokenClient) {
+      alert("Google kimlik doğrulama kütüphanesi henüz yüklenmedi. Lütfen biraz bekleyip tekrar deneyin.");
+      return;
+  }
   // Token alındığında veya hata oluştuğunda çalışacak fonksiyonu ayarla
   tokenClient.callback = async (resp) => {
     if (resp.error !== undefined) {
       console.error("Yetkilendirme Hatası:", resp);
-      // Kullanıcı izin vermediyse veya başka bir hata olduysa
       alert("Google Hesabınızla oturum açma veya izin verme sırasında bir hata oluştu: " + resp.error);
-      // Giriş başarısız olduğu için butonları eski haline getir
-      updateSigninStatus(false); 
+      updateSigninStatus(false);
       throw (resp);
     }
-    
+
     // Başarılı token alındı, GAPI'ye set et
     gapi.client.setToken(resp);
     console.log("Giriş Yapıldı ve Token Alındı.");
-    
-    // Giriş yapıldıktan sonra arayüzü güncelle (Giriş->Çıkış butonu)
-    updateSigninStatus(true); 
-    
+
+    // Giriş yapıldıktan sonra arayüzü güncelle
+    updateSigninStatus(true);
+
     // GİRİŞ YAPILDIKTAN SONRA YAPILACAK İLK İŞLEM: Sayfaya özel veriyi yükle
     const currentPageLoader = getCurrentPageLoadFunction();
     if(currentPageLoader) {
         console.log("Sayfaya özel veri yükleme fonksiyonu çalıştırılıyor:", currentPageLoader.name);
         try {
-            await currentPageLoader(); // Veri yükleme fonksiyonunu çalıştır ve bitmesini bekle (eğer async ise)
+            // Veri yükleme fonksiyonlarını `async` yapmadığımız için `await` kullanamayız.
+            // Sadece çağıralım. Fonksiyonlar kendi içinde loading state yönetmeli.
+            currentPageLoader();
         } catch(loadError) {
             console.error("Veri yükleme fonksiyonunda hata:", loadError);
             alert("Veriler yüklenirken bir hata oluştu.");
@@ -3481,14 +3485,29 @@ function handleAuthClick() {
     }
   };
 
-  // Eğer GAPI'de geçerli bir token yoksa, kullanıcıdan izin iste
    tokenClient.requestAccessToken({prompt: 'consent'}); // İzin ekranını göster
 }
 
-// updateSigninStatus fonksiyonu BURADA BAŞLIYOR (önceki koddan devam ediyor)
+/**
+ * Kullanıcı "Çıkış Yap" butonuna tıkladığında oturumu kapatır.
+ */
+function handleSignoutClick() {
+  const token = gapi.client.getToken();
+  if (token !== null) {
+    google.accounts.oauth2.revoke(token.access_token, () => {
+      gapi.client.setToken(null); // GAPI'deki token'ı temizle (null olarak ayarla)
+      console.log("Oturum Kapatıldı.");
+      updateSigninStatus(false); // Arayüzü güncelle
+      clearPageData(); // Sayfa içeriğini temizle
+    });
+  } else {
+      console.log("Zaten oturum kapalı.");
+      updateSigninStatus(false);
+  }
+}
+
 /**
  * Giriş/Çıkış durumuna göre butonların görünürlüğünü ayarlar.
- * @param {boolean} isSignedIn Kullanıcı giriş yapmışsa true.
  */
 function updateSigninStatus(isSignedIn) {
     const authButton = document.getElementById(authButtonId);
@@ -3497,7 +3516,7 @@ function updateSigninStatus(isSignedIn) {
     if (isSignedIn) {
         if(authButton) authButton.style.display = 'none';
         if(signoutButton) signoutButton.style.display = 'block';
-        enableApiButtons(true); 
+        enableApiButtons(true);
     } else {
         if(authButton) authButton.style.display = 'block';
         if(signoutButton) signoutButton.style.display = 'none';
@@ -3505,4 +3524,196 @@ function updateSigninStatus(isSignedIn) {
     }
 }
 
-// ... (handleSignoutClick, enableApiButtons, clearPageData, getCurrentPageLoadFunction vb. fonksiyonlar olduğu gibi kalacak) ...
+/**
+ * API çağrısı yapan butonları etkinleştirir veya pasifleştirir.
+ */
+function enableApiButtons(enable) {
+    // Kaydet, Başlat, Ekle vb. butonları bul
+    const actionButtons = document.querySelectorAll(
+        '.btn-save, button[type="submit"], .btn-start, .btn-add-fis, .btn-add-stock, .save-button, .btn-toplam-kaydet, .btn-guncelle, .btn-kaydet, .filter-button, #btnToggleUpdate'
+        );
+    actionButtons.forEach(btn => {
+        // 'Kaydet & Yazdır' butonu hamaliye sayfasında hep aktif kalabilir (yazdırma için)
+        // veya sadece yazdır butonu ayrı yapılır. Şimdilik hepsini kontrol edelim.
+        if (!btn.classList.contains('print-button') && !btn.classList.contains('back-button')) { // Yazdır ve Geri butonları hariç
+             btn.disabled = !enable;
+        }
+    });
+
+    // Düzenlenebilir input/select'leri bul
+    const editableElements = document.querySelectorAll(
+        '.editable-input, .stock-update-container .form-select, .price-list-container .price-input, .hamaliye-container .price-input, .cikan-miktar-input'
+    );
+    editableElements.forEach(el => el.disabled = !enable);
+
+    // Filtreleme select'leri (giriş yapınca aktif olsun)
+    const filterSelects = document.querySelectorAll('.filter-select, #stokTuruFiltre');
+    filterSelects.forEach(sel => sel.disabled = !enable);
+
+    console.log(`API butonları ${enable ? 'etkinleştirildi' : 'pasifleştirildi'}.`);
+}
+
+/**
+ * Çıkış yapıldığında sayfa içeriğini temizler.
+ */
+function clearPageData() {
+    const tableBodies = document.querySelectorAll('#dataTableBody, #stokTableBody, #veresiyeTableBody');
+    const rowsContainers = document.querySelectorAll('#priceListRowsContainer, #stockRowsContainer, #fisRowsContainer, #modalUrunlerContainer, #goruntuleContainer, #islemContainer'); // Talep tablosu için container'ları da ekle
+
+    const loginMessage = `<tr><td colspan="15" class="loading-text initial-message">Verileri görmek için lütfen Google hesabınızla giriş yapın.</td></tr>`;
+    const loginMessageDiv = `<div class="loading-text initial-message">Verileri görmek için lütfen Google hesabınızla giriş yapın.</div>`;
+
+    tableBodies.forEach(tbody => { if(tbody) tbody.innerHTML = loginMessage; });
+    rowsContainers.forEach(div => { if(div) div.innerHTML = loginMessageDiv; });
+
+    // Özel temizlemeler
+    const fisDetayAlani = document.getElementById('fisDetaylari');
+    if (fisDetayAlani) fisDetayAlani.value = '';
+    // Diğer formları da sıfırlayabiliriz
+}
+
+/**
+ * Mevcut sayfaya göre çalıştırılacak ana veri yükleme fonksiyonunu döndürür.
+ */
+function getCurrentPageLoadFunction() {
+    if (document.querySelector('.menu-column')) return null; // Ana sayfa özel yükleme gerektirmez
+    else if (document.getElementById("paraSayiContainer")) return initPesinPage; // pesin.html (API'den fiyat vs. alacaksa burası değişir)
+    else if (document.getElementById('fisNo') && document.getElementById('customerTypeBtn')) return initCikisFisi; // cikis.html
+    else if (document.querySelector(".reprint-container")) return loadFisNumaralari; // tekrar.html
+    else if (document.querySelector(".cancel-container")) return loadFisNumaralari; // iptal.html
+    else if (document.querySelector(".price-list-container")) return loadPriceListData; // fiyat.html
+    else if (document.getElementById("veresiyeTableBody")) return loadVeresiyeData; // veresiye.html
+    else if (document.querySelector(".list-table-container")) return fetchAllData; // liste.html
+    else if (document.querySelector(".entry-container")) return initGirisSayfasi; // giris.html
+    else if (document.getElementById("musteriSelect") && document.getElementById("detaylarTablosu")) return loadMusteriListesiCikis; // cikis-kayit.html
+    else if (document.querySelector(".records-table-container")) return () => { loadKayitlarData(currentFilter); loadMusteriFiltreListesi(); }; // kayitlar.html
+    else if (document.querySelector(".stock-view-container")) return loadStokListData; // stok-gor.html
+    else if (document.querySelector(".stock-update-container")) return loadStokYonetimData; // stok-guncelle.html
+    else if (document.getElementById("stokEkleForm")) return initStokEkleSayfasi; // stok-ekle.html
+    else if (document.querySelector(".partner-list-container") && document.getElementById("yeniKayitModal")) return loadOrtakListesi; // ortak.html
+    else if (document.querySelector(".partner-ext-list-container")) return loadOrtakDisiListesi; // ortak-disi.html
+    else if (document.getElementById("resultsTable")) return loadStokTurleriFiltre; // sayim.html
+    else if (document.getElementById("goruntuleTab") && document.getElementById("islemTab")) return fetchTalepler; // talep.html
+    else if (document.querySelector(".hamaliye-container")) return initHamaliyeSayfasi; // hamaliye.html
+    return null;
+}
+
+// ========================================
+// API Çağrı Fonksiyonları (GENEL ÖRNEKLER)
+// ========================================
+/**
+ * Belirli bir aralıktaki verileri okur.
+ */
+async function readSheetData(range) {
+    if (!gapi.client?.sheets) { throw new Error("Google Sheets API istemcisi yüklenmedi."); }
+    try {
+        console.log(`Okunuyor: ${range}`);
+        showLoadingOverlay("Veriler Okunuyor..."); // Yükleme göstergesi
+        const response = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: SPREADSHEET_ID, range: range,
+        });
+        hideLoadingOverlay(); // Yüklemeyi gizle
+        console.log("Okunan Veri:", response.result.values);
+        return response.result.values || [];
+    } catch (err) {
+        hideLoadingOverlay();
+        console.error("Okuma Hatası:", err);
+        alert(`Veri okunurken hata: ${err.result?.error?.message || err.message}`);
+        throw err;
+    }
+}
+/**
+ * Bir sayfanın sonuna yeni satırlar ekler.
+ */
+async function appendSheetData(range, values) {
+     if (!gapi.client?.sheets) { throw new Error("Google Sheets API istemcisi yüklenmedi."); }
+    try {
+        console.log(`Ekleniyor: ${range}, Veri:`, values);
+        showLoadingOverlay("Veriler Ekleniyor...");
+        const response = await gapi.client.sheets.spreadsheets.values.append({
+            spreadsheetId: SPREADSHEET_ID, range: range, valueInputOption: 'USER_ENTERED',
+            insertDataOption: 'INSERT_ROWS', resource: { values: values }
+        });
+        hideLoadingOverlay();
+        console.log("Ekleme Yanıtı:", response.result);
+        return response.result;
+    } catch (err) {
+        hideLoadingOverlay();
+        console.error("Ekleme Hatası:", err);
+        alert(`Veri eklenirken hata: ${err.result?.error?.message || err.message}`);
+        throw err;
+    }
+}
+/**
+ * Belirli bir aralıktaki hücreleri günceller.
+ */
+async function updateSheetData(range, values) {
+    if (!gapi.client?.sheets) { throw new Error("Google Sheets API istemcisi yüklenmedi."); }
+    try {
+        console.log(`Güncelleniyor: ${range}, Veri:`, values);
+        showLoadingOverlay("Veriler Güncelleniyor...");
+        const response = await gapi.client.sheets.spreadsheets.values.update({
+            spreadsheetId: SPREADSHEET_ID, range: range, valueInputOption: 'USER_ENTERED',
+            resource: { values: values }
+        });
+        hideLoadingOverlay();
+        console.log("Güncelleme Yanıtı:", response.result);
+        return response.result;
+    } catch (err) {
+        hideLoadingOverlay();
+        console.error("Güncelleme Hatası:", err);
+        alert(`Veri güncellenirken hata: ${err.result?.error?.message || err.message}`);
+        throw err;
+    }
+}
+
+// ========================================
+// DOMContentLoaded - SAYFA YÜKLENİNCE ÇALIŞAN KONTROLLER (SON HALİ)
+// ========================================
+document.addEventListener("DOMContentLoaded", () => {
+    // API istemcileri HTML'deki onload ile yüklenecek (handleGapiLoad, handleGisLoad)
+
+    // Giriş/Çıkış butonlarını HTML'e ekle (header'a)
+    const header = document.querySelector('.header');
+    if (header) {
+        let authDiv = header.querySelector('.auth-buttons');
+        if (!authDiv) {
+            authDiv = document.createElement('div');
+            authDiv.className = 'auth-buttons';
+            // Butonları başlığın sağına ekle (sağdaki boş div yerine)
+             const rightPlaceholder = header.querySelector('div[style*="width"]');
+             if(rightPlaceholder) {
+                 header.replaceChild(authDiv, rightPlaceholder);
+             } else {
+                 header.appendChild(authDiv); // Bulamazsa sona ekle
+             }
+        }
+        
+        // Buton HTML'ini oluştur (başlangıçta giriş butonu gizli değil, görünür)
+        authDiv.innerHTML = `
+            <button id="${authButtonId}" onclick="handleAuthClick()" style="visibility:hidden;" class="header-button"><i class="fab fa-google"></i> Google ile Giriş Yap</button>
+            <button id="${signoutButtonId}" onclick="handleSignoutClick()" style="display:none;" class="header-button"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</button>
+        `;
+        // Not: `visibility:hidden` butonu başlangıçta gizler, API hazır olunca `checkApiInitComplete` görünür yapar.
+    }
+    
+    // Sayfaya özel başlangıç fonksiyonunu bul (API gerektirmeyenler burada çağrılabilir)
+    const initialLoadFunction = getCurrentPageLoadFunction();
+    if(initialLoadFunction) {
+        console.log("Sayfa başlangıç fonksiyonu bulundu (DOM Ready):", initialLoadFunction.name);
+        // Önemli Not: API gerektiren yükleme fonksiyonları (loadXxxData) 
+        // handleAuthClick içinde, giriş yapıldıktan sonra çağrılacak.
+        // API GEREKTİRMEYEN initXxx fonksiyonları burada çağrılabilir, 
+        // ama çoğu init fonksiyonu da API'den liste çektiği için
+        // onları da handleAuthClick sonrasına bırakmak daha güvenli olabilir.
+        // Şimdilik sadece sayfa yapısını hazırlayanlar burada kalabilir.
+        // Örneğin: initPesinPage (içindeki API çağrıları hariç)
+        //          initStokEkleSayfasi (select'leri doldurur)
+        //          initHamaliyeSayfasi (başlığı ayarlar)
+        
+        // Hangi sayfada olduğumuzu belirleyip API gerektirmeyen ilk ayarları yapalım:
+        if (document.getElementById("stokEkleForm")) { initStokEkleSayfasi(); }
+        else if (document.querySelector(".hamaliye-container")) { initHamaliyeSayfasi(); }
+        // Diğer init fonksiyonları API'den liste beklediği için handleAuthClick içinde çağrılacak.
+    }
+});
