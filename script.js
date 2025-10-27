@@ -1764,9 +1764,6 @@ function saveNewOrtak() {
     }
   }, 1000); 
 }
-if (window.location.pathname.includes("ortak.html")) {
-    fetchOrtakListesi();
-}
 
 
 
@@ -1808,6 +1805,11 @@ async function loadOrtakListesi() {
     tableBody.innerHTML = '<tr><td colspan="5" class="loading-text" style="color: red;">Veriler yüklenemedi. Konsolu kontrol edin.</td></tr>';
   }
 }
+
+if (window.location.pathname.includes("ortak.html")) {
+    fetchOrtakListesi();
+}
+
 
 // ... (Diğer modal fonksiyonları aşağıda kalmaya devam etmeli: openModal, closeModal, saveNewOrtak) ...
 
