@@ -2071,3 +2071,78 @@ input:read-only { background-color: #f0f0f0; color: #333; }
   justify-content: center;
 }
 .btn-remove-item:hover { color: #c82333; }
+
+/* ======================================== */
+/* 26. GİRİŞ SAYFASI (login.html) STİLLERİ */
+/* ======================================== */
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  min-height: calc(100vh - 150px); /* Header/Footer yüksekliğini çıkar */
+}
+
+.login-panel {
+  width: 100%;
+  max-width: 400px; /* Giriş panelinin maksimum genişliği */
+  margin: 0 auto;
+}
+
+/* Giriş sayfasındaki form etiketleri */
+.login-panel .form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+/* Giriş sayfasındaki form elemanları */
+.login-panel .form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+  height: 40px; 
+  box-sizing: border-box;
+}
+
+.login-error-message {
+    color: var(--tkk-red); /* Hata mesajı için kırmızı */
+    background-color: var(--fail-color); /* Hata arka planı */
+    border: 1px solid var(--tkk-red);
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+}
+
+
+/* ======================================== */
+/* 27. HEADER ÇIKIŞ BUTONU STİLLERİ */
+/* ======================================== */
+
+.header-user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.welcome-message {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--white);
+    white-space: nowrap; /* İsim bölünmesin */
+}
+
+.logout-button {
+    background-color: #dc3545; /* Kırmızı çıkış butonu */
+    color: white;
+    padding: 8px 12px;
+}
+.logout-button:hover {
+    background-color: #c82333;
+}
