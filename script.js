@@ -1849,7 +1849,7 @@ async function saveNewOrtak() {
 /* Köprü: Eski çağrılar için */
 function loadOrtakListesi(){ fetchOrtakListesi(); }
  (GET)
-=========================== */
+// =========================== */
 async function fetchOrtakListesi() {
   showLoadingOverlay("Ortaklar getiriliyor...");
   try {
@@ -1906,7 +1906,7 @@ async function saveNewOrtak() {
 
 /* ===========================
    SAYFA AÇILINCA ÇALIŞTIR
-=========================== */
+//=========================== */
 window.addEventListener("load", () => {
   if (document.getElementById("dataTableBody")) {
     fetchOrtakListesi();
