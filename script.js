@@ -1,8 +1,8 @@
 // ========================================
 // 0. POSTACI (APPS SCRIPT) AYARLARI
 // ========================================
-const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbzhenRzUE2DWLG9nVvWtzzMoyoB0CglgY2vVD7OKTgsVWPljKUeBkaZuF2zc8YAjRCr/exec";
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzhenRzUE2DWLG9nVvWtzzMoyoB0CglgY2vVD7OKTgsVWPljKUeBkaZuF2zc8YAjRCr/exec';
+const SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbyJN1j76vzl8F9VXtCtjrsPgdo_Zo4ZRmfz97VmsL4roZgR1Ong81zGD1G9U48WFrYX/exec";
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyJN1j76vzl8F9VXtCtjrsPgdo_Zo4ZRmfz97VmsL4roZgR1Ong81zGD1G9U48WFrYX/exec';
 let currentUserEmail = localStorage.getItem('currentUserEmail') || 'Bilinmiyor';
 let lastLoginTime = localStorage.getItem('lastLoginTime');
 
@@ -12,31 +12,23 @@ let lastLoginTime = localStorage.getItem('lastLoginTime');
  * @returns {Promise<Object>} API'den gelen veriyi döndürür
  */
 async function fetchData(action) {
-    try {
-        const response = await fetch(WEB_APP_URL, {
-            method: 'POST',
-            mode: 'cors', // CORS modunu etkinleştir
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: action })
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP Hata! Statü: ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        if (result.success === false) {
-             throw new Error(result.message || 'API tarafından başarısız yanıt geldi.');
-        }
-        
-        return result;
-
-    } catch (error) {
-        console.error(`Fetch Hatası - İşlem: ${action}`, error);
-        return { success: false, data: [] };
+  try {
+    const response = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      // ⚠️ headers ve mode yok
+      body: JSON.stringify({ action })
+    });
+    const result = await response.json();
+    if (result && result.success === false) {
+      throw new Error(result.message || 'API tarafından başarısız yanıt geldi.');
     }
+    return result || { success: true, data: [] };
+  } catch (error) {
+    console.error(`Fetch Hatası - İşlem: ${action}`, error);
+    return { success: false, data: [], message: error.message };
+  }
 }
+
 
 /**
  * Apps Script'e veri yazmak için genel yardımcı fonksiyon.
@@ -45,32 +37,26 @@ async function fetchData(action) {
  * @returns {Promise<Object>} API'den gelen yanıtı döndürür
  */
 async function sendData(action, data) {
-     try {
-        const response = await fetch(WEB_APP_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: action, data: data }) // Hem action hem de data gönder
-        });
+  try {
+    const response = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      // ⚠️ headers ve mode yok
+      body: JSON.stringify({ action, data }) // ham metin olarak gider
+    });
 
-        if (!response.ok) {
-            throw new Error(`HTTP Hata! Statü: ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        if (result.success === false) {
-             throw new Error(result.message || 'API tarafından başarısız yanıt geldi.');
-        }
-        
-        return result;
-
-    } catch (error) {
-        console.error(`Send Hatası - İşlem: ${action}`, error);
-        alert(`Kayıt işlemi BAŞARISIZ oldu! Hata: (${error.message})`);
-        return { success: false, message: 'Kayıt başarısız.' };
+    // Apps Script no-cors değil; simple request olduğu için dönen JSON'u okuyabiliriz
+    const result = await response.json();
+    if (result && result.success === false) {
+      throw new Error(result.message || 'API tarafından başarısız yanıt geldi.');
     }
+    return result || { success: true };
+
+  } catch (error) {
+    console.error(`Send Hatası - İşlem: ${action}`, error);
+    return { success: false, message: error.message };
+  }
 }
+
 
 
 /* ======================================== */
