@@ -2951,13 +2951,23 @@ async function fetchOrtakListesi() {
 
     renderOrtakTable(rows);
   } catch (err) {
-    console.error(err);
-    const tbody = document.getElementById("dataTableBody");
-    if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="loading-text">Veri yüklenirken hata: ${escapeHtml(err.message)}</td></tr>`;
+    console.error("Veri çekme hatası:", err);
+
+    const tableHasData = document.getElementById("dataTableBody")?.rows.length > 0;
+    if (!tableHasData) {
+      alert("Veri yüklenemedi! Lütfen bağlantıyı kontrol edin.");
+      const tbody = document.getElementById("dataTableBody");
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="5" class="loading-text">Veri yüklenemedi: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    } else {
+      console.warn("Geçici fetch hatası oluştu ama tablo zaten dolu, uyarı bastırıldı.");
+    }
   } finally {
     showLoading(false);
   }
 }
+
 
 // Read form fields and POST new ortak
 async function saveNewOrtak() {
