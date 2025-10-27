@@ -1863,9 +1863,9 @@ async function fetchOrtakListesi() {
   }
 }
 
-/* ===========================
+//* ===========================
    KAYDET (GET ile write)
-=========================== */
+// =========================== */
 async function saveNewOrtak() {
   const d = {
     ortakNo: document.getElementById('ortakNumarasi').value.trim(),
