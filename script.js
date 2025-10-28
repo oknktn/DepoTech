@@ -65,10 +65,49 @@
       }
     },
 
-    initLogin() {
-      // login mevcut haliyle çalışacak. Buraya müdahale yok.
-      log("initLogin()");
-    },
+    // --- Sabit kullanıcı listesi ---
+DT.users = [
+  { user: "okan kotan", pass: "okan123" },
+  { user: "alper taşçı", pass: "alper321" },
+  { user: "kübra delisoy", pass: "kübra456" },
+  { user: "ünsal ünal", pass: "ünsal654" },
+  { user: "ömer yüzgeç", pass: "ömer789" },
+];
+
+// --- Login sayfasını başlat ---
+DT.initLogin = function() {
+  log("initLogin()");
+
+  const select = document.getElementById("loginUsername");
+  if (!select) return;
+
+  // Kullanıcı listesini select'e doldur
+  DT.users.forEach(u => {
+    const opt = document.createElement("option");
+    opt.value = u.user;
+    opt.textContent = u.user;
+    select.appendChild(opt);
+  });
+};
+
+// --- Login işlem fonksiyonu ---
+window.handleLogin = function () {
+  const user = document.getElementById("loginUsername").value.trim();
+  const pass = document.getElementById("loginPassword").value.trim();
+  const errorDiv = document.getElementById("loginError");
+
+  const found = DT.users.find(u => u.user === user && u.pass === pass);
+
+  if (!found) {
+    errorDiv.style.display = "block";
+    errorDiv.textContent = "Hatalı kullanıcı adı veya şifre.";
+    return;
+  }
+
+  // Giriş başarılı → index'e yönlendir
+  window.location.href = "index.html";
+};
+
 
     initIndex() {
   log("initIndex()");
