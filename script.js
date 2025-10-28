@@ -148,36 +148,37 @@
         }
       })();
 
-      // 3) Döviz ve Gram Altın
+      // 3) Döviz ve Gram Altın  (exchangerate.host)
 (async () => {
 
-  // USD
+  // USD → TRY
   const usd = await safeFetchJson(`https://api.exchangerate.host/latest?base=USD&symbols=TRY`);
   if (usd && usd.rates && usd.rates.TRY) {
-    elUSD.textContent = `${usd.rates.TRY.toLocaleString("tr-TR",{maximumFractionDigits:2})} TL`;
+    elUSD.textContent = usd.rates.TRY.toLocaleString("tr-TR",{maximumFractionDigits:2}) + " TL";
   } else {
     elUSD.textContent = "—";
   }
 
-  // EUR
+  // EUR → TRY
   const eur = await safeFetchJson(`https://api.exchangerate.host/latest?base=EUR&symbols=TRY`);
   if (eur && eur.rates && eur.rates.TRY) {
-    elEUR.textContent = `${eur.rates.TRY.toLocaleString("tr-TR",{maximumFractionDigits:2})} TL`;
+    elEUR.textContent = eur.rates.TRY.toLocaleString("tr-TR",{maximumFractionDigits:2}) + " TL";
   } else {
     elEUR.textContent = "—";
   }
 
-  // Altın (XAU -> TRY -> gram)
+  // ALTIN (XAU → TRY → GRAM)
   const xau = await safeFetchJson(`https://api.exchangerate.host/latest?base=XAU&symbols=TRY`);
   if (xau && xau.rates && xau.rates.TRY) {
     const ounceTry = xau.rates.TRY;
-    const gramTry = ounceTry / 31.1034768;
-    elGold.textContent = `${gramTry.toLocaleString("tr-TR",{maximumFractionDigits:2})} TL / gr`;
+    const gram = ounceTry / 31.1034768;
+    elGold.textContent = gram.toLocaleString("tr-TR",{maximumFractionDigits:2}) + " TL";
   } else {
     elGold.textContent = "—";
   }
 
 })();
+
 
 
       // 4) HABERLER (TODO)
