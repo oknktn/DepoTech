@@ -1,4 +1,4 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbydqERF2-9thnpdq8biORCDT3C0hjRN6wIjFciVPNE4izkjQoZ9VXB_VZYB_9S1V8zu/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxW07UCeGZMXa-aUZqyKvI7vW9VcBndYP9m3V4Z3iFdrVNi4jkh8R37kOlaHxXz7FQa/exec";
 // ========================================
 // 0. POSTACI (APPS SCRIPT) AYARLARI
 // ========================================
