@@ -148,28 +148,37 @@
         }
       })();
 
-      // 3) Döviz ve Gram Altın (exchangerate.host)
-      (async () => {
-        // USD -> TRY
-        const usdData = await safeFetchJson(`https://api.exchangerate.host/convert?from=USD&to=TRY`);
-        if (usdData && usdData.result != null) {
-          if (elUSD) elUSD.textContent = `${Number(usdData.result).toLocaleString("tr-TR", { maximumFractionDigits: 2 })} TL`;
-        } else if (elUSD) elUSD.textContent = "—";
+      // 3) Döviz ve Gram Altın
+(async () => {
 
-        // EUR -> TRY
-        const eurData = await safeFetchJson(`https://api.exchangerate.host/convert?from=EUR&to=TRY`);
-        if (eurData && eurData.result != null) {
-          if (elEUR) elEUR.textContent = `${Number(eurData.result).toLocaleString("tr-TR", { maximumFractionDigits: 2 })} TL`;
-        } else if (elEUR) elEUR.textContent = "—";
+  // USD
+  const usd = await safeFetchJson(`https://api.exchangerate.host/latest?base=USD&symbols=TRY`);
+  if (usd && usd.rates && usd.rates.TRY) {
+    elUSD.textContent = `${usd.rates.TRY.toLocaleString("tr-TR",{maximumFractionDigits:2})} TL`;
+  } else {
+    elUSD.textContent = "—";
+  }
 
-        // XAU(ons) -> TRY  → gram TL
-        const goldData = await safeFetchJson(`https://api.exchangerate.host/convert?from=XAU&to=TRY`);
-        if (goldData && goldData.result != null) {
-          const ounceTry = Number(goldData.result);
-          const gramTry = ounceTry / 31.1034768; // 1 troy ounce = 31.1034768 gram
-          if (elGold) elGold.textContent = `${gramTry.toLocaleString("tr-TR", { maximumFractionDigits: 2 })} TL / gr`;
-        } else if (elGold) elGold.textContent = "—";
-      })();
+  // EUR
+  const eur = await safeFetchJson(`https://api.exchangerate.host/latest?base=EUR&symbols=TRY`);
+  if (eur && eur.rates && eur.rates.TRY) {
+    elEUR.textContent = `${eur.rates.TRY.toLocaleString("tr-TR",{maximumFractionDigits:2})} TL`;
+  } else {
+    elEUR.textContent = "—";
+  }
+
+  // Altın (XAU -> TRY -> gram)
+  const xau = await safeFetchJson(`https://api.exchangerate.host/latest?base=XAU&symbols=TRY`);
+  if (xau && xau.rates && xau.rates.TRY) {
+    const ounceTry = xau.rates.TRY;
+    const gramTry = ounceTry / 31.1034768;
+    elGold.textContent = `${gramTry.toLocaleString("tr-TR",{maximumFractionDigits:2})} TL / gr`;
+  } else {
+    elGold.textContent = "—";
+  }
+
+})();
+
 
       // 4) HABERLER (TODO)
       // TODO: Haber API eklenecek: https://newsdata.io ...
