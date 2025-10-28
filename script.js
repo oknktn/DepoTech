@@ -75,6 +75,25 @@
       log("initLogin()");
     },
 
+     initIndex() {
+  log("initIndex()");
+  // Yükleyiciyi kaldır
+  const loader = document.getElementById("loader");
+  if (loader) {
+    loader.style.display = "none";
+  }
+
+  // Ana içerik görünür olsun
+  const mainContent = document.getElementById("main-content");
+  if (mainContent) {
+    mainContent.style.display = "block";
+  }
+
+  // İstersen sayfa yönlendirme ekleyebilirsin:
+  // window.location = "login.html";  // Gerekirse login'e yönlendir
+},
+
+
     // buradan sonrası modül modül gerçek işlemler için doldurulacak:
     initPesin() { log("initPesin()"); },
     initVeresiye() { log("initVeresiye()"); },
