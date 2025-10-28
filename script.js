@@ -65,11 +65,6 @@
       }
     },
 
-    // --- SAYFA STUB’LARI (hepsi boş; hiçbir şey yapmaz, hata çıkarmaz) ---
-    initIndex() {
-      // index mevcut haliyle çalışacak. Buraya müdahale yok.
-      log("initIndex()");
-    },
     initLogin() {
       // login mevcut haliyle çalışacak. Buraya müdahale yok.
       log("initLogin()");
