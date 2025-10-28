@@ -70,22 +70,19 @@
       log("initLogin()");
     },
 
-     initIndex() {
+    initIndex() {
   log("initIndex()");
-  // Yükleyiciyi kaldır
-  const loader = document.getElementById("loader");
-  if (loader) {
-    loader.style.display = "none";
-  }
 
-  // Ana içerik görünür olsun
-  const mainContent = document.getElementById("main-content");
-  if (mainContent) {
-    mainContent.style.display = "block";
-  }
+  // Yükleme ekranlarını gizle
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) overlay.style.display = "none";
 
-  // İstersen sayfa yönlendirme ekleyebilirsin:
-  // window.location = "login.html";  // Gerekirse login'e yönlendir
+  const loading = document.getElementById("loadingScreen");
+  if (loading) loading.style.display = "none";
+
+  // Ana ekranı göster
+  const main = document.getElementById("mainScreen");
+  if (main) main.style.display = "block";
 },
 
 
