@@ -16,6 +16,12 @@
     version: "v2",
 
     autoInit() {
+       if (!localStorage.getItem("logged")) {
+  if (!location.pathname.toLowerCase().includes("login")) {
+    location.href = "login.html";
+    return;
+  }
+}
       const path = (location.pathname || "").toLowerCase();
       const file = path.split("/").pop() || "index.html";
       log("page:", file);
@@ -73,7 +79,8 @@
       err.textContent="Hatalı kullanıcı adı veya şifre.";
       return;
     }
-    window.location.href="index.html";
+   localStorage.setItem("logged", "1");
+   window.location.href="index.html";
   };
 
   window.DT = DT;
