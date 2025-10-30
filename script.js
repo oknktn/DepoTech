@@ -234,6 +234,35 @@
         ? "block" : "none";
   };
 
+
+async function yukleCikisBekleyenVeVeresiye() {
+  try {
+    const response = await fetch('https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec');
+    const data = await response.json();
+
+    if (!data) throw new Error("Veri alınamadı");
+
+    // === ÇIKIŞ BEKLEYEN PANEL ===
+    document.getElementById("cikis-gubre").textContent = data.cikisBekleyen.gubre;
+    document.getElementById("cikis-yem").textContent = data.cikisBekleyen.yem;
+    document.getElementById("cikis-tohum").textContent = data.cikisBekleyen.tohum;
+    document.getElementById("cikis-motorin").textContent = data.cikisBekleyen.motorin;
+
+    // === VERESİYE PANELİ ===
+    document.getElementById("veresiye-gubre").textContent = data.veresiye.gubre;
+    document.getElementById("veresiye-yem").textContent = data.veresiye.yem;
+    document.getElementById("veresiye-tohum").textContent = data.veresiye.tohum;
+    document.getElementById("veresiye-motorin").textContent = data.veresiye.motorin;
+
+  } catch (err) {
+    console.error("Panel verileri alınamadı:", err);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", yukleCikisBekleyenVeVeresiye);
+
+
+
   // --- Başlat ---
   window.DT = DT;
   onReady(() => DT.autoInit());
