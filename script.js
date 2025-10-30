@@ -68,6 +68,56 @@
       DT.populateSevkler(); // Sevk verileri (Sheets)
     },
 
+    // ---- Sevk Verilerini Doldur ----
+    async populateSevkler() {
+      const overlay = document.getElementById("loadingOverlay");
+      const loading = document.getElementById("loadingScreen");
+      const main = document.getElementById("mainScreen");
+
+      try {
+        if (main) main.style.display = "none";
+        if (loading) loading.style.display = "flex";
+
+        // GitHub ortamı (google.script yok)
+        if (typeof google === "undefined" || !google.script) {
+          console.warn("[DT] Google Script erişimi yok, fetch moduna geçiliyor...");
+
+          const res = await fetch("https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec");
+          if (!res.ok) throw new Error("HTTP " + res.status);
+
+          const data = await res.json();
+          if (data) {
+            document.getElementById("sevkgubre").textContent = data.gubre ?? "—";
+            document.getElementById("sevkyem").textContent = data.yem ?? "—";
+            document.getElementById("sevktom").textContent = data.tohum ?? "—";
+            document.getElementById("sevkmot").textContent = data.motorin ?? "—";
+            document.getElementById("veresiyetutar").textContent = data.veresiye ?? "—";
+          } else {
+            console.warn("[DT] Veri boş döndü.");
+          }
+        } else {
+          // Apps Script ortamı (Sheets içinden açılırsa)
+          google.script.run
+            .withSuccessHandler((data) => {
+              if (!data) return;
+              document.getElementById("sevkgubre").textContent = data.gubre ?? "—";
+              document.getElementById("sevkyem").textContent = data.yem ?? "—";
+              document.getElementById("sevktom").textContent = data.tohum ?? "—";
+              document.getElementById("sevkmot").textContent = data.motorin ?? "—";
+              document.getElementById("veresiyetutar").textContent = data.veresiye ?? "—";
+            })
+            .withFailureHandler(err => console.error("[DT] Hata:", err))
+            .getSevkVerileri();
+        }
+      } catch (err) {
+        console.error("[DT] populateSevkler hata:", err);
+      } finally {
+        if (loading) loading.style.display = "none";
+        if (overlay) overlay.style.display = "none";
+        if (main) main.style.display = "block";
+      }
+    },
+
     // ---- LOGIN ----
     initLogin() {
       log("initLogin()");
@@ -183,27 +233,6 @@
       list.style.display = (list.style.display === "none" || !list.style.display)
         ? "block" : "none";
   };
-
-  // --- Sevk Verileri ---
-// Eğer Apps Script ortamında değilsek (GitHub gibi), doğrudan web app'e fetch at
-if (typeof google === "undefined" || !google.script) {
-  console.warn("[DT] Google Script erişimi yok, fetch moduna geçiliyor...");
-
-  fetch("https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec")
-    .then(res => res.json())
-    .then(data => {
-      if (!data) return;
-      document.getElementById("sevkgubre").textContent = data.gubre;
-      document.getElementById("sevkyem").textContent = data.yem;
-      document.getElementById("sevktom").textContent = data.tohum;
-      document.getElementById("sevkmot").textContent = data.motorin;
-      document.getElementById("veresiyetutar").textContent = data.veresiye;
-    })
-    .catch(err => console.error("[DT] Fetch Hatası:", err));
-
-  return;
-}
-;
 
   // --- Başlat ---
   window.DT = DT;
