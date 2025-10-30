@@ -185,24 +185,25 @@
   };
 
   // --- Sevk Verileri ---
-  DT.populateSevkler = function() {
-    if (typeof google === "undefined" || !google.script) {
-      console.warn("[DT] Google Script erişimi yok (önizleme modunda).");
-      return;
-    }
+// Eğer Apps Script ortamında değilsek (GitHub gibi), doğrudan web app'e fetch at
+if (typeof google === "undefined" || !google.script) {
+  console.warn("[DT] Google Script erişimi yok, fetch moduna geçiliyor...");
 
-    google.script.run
-      .withSuccessHandler((data) => {
-        if (!data) return;
-        document.getElementById("sevkgubre").textContent = data.gubre;
-        document.getElementById("sevkyem").textContent = data.yem;
-        document.getElementById("sevktom").textContent = data.tohum;
-        document.getElementById("sevkmot").textContent = data.motorin;
-        document.getElementById("veresiyetutar").textContent = data.veresiye;
-      })
-      .withFailureHandler(err => console.error("[DT] Hata:", err))
-      .getSevkVerileri();
-  };
+  fetch("https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec")
+    .then(res => res.json())
+    .then(data => {
+      if (!data) return;
+      document.getElementById("sevkgubre").textContent = data.gubre;
+      document.getElementById("sevkyem").textContent = data.yem;
+      document.getElementById("sevktom").textContent = data.tohum;
+      document.getElementById("sevkmot").textContent = data.motorin;
+      document.getElementById("veresiyetutar").textContent = data.veresiye;
+    })
+    .catch(err => console.error("[DT] Fetch Hatası:", err));
+
+  return;
+}
+;
 
   // --- Başlat ---
   window.DT = DT;
