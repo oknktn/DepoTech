@@ -1,21 +1,35 @@
 /* =========================================================================
-   DepoTech - FINAL (Login + Genel Bilgi + Sevkler)
+   DepoTech - FINAL (Login + Genel Bilgi + Sevkler + Paneller)
    ========================================================================== */
 (() => {
   "use strict";
 
-  const log = (...args) => console.log("[DT]", ...args);
-  const warn = (...args) => console.warn("[DT]", ...args);
+  // ---- yardımcılar ----
+  const log  = (...a) => console.log("[DT]", ...a);
+  const warn = (...a) => console.warn("[DT]", ...a);
   const onReady = (fn) => {
-    if (document.readyState === "loading")
+    if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", fn, { once: true });
-    else fn();
+    } else fn();
+  };
+  const $ = (id) => document.getElementById(id);
+  const setText = (id, val) => { const el = $(id); if (el) el.textContent = val; };
+
+  const safeFetchJson = async (url) => {
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    } catch (err) {
+      warn("fetch error:", url, err);
+      return null;
+    }
   };
 
   const DT = {
     version: "2025.10.31-final",
 
-    // ---- Sayfa Yönlendirici ----
+    // ---- Router ----
     autoInit() {
       const isLoginPage = location.pathname.toLowerCase().includes("login");
       if (!localStorage.getItem("logged") && !isLoginPage) {
@@ -30,6 +44,7 @@
         "index.html": DT.initIndex,
         "login.html": DT.initLogin,
         "giris.html": DT.initLogin,
+
         "pesin.html": DT.initPesin,
         "veresiye.html": DT.initVeresiye,
         "cikis.html": DT.initCikis,
@@ -57,71 +72,55 @@
     initIndex() {
       log("initIndex()");
 
-      const overlay = document.getElementById("loadingOverlay");
+      const overlay = $("loadingOverlay");
       if (overlay) overlay.style.display = "none";
-      const loading = document.getElementById("loadingScreen");
+      const loading = $("loadingScreen");
       if (loading) loading.style.display = "none";
-      const main = document.getElementById("mainScreen");
+      const main = $("mainScreen");
       if (main) main.style.display = "block";
 
-      DT.populateGeneralInfo({ lat: 38.8483, lon: 35.86, newsApiKey: null });
-      DT.populateSevkler(); // Sevk verileri (Sheets)
+      DT.populateGeneralInfo({ lat: 38.8483, lon: 35.86 });
+      DT.populateSevkler(); // 15 Günlük sevk + veresiye + paneller
     },
 
-    // ---- Sevk Verilerini Doldur ----
+    // ---- 15 Günlük Sevkler + Veresiye Tutarı + Paneller ----
     async populateSevkler() {
-      const overlay = document.getElementById("loadingOverlay");
-      const loading = document.getElementById("loadingScreen");
-      const main = document.getElementById("mainScreen");
+      const url = "https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec";
+      const data = await safeFetchJson(url);
+      if (!data) return;
 
-      try {
-        if (main) main.style.display = "none";
-        if (loading) loading.style.display = "flex";
+      // 15 Günlük sevkler + veresiye tutarı
+      setText("sevkgubre",  data.gubre   ?? "—");
+      setText("sevkyem",    data.yem     ?? "—");
+      setText("sevktom",    data.tohum   ?? "—");
+      setText("sevkmot",    data.motorin ?? "—");
+      setText("veresiyetutar", data.veresiye ?? "—");
 
-        // GitHub ortamı (google.script yok)
-        if (typeof google === "undefined" || !google.script) {
-          console.warn("[DT] Google Script erişimi yok, fetch moduna geçiliyor...");
+      // Çıkış Bekleyen paneli (varsa)
+      if (data.cikisBekleyen) {
+        setText("cikis-gubre",   data.cikisBekleyen.gubre   ?? "0");
+        setText("cikis-yem",     data.cikisBekleyen.yem     ?? "0");
+        setText("cikis-tohum",   data.cikisBekleyen.tohum   ?? "0");
+        setText("cikis-motorin", data.cikisBekleyen.motorin ?? "0");
+      }
 
-          const res = await fetch("https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec");
-          if (!res.ok) throw new Error("HTTP " + res.status);
-
-          const data = await res.json();
-          if (data) {
-            document.getElementById("sevkgubre").textContent = data.gubre ?? "—";
-            document.getElementById("sevkyem").textContent = data.yem ?? "—";
-            document.getElementById("sevktom").textContent = data.tohum ?? "—";
-            document.getElementById("sevkmot").textContent = data.motorin ?? "—";
-            document.getElementById("veresiyetutar").textContent = data.veresiye ?? "—";
-          } else {
-            console.warn("[DT] Veri boş döndü.");
-          }
-        } else {
-          // Apps Script ortamı (Sheets içinden açılırsa)
-          google.script.run
-            .withSuccessHandler((data) => {
-              if (!data) return;
-              document.getElementById("sevkgubre").textContent = data.gubre ?? "—";
-              document.getElementById("sevkyem").textContent = data.yem ?? "—";
-              document.getElementById("sevktom").textContent = data.tohum ?? "—";
-              document.getElementById("sevkmot").textContent = data.motorin ?? "—";
-              document.getElementById("veresiyetutar").textContent = data.veresiye ?? "—";
-            })
-            .withFailureHandler(err => console.error("[DT] Hata:", err))
-            .getSevkVerileri();
-        }
-      } catch (err) {
-        console.error("[DT] populateSevkler hata:", err);
-      } finally {
-        if (loading) loading.style.display = "none";
-        if (overlay) overlay.style.display = "none";
-        if (main) main.style.display = "block";
+      // Veresiye Kayıtları paneli (varsa)
+      if (data.veresiyePanel) {
+        // Backend'de veresiyePanel alanı varsa kullan
+        setText("veresiye-gubre",   data.veresiyePanel.gubre   ?? "0");
+        setText("veresiye-yem",     data.veresiyePanel.yem     ?? "0");
+        setText("veresiye-tohum",   data.veresiyePanel.tohum   ?? "0");
+        setText("veresiye-motorin", data.veresiyePanel.motorin ?? "0");
+      } else if (data.veresiye) {
+        // Eski şema ile geriye uyumluluk: tek kalem toplam veresiye varsa sadece tutarı yazıldı; kalem kırılımları yoksa dokunma
+        // İstersen burada hiçbir şey yapma; sadece toplam tutar yukarıda görünsün.
       }
     },
 
-    // ---- LOGIN ----
+    // ---- Login ----
     initLogin() {
       log("initLogin()");
-      const select = document.getElementById("loginUsername");
+      const select = $("loginUsername");
       if (!select) return;
       DT.users.forEach((u) => {
         const opt = document.createElement("option");
@@ -131,13 +130,10 @@
       });
     },
 
-    // ---- GENEL BİLGİLER ----
-    async populateGeneralInfo(opts = {}) {
-      const lat = opts.lat ?? 38.8483;
-      const lon = opts.lon ?? 35.86;
-
-      const elDate = document.getElementById("date");
-      const elWeather = document.getElementById("weather");
+    // ---- Genel Bilgi (tarih + hava) ----
+    async populateGeneralInfo({ lat = 38.8483, lon = 35.86 } = {}) {
+      const elDate = $("date");
+      const elWeather = $("weather");
 
       if (elDate) {
         const now = new Date();
@@ -146,38 +142,28 @@
         });
       }
 
-      const safeFetchJson = async (url) => {
-        try {
-          const res = await fetch(url);
-          if (!res.ok) throw new Error(res.status);
-          return await res.json();
-        } catch (err) {
-          console.warn("[DT] fetch error:", url, err);
-          return null;
-        }
-      };
-
-      // --- Hava durumu (Open-Meteo) ---
-      (async () => {
+      if (elWeather) {
         const api = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=Europe%2FIstanbul`;
         const data = await safeFetchJson(api);
         if (data && data.current_weather) {
           const { temperature, windspeed, weathercode } = data.current_weather;
           const codeMap = {
-            0: "Açık", 1: "Az bulutlu", 2: "Parçalı bulutlu", 3: "Bulutlu",
-            45: "Sis", 48: "Donan sis", 51: "Hafif çisenti", 53: "Çisenti",
-            61: "Hafif yağmur", 63: "Yağmur", 65: "Kuvvetli yağmur",
-            71: "Hafif kar", 73: "Kar", 75: "Kuvvetli kar",
-            80: "Sağanak", 81: "Kuvvetli sağanak", 82: "Şiddetli sağanak",
-            95: "Gök gürültülü", 99: "Kuvvetli dolu"
+            0:"Açık",1:"Az bulutlu",2:"Parçalı bulutlu",3:"Bulutlu",
+            45:"Sis",48:"Donan sis",51:"Hafif çisenti",53:"Çisenti",
+            61:"Hafif yağmur",63:"Yağmur",65:"Kuvvetli yağmur",
+            71:"Hafif kar",73:"Kar",75:"Kuvvetli kar",
+            80:"Sağanak",81:"Kuvvetli sağanak",82:"Şiddetli sağanak",
+            95:"Gök gürültülü",99:"Kuvvetli dolu"
           };
           const desc = codeMap[weathercode] ?? "Hava bilgisi yok";
           elWeather.textContent = `${desc}, ${temperature}°C (rüzgâr ${windspeed} km/s)`;
-        } else elWeather.textContent = "Hava verisi alınamadı";
-      })();
+        } else {
+          elWeather.textContent = "Hava verisi alınamadı";
+        }
+      }
     },
 
-    // ---- BOŞ SAYFA STUBLARI ----
+    // ---- Diğer sayfa stub'ları ----
     initPesin() { log("initPesin()"); },
     initVeresiye() { log("initVeresiye()"); },
     initCikis() { log("initCikis()"); },
@@ -197,20 +183,20 @@
     initSayim() { log("initSayim()"); },
   };
 
-  // --- Sabit kullanıcı listesi ---
+  // ---- Sabit kullanıcı listesi ----
   DT.users = [
-    { user: "okan kotan", pass: "okan123" },
+    { user: "okan kotan",  pass: "okan123" },
     { user: "alper taşçı", pass: "alper321" },
     { user: "kübra delisoy", pass: "kübra456" },
-    { user: "ünsal ünal", pass: "ünsal654" },
+    { user: "ünsal ünal",  pass: "ünsal654" },
     { user: "ömer yüzgeç", pass: "ömer789" },
   ];
 
-  // --- Login fonksiyonu ---
-  window.handleLogin = function() {
-    const user = document.getElementById("loginUsername")?.value.trim() || "";
-    const pass = document.getElementById("loginPassword")?.value.trim() || "";
-    const err = document.getElementById("loginError");
+  // ---- Login fonksiyonu / Menü yardımcıları ----
+  window.handleLogin = function () {
+    const user = $("loginUsername")?.value.trim() || "";
+    const pass = $("loginPassword")?.value.trim() || "";
+    const err  = $("loginError");
 
     const ok = DT.users.find((u) => u.user === user && u.pass === pass);
     if (!ok) {
@@ -224,46 +210,14 @@
     location.href = "index.html";
   };
 
-  // --- Menü butonları ---
   window.navigate = (url) => { if (url) location.href = url; };
   window.toggleMenu = (btn) => {
     if (!btn) return;
     const list = btn.nextElementSibling;
-    if (list)
-      list.style.display = (list.style.display === "none" || !list.style.display)
-        ? "block" : "none";
+    if (list) list.style.display = (list.style.display === "none" || !list.style.display) ? "block" : "none";
   };
 
-
-async function yukleCikisBekleyenVeVeresiye() {
-  try {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec');
-    const data = await response.json();
-
-    if (!data) throw new Error("Veri alınamadı");
-
-    // === ÇIKIŞ BEKLEYEN PANEL ===
-    document.getElementById("cikis-gubre").textContent = data.cikisBekleyen.gubre;
-    document.getElementById("cikis-yem").textContent = data.cikisBekleyen.yem;
-    document.getElementById("cikis-tohum").textContent = data.cikisBekleyen.tohum;
-    document.getElementById("cikis-motorin").textContent = data.cikisBekleyen.motorin;
-
-    // === VERESİYE PANELİ ===
-    document.getElementById("veresiye-gubre").textContent = data.veresiye.gubre;
-    document.getElementById("veresiye-yem").textContent = data.veresiye.yem;
-    document.getElementById("veresiye-tohum").textContent = data.veresiye.tohum;
-    document.getElementById("veresiye-motorin").textContent = data.veresiye.motorin;
-
-  } catch (err) {
-    console.error("Panel verileri alınamadı:", err);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", yukleCikisBekleyenVeVeresiye);
-
-
-
-  // --- Başlat ---
+  // ---- başlat ----
   window.DT = DT;
   onReady(() => DT.autoInit());
 })();
