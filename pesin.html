@@ -172,6 +172,28 @@
       else if(durum>0){aciklama.style.display="block";aciklama.style.background="#27ae60";aciklama.textContent=`${durum.toFixed(2)} TL Kasa Fazla`;}
       else aciklama.style.display="none";
     }
+    const API = "https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec";
+
+window.addEventListener("DOMContentLoaded", async () => {
+  const res = await fetch(`${API}?action=getPesinRows`);
+  const j = await res.json();
+  if (!j.success || !j.rows) return;
+
+  j.rows.forEach(r => {
+    const wrap=document.createElement("div");
+    wrap.className="satis-row";
+    wrap.innerHTML=`
+      <input class="form-control" value="${r.code||''}">
+      <input class="form-control" value="${r.name||''}">
+      <input type="number" class="form-control" value="${r.qty||0}" oninput="calcRow(this)">
+      <input type="number" class="form-control" value="${r.price||0}" oninput="calcRow(this)">
+      <input class="form-control" readonly value="${r.total||0}">
+      <button onclick="this.parentElement.remove()">🗑️</button>`;
+    document.getElementById("satisKayitlariContainer").appendChild(wrap);
+  });
+  runAllCalculations();
+});
+
   </script>
 </body>
 </html>
