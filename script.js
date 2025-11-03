@@ -110,6 +110,7 @@
         setText("veresiye-gubre",   data.veresiyePanel.gubre   ?? "0");
         setText("veresiye-yem",     data.veresiyePanel.yem     ?? "0");
         setText("veresiye-tohum",   data.veresiyePanel.tohum   ?? "0");
+        setText("veresiye-zirai", data.veresiyePanel.ziraiilac ?? "0");
         setText("veresiye-motorin", data.veresiyePanel.motorin ?? "0");
       }
     },
