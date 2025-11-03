@@ -127,7 +127,7 @@ populateCikisBekleyen: async function() {
   setText("cikis-tohum", p.tohum ?? "0");
   setText("cikis-motorin", p.motorin ?? "0");
   setText("cikis-ziraiilac", p.ziraiIlac ?? "0");
-};
+},
 
 
     // ---- Login ----
