@@ -1,112 +1,123 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DepoTech - Peşin Satış</title>
-    
-    <link rel="stylesheet" href="style.css">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-   
-    <script src="script.js" defer></script>    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DepoTech - Peşin Satış</title>
+
+  <!-- Stil dosyaları -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Script dosyaları -->
+  <script src="script.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
+
 <body>
-   
-    
-    <div class="loading-overlay" id="loadingOverlay"><div class="loading-text">İşleniyor...</div></div>
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-text">İşleniyor...</div>
+  <!-- Yükleniyor ekranı -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-text">İşleniyor...</div>
+  </div>
+
+  <!-- Üst Başlık -->
+  <div class="header">
+    <button class="back-button" onclick="goBack()">
+      <i class="fas fa-arrow-left"></i> Ana Menü
+    </button>
+    <h1 id="pageTitle">Peşin Satış</h1>
+    <div></div>
+  </div>
+
+  <div class="container">
+    <!-- Üst 3 Panel (Para Sayıları - Kasa Durumu - Düzeltme Kayıtları) -->
+    <div class="top-grid">
+      <!-- Para Sayıları -->
+      <div class="panel panel-compact">
+        <h3 class="panel-title">Para Sayıları</h3>
+        <div class="para-sayi-grid" style="font-weight:bold;">
+          <label>Banknot</label><label>Adet</label><label>Toplam</label>
+        </div>
+        <div id="paraSayiContainer"></div>
+        <div class="para-sayi-grid total-row">
+          <label>TOPLAM</label>
+          <div></div>
+          <input id="paraSayilariToplam" class="form-control" readonly />
+        </div>
+      </div>
+
+      <!-- Kasa Durumu -->
+      <div class="panel panel-compact">
+        <h3 class="panel-title">Kasa Durumu</h3>
+        <div class="kasa-durum-grid">
+          <label>Nakit Satış Toplamı</label>
+          <input id="nakitSatisKasaDurumu" class="form-control" readonly />
+        </div>
+        <div class="kasa-durum-grid">
+          <label>Kasa Toplamı</label>
+          <input id="kasaToplami" class="form-control" readonly />
+        </div>
+        <div class="kasa-durum-grid">
+          <label>Kasa Bakiyesi</label>
+          <input type="number" id="kasaBakiyesi" class="form-control" oninput="runAllCalculations()" />
+        </div>
+        <div class="kasa-durum-grid">
+          <label>Durum</label>
+          <input id="kasaDurum" class="form-control" readonly />
+        </div>
+
+        <div style="margin-top:10px;">
+          <label class="form-label" style="font-size:13px;">Açıklama</label>
+          <div id="kasaDurumAciklama" class="kasa-durum-aciklama" style="display:none;"></div>
+        </div>
+
+        <div class="kasa-buton-grup">
+          <button class="btn" style="background-color: var(--orange); color: white;" onclick="yazdirKasa()">
+            <i class="fas fa-print"></i> Yazdır
+          </button>
+          <button class="btn btn-primary" onclick="kaydetKasa()">
+            <i class="fas fa-save"></i> Kaydet
+          </button>
+        </div>
+      </div>
+
+      <!-- Düzeltme Kayıtları -->
+      <div class="panel panel-compact">
+        <h3 class="panel-title">Düzeltme Kayıtları</h3>
+        <div class="duzeltme-grid" style="font-weight:bold;">
+          <label>Açıklama</label><label>Tutar</label>
+        </div>
+        <div id="duzeltmeContainer"></div>
+        <div class="duzeltme-grid total-row">
+          <label>Düzeltme Kayıtları Toplamı</label>
+          <input id="duzeltmeKayitlariToplam" class="form-control" readonly />
+        </div>
+        <div class="duzeltme-grid total-row">
+          <label>Nakit Satış Toplamı</label>
+          <input id="nakitSatisDuzeltme" class="form-control" readonly />
+        </div>
+      </div>
     </div>
 
-    <div class="header">
-        <button class="back-button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Ana Menü</button>
-        <h1 id="pageTitle">Peşin Satış</h1> <div></div> </div>
+    <!-- Satış Kayıtları -->
+    <div class="panel">
+      <div class="satis-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <h3 class="panel-title" style="margin:0;">Satış Kayıtları</h3>
+        <button id="btnAddSatisRow" class="btn-add-fis">
+          <i class="fas fa-plus"></i> Satır Ekle
+        </button>
+      </div>
 
-<div class="container"> <div class="top-grid">
-        
-        <div class="panel panel-compact">
-            <h3 class="panel-title">Para Sayıları</h3>
-            <div class="para-sayi-grid" style="font-weight:bold;">
-                <label>Banknot</label><label>Adet</label><label>Toplam</label>
-            </div>
-            <div id="paraSayiContainer">
-                </div>
-            <div class="para-sayi-grid total-row">
-                <label>TOPLAM</label>
-                <div></div>
-                <input id="paraSayilariToplam" class="form-control" readonly>
-            </div>
-        </div>
-
-        <div class="panel panel-compact">
-            <h3 class="panel-title">Kasa Durumu</h3>
-            <div class="kasa-durum-grid">
-                <label>Nakit Satış Toplamı</label>
-                <input id="nakitSatisKasaDurumu" class="form-control" readonly>
-            </div>
-            <div class="kasa-durum-grid">
-                <label>Kasa Toplamı</label>
-                <input id="kasaToplami" class="form-control" readonly>
-            </div>
-            <div class="kasa-durum-grid">
-                <label>Kasa Bakiyesi</label>
-                <input type="number" id="kasaBakiyesi" class="form-control" oninput="runAllCalculations()">
-            </div>
-            <div class="kasa-durum-grid">
-                <label>Durum</label>
-                <input id="kasaDurum" class="form-control" readonly>
-            </div>
-            <div style="margin-top:10px;">
-                <label class="form-label" style="font-size: 13px;">Açıklama</label>
-                <div id="kasaDurumAciklama" class="kasa-durum-aciklama" style="display:none;"></div>
-            </div>
-            <div class="kasa-buton-grup">
-                <button class="btn" style="background-color: var(--orange); color: white;" onclick="yazdirKasa()">
-                    <i class="fas fa-print"></i> Yazdır
-                </button>
-                <button class="btn btn-primary" onclick="kaydetKasa()">
-                    <i class="fas fa-save"></i> Kaydet
-                </button>
-            </div>
-        </div>
-
-        <div class="panel panel-compact">
-            <h3 class="panel-title">Düzeltme Kayıtları</h3>
-            <div class="duzeltme-grid" style="font-weight:bold;">
-                <label>Açıklama</label><label>Tutar</label>
-            </div>
-            <div id="duzeltmeContainer">
-                </div>
-            <div class="duzeltme-grid total-row">
-                <label>Düzeltme Kayıtları Toplamı</label>
-                <input id="duzeltmeKayitlariToplam" class="form-control" readonly>
-            </div>
-            <div class="duzeltme-grid total-row">
-                <label>Nakit Satış Toplamı</label>
-                <input id="nakitSatisDuzeltme" class="form-control" readonly>
-            </div>
-        </div>
-    </div> <div class="panel">
-        <div class="satis-header">
-            <h3 class="panel-title" style="margin:0;">Satış Kayıtları</h3>
-            <button id="btnAddSatisRow" class="btn-add-fis" onclick="addSatisRow()">
-                <i class="fas fa-plus"></i> Satır Ekle
-            </button>
-        </div>
-        <div class="satis-table-header">
-            <div>Stok Kodu</div>
-            <div>Stok Adı</div>
-            <div>Miktar</div>
-            <div>Birim Fiyat</div>
-            <div>Toplam</div>
-            <div></div>
-        </div>
-        <div id="satisKayitlariContainer">
-            </div>
+      <div class="satis-table-header">
+        <div>Stok Kodu</div>
+        <div>Stok Adı</div>
+        <div>Miktar</div>
+        <div>Birim Fiyat</div>
+        <div>Toplam</div>
+        <div></div>
+      </div>
+      <div id="satisKayitlariContainer"></div>
     </div>
-</div>
-    </div> </body>
+  </div>
+</body>
 </html>
