@@ -81,6 +81,7 @@
 
       DT.populateGeneralInfo({ lat: 38.8483, lon: 35.86 });
       DT.populateSevkler(); // 15 Günlük sevk + veresiye + paneller
+      DT.populateCikisBekleyen();
     },
 
     // ---- 15 Günlük Sevkler + Veresiye Tutarı + Paneller ----
@@ -114,6 +115,20 @@
         setText("veresiye-motorin", data.veresiyePanel.motorin ?? "0");
       }
     },
+
+     DT.populateCikisBekleyen = async function() {
+  const url = "https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec?type=cikisBekleyen";
+  const data = await safeFetchJson(url);
+  if (!data || !data.cikisBekleyen) return;
+
+  const p = data.cikisBekleyen;
+  setText("cikis-gubre", p.gubre ?? "0");
+  setText("cikis-yem", p.yem ?? "0");
+  setText("cikis-tohum", p.tohum ?? "0");
+  setText("cikis-motorin", p.motorin ?? "0");
+  setText("cikis-zirai-ilac", p.ziraiIlac ?? "0");
+};
+
 
     // ---- Login ----
     initLogin() {
