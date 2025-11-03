@@ -239,3 +239,204 @@ populateCikisBekleyen: async function() {
   window.DT = DT;
   onReady(() => DT.autoInit());
 })();
+
+// === Peşin Satış Modülü ===
+DT.pesin = (function(){
+  const API = "https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec";
+
+  // UI
+  const rowContainer = () => document.getElementById("satisKayitlariContainer");
+  const addRowBtn    = () => document.getElementById("btnAddSatisRow");
+
+  // Kaynak listeler
+  let STOCK_CODES = []; // Stok Listesi!A
+  let STOCK_NAMES = []; // Stok Listesi!B
+
+  // Ekrandaki satır state’i
+  const state = {
+    rows: [] // {el, codeSel, nameSel, qtyInp, priceInp, totalInp}
+  };
+
+  // --- Helpers ---
+  const fmt = (n) => {
+    const v = Number(n)||0;
+    return v.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  async function getJSON(url){
+    try{
+      const r = await fetch(url, {cache:"no-store"});
+      if (!r.ok) throw new Error("HTTP "+r.status);
+      return await r.json();
+    }catch(e){ console.warn("[DT][pesin] fetch", e); return null; }
+  }
+
+  // Kod -> Ad & Fiyat
+  async function autofillByCode(row){
+    const code = row.codeSel.value || "";
+    if (!code) return;
+
+    // Adı doldur (Stok Listesi)
+    const idx = STOCK_CODES.indexOf(code);
+    if (idx >= 0) row.nameSel.value = STOCK_NAMES[idx] || "";
+
+    // Fiyatı doldur
+    const j = await getJSON(`${API}?action=findPriceByCode&code=${encodeURIComponent(code)}`);
+    const price = j?.price ?? "";
+    row.priceInp.value = price !== "" ? Number(price) : "";
+    recalcRow(row);
+  }
+
+  // Ad -> Kod & Fiyat
+  async function autofillByName(row){
+    const name = row.nameSel.value || "";
+    if (!name) return;
+
+    const idx = STOCK_NAMES.indexOf(name);
+    if (idx >= 0) row.codeSel.value = STOCK_CODES[idx] || "";
+
+    await autofillByCode(row);
+  }
+
+  // Toplam = qty × price
+  function recalcRow(row){
+    const q = Number(row.qtyInp.value || "0");
+    const p = Number(row.priceInp.value || "0");
+    const t = q * p;
+    row.totalInp.value = fmt(t);
+  }
+
+  // Fiyat değiştiğinde Fiyat Listesi’ni güncelle
+  async function pushPriceToSheet(row){
+    const code = row.codeSel.value || "";
+    if (!code) return;
+    const price = Number(row.priceInp.value || "0");
+    await getJSON(`${API}?action=updatePriceByCode&code=${encodeURIComponent(code)}&price=${encodeURIComponent(price)}`);
+  }
+
+  // Satır DOM’u oluştur
+  function createRowDom(initial = {code:"", name:"", qty:"", price:"", total:""}){
+    const wrap = document.createElement("div");
+    wrap.className = "satis-row";
+    wrap.style.display = "grid";
+    wrap.style.gridTemplateColumns = "1.2fr 2fr 1fr 1.2fr 1.2fr 40px";
+    wrap.style.gap = "8px";
+    wrap.style.alignItems = "center";
+    wrap.style.padding = "6px 0";
+
+    // Stok Kodu (select)
+    const codeSel = document.createElement("select");
+    codeSel.className = "form-control";
+    codeSel.innerHTML = `<option value="">Seçiniz…</option>` + STOCK_CODES.map(v=>`<option>${v}</option>`).join('');
+    codeSel.value = initial.code || "";
+
+    // Stok Adı (select)
+    const nameSel = document.createElement("select");
+    nameSel.className = "form-control";
+    nameSel.innerHTML = `<option value="">Seçiniz…</option>` + STOCK_NAMES.map(v=>`<option>${v}</option>`).join('');
+    nameSel.value = initial.name || "";
+
+    // Miktar (input number)
+    const qtyInp = document.createElement("input");
+    qtyInp.type = "number";
+    qtyInp.step = "any";
+    qtyInp.className = "form-control";
+    qtyInp.value = initial.qty ?? "";
+
+    // Birim Fiyat (input number, güncellenebilir)
+    const priceInp = document.createElement("input");
+    priceInp.type = "number";
+    priceInp.step = "any";
+    priceInp.className = "form-control";
+    priceInp.value = initial.price ?? "";
+
+    // Toplam (readonly)
+    const totalInp = document.createElement("input");
+    totalInp.readOnly = true;
+    totalInp.className = "form-control";
+    totalInp.value = initial.total !== undefined && initial.total !== "" ? fmt(initial.total) : "";
+
+    // Sil butonu
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn";
+    delBtn.innerHTML = "✖";
+    delBtn.title = "Satırı sil";
+
+    wrap.appendChild(codeSel);
+    wrap.appendChild(nameSel);
+    wrap.appendChild(qtyInp);
+    wrap.appendChild(priceInp);
+    wrap.appendChild(totalInp);
+    wrap.appendChild(delBtn);
+
+    const row = { el:wrap, codeSel, nameSel, qtyInp, priceInp, totalInp };
+    // Eventler
+    codeSel.addEventListener("change", ()=>autofillByCode(row));
+    nameSel.addEventListener("change", ()=>autofillByName(row));
+    qtyInp.addEventListener("input", ()=>recalcRow(row));
+    priceInp.addEventListener("input", ()=>{ recalcRow(row); });
+    priceInp.addEventListener("change", ()=>pushPriceToSheet(row));
+    delBtn.addEventListener("click", ()=>{
+      wrap.remove();
+      const i = state.rows.indexOf(row);
+      if (i>=0) state.rows.splice(i,1);
+    });
+
+    // İlk hesap
+    recalcRow(row);
+    return row;
+  }
+
+  function addRow(initial){
+    const row = createRowDom(initial);
+    state.rows.push(row);
+    rowContainer()?.appendChild(row.el);
+  }
+
+  // Kaydet (satırlar) — A,B,G,H,I blok olarak yazar
+  async function saveRows(){
+    const payload = state.rows.map(r=>{
+      const code  = r.codeSel.value || "";
+      const name  = r.nameSel.value || "";
+      const qty   = Number(r.qtyInp.value || "0");
+      const price = Number(r.priceInp.value || "0");
+      const total = qty * price;
+      return { code, name, qty, price, total };
+    });
+    const url = `${API}?action=setPesinRows&rows=${encodeURIComponent(JSON.stringify(payload))}`;
+    const j = await getJSON(url);
+    if (j?.success){
+      alert(`Satırlar kaydedildi (${j.rows}).`);
+    } else {
+      alert("Kaydet hatası!");
+    }
+  }
+
+  // Başlangıç: dropdown verileri ve mevcut satırları yükle
+  async function init(){
+    // 1) Stok listeleri
+    const s = await getJSON(`${API}?action=getStockLists`);
+    STOCK_CODES = s?.codes || [];
+    STOCK_NAMES = s?.names || [];
+
+    // 2) Mevcut satırları çek ve bas
+    const r = await getJSON(`${API}?action=getPesinRows`);
+    const rows = r?.rows || [];
+    rows.forEach(obj => addRow(obj));
+
+    // 3) “Satır Ekle” butonu
+    addRowBtn()?.addEventListener("click", ()=> addRow({}));
+
+    // 4) Dışarıya kaydet fonksiyonu aç (istersen butona bağlarız)
+    window.savePesinRows = saveRows;
+  }
+
+  return { init, addRow, saveRows };
+})();
+
+// Router tarafında:
+DT.initPesin = function(){
+  console.log("[DT] initPesin()");
+  DT.pesin.init();
+};
+
