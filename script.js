@@ -96,7 +96,12 @@
       setText("sevktom",    data.tohum   ?? "—");
       setText("sevkmot",    data.motorin ?? "—");
       setText("sevkzrai",   data.ziraiilac ?? "—");  // ✅ Zirai ilaç eklendi
-      setText("veresiyetutar", data.veresiye ?? "—");
+      if (data.veresiye) {
+  // Veresiye tutar TL olarak gelir
+  setText("veresiyetutar", data.veresiye);
+} else {
+  setText("veresiyetutar", "0,00 TL");
+}
 
       // --- Çıkış Bekleyen paneli ---
       if (data.cikisBekleyen) {
