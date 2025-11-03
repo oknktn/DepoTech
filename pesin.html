@@ -4,165 +4,174 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DepoTech - Peşin Satış</title>
-  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="script.js" defer></script>
+  <style>
+    :root {
+      --green: #1A6B3B;
+      --light-green: #2E8B57;
+      --orange: #FF9800;
+      --gray: #F5F5F5;
+      --dark: #333;
+    }
+    body { font-family: 'Segoe UI', sans-serif; margin:0; background:var(--gray); }
+    .header { background:var(--green); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:10px 20px; }
+    .back-button { background:#fff; color:var(--green); border:none; padding:8px 14px; border-radius:4px; font-weight:bold; cursor:pointer; }
+    .container { padding:15px; }
+    .top-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; }
+    .panel { background:#fff; border-radius:6px; padding:12px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+    .panel-title { border-bottom:2px solid var(--light-green); padding-bottom:5px; margin-bottom:8px; color:var(--light-green); }
+    .para-sayi-grid, .kasa-durum-grid, .duzeltme-grid, .satis-table-header { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-bottom:5px; align-items:center; }
+    .satis-table-header { font-weight:bold; background:#e9e9e9; padding:6px; border-radius:4px; grid-template-columns:1.2fr 2fr 1fr 1fr 1fr 40px; }
+    .form-control { width:100%; padding:4px; box-sizing:border-box; border:1px solid #ccc; border-radius:3px; text-align:right; }
+    .total-row label { font-weight:bold; }
+    .btn { padding:6px 12px; border:none; border-radius:4px; cursor:pointer; font-weight:bold; }
+    .btn-primary { background:var(--green); color:white; }
+    .btn-add-fis { background:none; color:var(--green); border:none; cursor:pointer; font-weight:bold; }
+    .btn-add-fis i { margin-right:5px; }
+    .satis-row { display:grid; grid-template-columns:1.2fr 2fr 1fr 1fr 1fr 40px; gap:5px; align-items:center; margin-top:5px; }
+    .satis-row button { background:#e74c3c; color:white; border:none; border-radius:4px; cursor:pointer; }
+    .kasa-buton-grup { display:flex; gap:8px; margin-top:10px; }
+  </style>
 </head>
 
 <body>
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-text">İşleniyor...</div>
-  </div>
-
-  <!-- Üst Bar -->
   <div class="header">
-    <button class="back-button" onclick="window.location.href='index.html'">
-      <i class="fas fa-arrow-left"></i> Ana Menü
-    </button>
-    <h1 id="pageTitle">Peşin Satış</h1>
+    <button class="back-button" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Ana Menü</button>
+    <h1>Peşin Satış</h1>
     <div></div>
   </div>
 
   <div class="container">
     <div class="top-grid">
       <!-- PARA SAYILARI -->
-      <div class="panel panel-compact">
+      <div class="panel">
         <h3 class="panel-title">Para Sayıları</h3>
         <div class="para-sayi-grid" style="font-weight:bold;">
           <label>Banknot</label><label>Adet</label><label>Toplam</label>
         </div>
-
-        <div id="paraSayiContainer">
-          <div class="para-sayi-grid">
-            <input value="200" class="form-control" readonly>
-            <input type="number" id="adet200" class="form-control" oninput="runAllCalculations()">
-            <input id="toplam200" class="form-control" readonly>
-          </div>
-          <div class="para-sayi-grid">
-            <input value="100" class="form-control" readonly>
-            <input type="number" id="adet100" class="form-control" oninput="runAllCalculations()">
-            <input id="toplam100" class="form-control" readonly>
-          </div>
-          <div class="para-sayi-grid">
-            <input value="50" class="form-control" readonly>
-            <input type="number" id="adet50" class="form-control" oninput="runAllCalculations()">
-            <input id="toplam50" class="form-control" readonly>
-          </div>
-          <div class="para-sayi-grid">
-            <input value="20" class="form-control" readonly>
-            <input type="number" id="adet20" class="form-control" oninput="runAllCalculations()">
-            <input id="toplam20" class="form-control" readonly>
-          </div>
-          <div class="para-sayi-grid">
-            <input value="10" class="form-control" readonly>
-            <input type="number" id="adet10" class="form-control" oninput="runAllCalculations()">
-            <input id="toplam10" class="form-control" readonly>
-          </div>
-          <div class="para-sayi-grid">
-            <input value="5" class="form-control" readonly>
-            <input type="number" id="adet5" class="form-control" oninput="runAllCalculations()">
-            <input id="toplam5" class="form-control" readonly>
-          </div>
-          <div class="para-sayi-grid">
-            <input value="1" class="form-control" readonly>
-            <input type="number" id="adet1" class="form-control" oninput="runAllCalculations()">
-            <input id="toplam1" class="form-control" readonly>
-          </div>
-          <div class="para-sayi-grid">
-            <input value="0.5" class="form-control" readonly>
-            <input type="number" id="adet05" class="form-control" oninput="runAllCalculations()">
-            <input id="toplam05" class="form-control" readonly>
-          </div>
-          <div class="para-sayi-grid">
-            <input value="0.25" class="form-control" readonly>
-            <input type="number" id="adet025" class="form-control" oninput="runAllCalculations()">
-            <input id="toplam025" class="form-control" readonly>
-          </div>
-        </div>
-
-        <div class="para-sayi-grid total-row">
-          <label>TOPLAM</label>
-          <div></div>
-          <input id="paraSayilariToplam" class="form-control" readonly>
-        </div>
+        <div id="paraSayiContainer"></div>
+        <div class="para-sayi-grid total-row"><label>TOPLAM</label><div></div><input id="paraSayilariToplam" class="form-control" readonly></div>
       </div>
 
       <!-- KASA DURUMU -->
-      <div class="panel panel-compact">
+      <div class="panel">
         <h3 class="panel-title">Kasa Durumu</h3>
-        <div class="kasa-durum-grid">
-          <label>Nakit Satış Toplamı</label>
-          <input id="nakitSatisKasaDurumu" class="form-control" readonly>
-        </div>
-        <div class="kasa-durum-grid">
-          <label>Kasa Toplamı</label>
-          <input id="kasaToplami" class="form-control" readonly>
-        </div>
-        <div class="kasa-durum-grid">
-          <label>Kasa Bakiyesi</label>
-          <input type="number" id="kasaBakiyesi" class="form-control" oninput="runAllCalculations()">
-        </div>
-        <div class="kasa-durum-grid">
-          <label>Durum</label>
-          <input id="kasaDurum" class="form-control" readonly>
-        </div>
-        <div style="margin-top:10px;">
-          <label class="form-label" style="font-size:13px;">Açıklama</label>
-          <div id="kasaDurumAciklama" class="kasa-durum-aciklama" style="display:none;"></div>
-        </div>
+        <div class="kasa-durum-grid"><label>Nakit Satış Toplamı</label><input id="nakitSatisKasaDurumu" class="form-control" readonly></div>
+        <div class="kasa-durum-grid"><label>Kasa Toplamı</label><input id="kasaToplami" class="form-control" readonly></div>
+        <div class="kasa-durum-grid"><label>Kasa Bakiyesi</label><input type="number" id="kasaBakiyesi" class="form-control" oninput="runAllCalculations()"></div>
+        <div class="kasa-durum-grid"><label>Durum</label><input id="kasaDurum" class="form-control" readonly></div>
+        <div><label>Açıklama</label><div id="kasaDurumAciklama" class="form-control" style="text-align:center;color:#fff;background:#e74c3c;display:none;"></div></div>
         <div class="kasa-buton-grup">
-          <button class="btn" style="background-color: var(--orange); color: white;" onclick="yazdirKasa()">
-            <i class="fas fa-print"></i> Yazdır
-          </button>
-          <button class="btn btn-primary" onclick="kaydetKasa()">
-            <i class="fas fa-save"></i> Kaydet
-          </button>
+          <button class="btn" style="background:var(--orange);color:white;"><i class="fas fa-print"></i> Yazdır</button>
+          <button class="btn btn-primary"><i class="fas fa-save"></i> Kaydet</button>
         </div>
       </div>
 
       <!-- DÜZELTME KAYITLARI -->
-      <div class="panel panel-compact">
+      <div class="panel">
         <h3 class="panel-title">Düzeltme Kayıtları</h3>
-        <div class="duzeltme-grid" style="font-weight:bold;">
-          <label>Açıklama</label><label>Tutar</label>
-        </div>
-        <div id="duzeltmeContainer">
-          ${Array.from({length:8}).map(()=>`
-          <div class="duzeltme-grid">
-            <input class="form-control" placeholder="Açıklama...">
-            <input type="number" class="form-control" placeholder="0,00" oninput="runAllCalculations()">
-          </div>`).join('')}
-        </div>
-        <div class="duzeltme-grid total-row">
-          <label>Düzeltme Kayıtları Toplamı</label>
-          <input id="duzeltmeKayitlariToplam" class="form-control" readonly>
-        </div>
-        <div class="duzeltme-grid total-row">
-          <label>Nakit Satış Toplamı</label>
-          <input id="nakitSatisDuzeltme" class="form-control" readonly>
-        </div>
+        <div class="duzeltme-grid" style="font-weight:bold;"><label>Açıklama</label><label>Tutar</label></div>
+        <div id="duzeltmeContainer"></div>
+        <div class="duzeltme-grid total-row"><label>Düzeltme Kayıtları Toplamı</label><input id="duzeltmeKayitlariToplam" class="form-control" readonly></div>
+        <div class="duzeltme-grid total-row"><label>Nakit Satış Toplamı</label><input id="nakitSatisDuzeltme" class="form-control" readonly></div>
       </div>
     </div>
 
     <!-- SATIŞ KAYITLARI -->
-    <div class="panel">
-      <div class="satis-header">
-        <h3 class="panel-title">Satış Kayıtları</h3>
-        <button id="btnAddSatisRow" class="btn-add-fis">
-          <i class="fas fa-plus"></i> Satır Ekle
-        </button>
+    <div class="panel" style="margin-top:15px;">
+      <div class="satis-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <h3 class="panel-title" style="margin:0;">Satış Kayıtları</h3>
+        <button id="btnAddSatisRow" class="btn-add-fis"><i class="fas fa-plus"></i> Satır Ekle</button>
       </div>
-
       <div class="satis-table-header">
-        <div>Stok Kodu</div>
-        <div>Stok Adı</div>
-        <div>Miktar</div>
-        <div>Birim Fiyat</div>
-        <div>Toplam</div>
-        <div></div>
+        <div>Stok Kodu</div><div>Stok Adı</div><div>Miktar</div><div>Birim Fiyat</div><div>Toplam</div><div></div>
       </div>
       <div id="satisKayitlariContainer"></div>
     </div>
   </div>
+
+  <script>
+    // === PARA SAYILARI OLUŞTUR ===
+    const banknotlar = [200,100,50,20,10,5,1,0.5,0.25];
+    const paraDiv = document.getElementById("paraSayiContainer");
+    banknotlar.forEach(b=>{
+      const row=document.createElement("div");
+      row.className="para-sayi-grid";
+      row.innerHTML=`
+        <input class="form-control" readonly value="${b}">
+        <input type="number" id="adet${b}" class="form-control" oninput="runAllCalculations()">
+        <input id="toplam${b}" class="form-control" readonly>`;
+      paraDiv.appendChild(row);
+    });
+
+    // === DÜZELTME SATIRLARI OLUŞTUR ===
+    const duzDiv=document.getElementById("duzeltmeContainer");
+    for(let i=0;i<8;i++){
+      const r=document.createElement("div");
+      r.className="duzeltme-grid";
+      r.innerHTML=`<input class="form-control" placeholder="Açıklama..."><input type="number" class="form-control" oninput="runAllCalculations()">`;
+      duzDiv.appendChild(r);
+    }
+
+    // === SATIŞ KAYITLARI ===
+    const container=document.getElementById("satisKayitlariContainer");
+    document.getElementById("btnAddSatisRow").onclick=()=>addRow();
+    function addRow(){
+      const wrap=document.createElement("div");
+      wrap.className="satis-row";
+      wrap.innerHTML=`
+        <input class="form-control" placeholder="Kod">
+        <input class="form-control" placeholder="Ürün Adı">
+        <input type="number" class="form-control" placeholder="Miktar" oninput="calcRow(this)">
+        <input type="number" class="form-control" placeholder="Birim Fiyat" oninput="calcRow(this)">
+        <input class="form-control" readonly placeholder="Toplam">
+        <button onclick="this.parentElement.remove()">🗑️</button>`;
+      container.appendChild(wrap);
+    }
+    function calcRow(el){
+      const row=el.parentElement;
+      const m=Number(row.children[2].value||0);
+      const f=Number(row.children[3].value||0);
+      row.children[4].value=(m*f).toFixed(2);
+      runAllCalculations();
+    }
+
+    // === HESAPLAMA ===
+    function runAllCalculations(){
+      // Para toplamı
+      let paraTop=0;
+      banknotlar.forEach(b=>{
+        const adet=Number(document.getElementById(`adet${b}`)?.value||0);
+        const toplam=adet*b;
+        document.getElementById(`toplam${b}`).value=toplam.toFixed(2);
+        paraTop+=toplam;
+      });
+      document.getElementById("paraSayilariToplam").value=paraTop.toFixed(2);
+
+      // Düzeltme toplamı
+      let duzTop=0;
+      duzDiv.querySelectorAll("input[type=number]").forEach(i=>duzTop+=Number(i.value||0));
+      document.getElementById("duzeltmeKayitlariToplam").value=duzTop.toFixed(2);
+
+      // Satış toplamı
+      let satisTop=0;
+      container.querySelectorAll(".satis-row").forEach(r=>{
+        satisTop+=Number(r.children[4].value||0);
+      });
+      document.getElementById("nakitSatisDuzeltme").value=satisTop.toFixed(2);
+      document.getElementById("nakitSatisKasaDurumu").value=satisTop.toFixed(2);
+
+      // Kasa toplam ve durum
+      const kasaBakiyesi=Number(document.getElementById("kasaBakiyesi").value||0);
+      const kasaToplami=paraTop+duzTop;
+      document.getElementById("kasaToplami").value=kasaToplami.toFixed(2);
+      const durum=kasaToplami - kasaBakiyesi;
+      document.getElementById("kasaDurum").value=durum.toFixed(2);
+      const aciklama=document.getElementById("kasaDurumAciklama");
+      if(durum<0){aciklama.style.display="block";aciklama.style.background="#e74c3c";aciklama.textContent=`${durum.toFixed(2)} TL Kasa Hesabı Eksik`;}
+      else if(durum>0){aciklama.style.display="block";aciklama.style.background="#27ae60";aciklama.textContent=`${durum.toFixed(2)} TL Kasa Fazla`;}
+      else aciklama.style.display="none";
+    }
+  </script>
 </body>
 </html>
