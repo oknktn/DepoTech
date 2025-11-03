@@ -116,7 +116,7 @@
       }
     },
 
-     DT.populateCikisBekleyen = async function() {
+   DT.populateCikisBekleyen = async function() {
   const url = "https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec?type=cikisBekleyen";
   const data = await safeFetchJson(url);
   if (!data || !data.cikisBekleyen) return;
@@ -126,7 +126,7 @@
   setText("cikis-yem", p.yem ?? "0");
   setText("cikis-tohum", p.tohum ?? "0");
   setText("cikis-motorin", p.motorin ?? "0");
-  setText("cikis-zirai-ilac", p.ziraiIlac ?? "0");
+  setText("cikis-ziraiilac", p.ziraiIlac ?? "0");
 };
 
 
