@@ -1,5 +1,5 @@
 /* =========================================================================
-   DepoTech - FINAL (Login + Genel Bilgi + Sevkler + Paneller)
+   DepoTech - FINAL (Login + Genel Bilgi + Sevkler + Paneller + Zirai İlaç)
    ========================================================================== */
 (() => {
   "use strict";
@@ -27,7 +27,7 @@
   };
 
   const DT = {
-    version: "2025.10.31-final",
+    version: "2025.11.03-final",
 
     // ---- Router ----
     autoInit() {
@@ -89,14 +89,15 @@
       const data = await safeFetchJson(url);
       if (!data) return;
 
-      // 15 Günlük sevkler + veresiye tutarı
+      // --- 15 Günlük sevkler + veresiye tutarı ---
       setText("sevkgubre",  data.gubre   ?? "—");
       setText("sevkyem",    data.yem     ?? "—");
       setText("sevktom",    data.tohum   ?? "—");
       setText("sevkmot",    data.motorin ?? "—");
+      setText("sevkzrai",   data.ziraiilac ?? "—");  // ✅ Zirai ilaç eklendi
       setText("veresiyetutar", data.veresiye ?? "—");
 
-      // Çıkış Bekleyen paneli (varsa)
+      // --- Çıkış Bekleyen paneli ---
       if (data.cikisBekleyen) {
         setText("cikis-gubre",   data.cikisBekleyen.gubre   ?? "0");
         setText("cikis-yem",     data.cikisBekleyen.yem     ?? "0");
@@ -104,16 +105,12 @@
         setText("cikis-motorin", data.cikisBekleyen.motorin ?? "0");
       }
 
-      // Veresiye Kayıtları paneli (varsa)
+      // --- Veresiye Kayıtları paneli ---
       if (data.veresiyePanel) {
-        // Backend'de veresiyePanel alanı varsa kullan
         setText("veresiye-gubre",   data.veresiyePanel.gubre   ?? "0");
         setText("veresiye-yem",     data.veresiyePanel.yem     ?? "0");
         setText("veresiye-tohum",   data.veresiyePanel.tohum   ?? "0");
         setText("veresiye-motorin", data.veresiyePanel.motorin ?? "0");
-      } else if (data.veresiye) {
-        // Eski şema ile geriye uyumluluk: tek kalem toplam veresiye varsa sadece tutarı yazıldı; kalem kırılımları yoksa dokunma
-        // İstersen burada hiçbir şey yapma; sadece toplam tutar yukarıda görünsün.
       }
     },
 
