@@ -1,343 +1,282 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DepoTech - Peşin Satış</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --green: #1A6B3B;
-      --light-green: #2E8B57;
-      --orange: #FF9800;
-      --gray: #F5F5F5;
-      --dark: #333;
-    }
-    body { font-family: 'Segoe UI', sans-serif; margin:0; background:var(--gray); }
-    .header { background:var(--green); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:10px 20px; }
-    .back-button { background:#fff; color:var(--green); border:none; padding:8px 14px; border-radius:4px; font-weight:bold; cursor:pointer; }
-    .container { padding:15px; }
-    .top-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; }
-    .panel { background:#fff; border-radius:6px; padding:12px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-    .panel-title { border-bottom:2px solid var(--light-green); padding-bottom:5px; margin-bottom:8px; color:var(--light-green); }
-    .para-sayi-grid, .kasa-durum-grid, .duzeltme-grid, .satis-table-header { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-bottom:5px; align-items:center; }
-    .satis-table-header { font-weight:bold; background:#e9e9e9; padding:6px; border-radius:4px; grid-template-columns:1.2fr 2fr 1fr 1fr 1fr 40px; }
-    .form-control { width:100%; padding:4px; box-sizing:border-box; border:1px solid #ccc; border-radius:3px; text-align:right; }
-    .total-row label { font-weight:bold; }
-    .btn { padding:6px 12px; border:none; border-radius:4px; cursor:pointer; font-weight:bold; }
-    .btn-primary { background:var(--green); color:white; }
-    .btn-add-fis { background:none; color:var(--green); border:none; cursor:pointer; font-weight:bold; }
-    .btn-add-fis i { margin-right:5px; }
-    .satis-row { display:grid; grid-template-columns:1.2fr 2fr 1fr 1fr 1fr 40px; gap:5px; align-items:center; margin-top:5px; }
-    .satis-row button { background:#e74c3c; color:white; border:none; border-radius:4px; cursor:pointer; }
-    .kasa-buton-grup { display:flex; gap:8px; margin-top:10px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peşin Satış</title>
+<style>
+:root {
+  --tkk-green: #1A6B3B;
+  --tkk-light-green: #2E8B57;
+  --tkk-orange: #FF9800;
+  --tkk-red: #E53935;
+  --tkk-white: #FFFFFF;
+  --tkk-light-gray: #F5F5F5;
+  --tkk-dark-gray: #333333;
+  --tkk-border: #ddd;
+}
+body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background: var(--tkk-light-gray);
+  margin: 0;
+  padding: 0;
+}
+.container { padding: 10px; }
+
+/* === PANEL GENEL === */
+.panel {
+  background: var(--tkk-white);
+  border-radius: 10px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  padding: 15px;
+  margin: 10px;
+  flex: 1;
+}
+.panels-row { display: flex; flex-wrap: wrap; gap: 10px; }
+h3 {
+  color: var(--tkk-green);
+  border-bottom: 2px solid var(--tkk-green);
+  padding-bottom: 4px;
+  margin-bottom: 10px;
+}
+
+/* === PARA SAYILARI === */
+.para-sayi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px; }
+.form-control {
+  border: 1px solid var(--tkk-border);
+  padding: 4px;
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+#paraSayilariToplam { font-weight: bold; background: #fff8e1; }
+
+/* === DÜZELTME === */
+.duzeltme-grid { display: grid; grid-template-columns: 3fr 1fr; gap: 5px; margin-bottom: 5px; }
+
+/* === SATIŞ KAYITLARI === */
+.satis-item-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 1fr 1fr 40px;
+  gap: 5px;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.btn-remove-row {
+  background: var(--tkk-red);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.btn-remove-row:hover { opacity: 0.8; }
+.add-row-btn { color: var(--tkk-green); cursor: pointer; font-weight: bold; }
+
+/* === KASA DURUMU === */
+.kasa-durum-aciklama {
+  padding: 6px;
+  color: white;
+  border-radius: 5px;
+  margin-top: 5px;
+  text-align: center;
+  font-weight: bold;
+}
+.kasa-tam { background: #2E8B57; }
+.kasa-eksik { background: #E53935; }
+.kasa-fazla { background: #FF9800; }
+
+/* === BUTONLAR === */
+.btn {
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 25px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn:hover { opacity: 0.9; }
+.btn-orange { background: var(--tkk-orange); }
+.btn-green { background: var(--tkk-green); }
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+</style>
 </head>
-
 <body>
-  <div class="header">
-    <button class="back-button" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Ana Menü</button>
-    <h1>Peşin Satış</h1>
-    <div></div>
-  </div>
+<div class="container">
 
-  <div class="container">
-    <div class="top-grid">
-      <!-- PARA SAYILARI -->
-      <div class="panel">
-        <h3 class="panel-title">Para Sayıları</h3>
-        <div class="para-sayi-grid" style="font-weight:bold;">
-          <label>Banknot</label><label>Adet</label><label>Toplam</label>
-        </div>
-        <div id="paraSayiContainer"></div>
-        <div class="para-sayi-grid total-row"><label>TOPLAM</label><div></div><input id="paraSayilariToplam" class="form-control" readonly></div>
-      </div>
-
-      <!-- KASA DURUMU -->
-      <div class="panel">
-        <h3 class="panel-title">Kasa Durumu</h3>
-        <div class="kasa-durum-grid"><label>Nakit Satış Toplamı</label><input id="nakitSatisKasaDurumu" class="form-control" readonly></div>
-        <div class="kasa-durum-grid"><label>Kasa Toplamı</label><input id="kasaToplami" class="form-control" readonly></div>
-        <div class="kasa-durum-grid"><label>Kasa Bakiyesi</label><input type="number" id="kasaBakiyesi" class="form-control" oninput="runAllCalculations()"></div>
-        <div class="kasa-durum-grid"><label>Durum</label><input id="kasaDurum" class="form-control" readonly></div>
-        <div><label>Açıklama</label><div id="kasaDurumAciklama" class="form-control" style="text-align:center;color:#fff;background:#e74c3c;display:none;"></div></div>
-        <div class="kasa-buton-grup">
-          <button class="btn" style="background:var(--orange);color:white;"><i class="fas fa-print"></i> Yazdır</button>
-          <button class="btn btn-primary"><i class="fas fa-save"></i> Kaydet</button>
-        </div>
-      </div>
-
-      <!-- DÜZELTME KAYITLARI -->
-      <div class="panel">
-        <h3 class="panel-title">Düzeltme Kayıtları</h3>
-        <div class="duzeltme-grid" style="font-weight:bold;"><label>Açıklama</label><label>Tutar</label></div>
-        <div id="duzeltmeContainer"></div>
-        <div class="duzeltme-grid total-row"><label>Düzeltme Kayıtları Toplamı</label><input id="duzeltmeKayitlariToplam" class="form-control" readonly></div>
-        <div class="duzeltme-grid total-row"><label>Nakit Satış Toplamı</label><input id="nakitSatisDuzeltme" class="form-control" readonly></div>
+  <div class="panels-row">
+    <!-- === PARA SAYILARI === -->
+    <div class="panel" style="flex:1">
+      <h3>Para Sayıları</h3>
+      <div id="paraSayiContainer"></div>
+      <div style="margin-top:8px;">
+        <label>TOPLAM</label>
+        <input id="paraSayilariToplam" class="form-control" readonly>
       </div>
     </div>
 
-    <!-- SATIŞ KAYITLARI -->
-    <div class="panel" style="margin-top:15px;">
-      <div class="satis-header" style="display:flex;justify-content:space-between;align-items:center;">
-        <h3 class="panel-title" style="margin:0;">Satış Kayıtları</h3>
-        <button id="btnAddSatisRow" class="btn-add-fis"><i class="fas fa-plus"></i> Satır Ekle</button>
+    <!-- === KASA DURUMU === -->
+    <div class="panel" style="flex:1">
+      <h3>Kasa Durumu</h3>
+      <label>Nakit Satış Toplamı</label>
+      <input id="nakitSatisKasaDurumu" class="form-control">
+      <label>Kasa Toplamı</label>
+      <input id="kasaToplami" class="form-control">
+      <label>Kasa Bakiyesi</label>
+      <input id="kasaBakiyesi" class="form-control">
+      <label>Durum</label>
+      <input id="kasaDurum" class="form-control">
+      <label>Açıklama</label>
+      <div id="kasaDurumAciklama" class="kasa-durum-aciklama kasa-tam">Kasa tam.</div>
+      <div class="buttons">
+        <button class="btn btn-orange">Yazdır</button>
+        <button class="btn btn-green">Kaydet</button>
       </div>
-      <div class="satis-table-header">
-        <div>Stok Kodu</div><div>Stok Adı</div><div>Miktar</div><div>Birim Fiyat</div><div>Toplam</div><div></div>
+    </div>
+
+    <!-- === DÜZELTME === -->
+    <div class="panel" style="flex:1">
+      <h3>Düzeltme Kayıtları</h3>
+      <div id="duzeltmeContainer"></div>
+      <div>
+        <label>Düzeltme Kayıtları Toplamı</label>
+        <input id="duzeltmeKayitlariToplam" class="form-control" readonly>
       </div>
-      <div id="satisKayitlariContainer"></div>
     </div>
   </div>
 
- <script>
-(() => {
-  "use strict";
+  <!-- === SATIŞ KAYITLARI === -->
+  <div class="panel" style="margin-top:15px;">
+    <h3>Satış Kayıtları <span class="add-row-btn" id="btnAddSatisRow">+ Satır Ekle</span></h3>
+    <div id="satisKayitlariContainer"></div>
+  </div>
+</div>
 
-  const API = "https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec";
+<script>
+const API = "https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec";
+const $ = id => document.getElementById(id);
+const fmt = n => (Number(n)||0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+let STOCK_CODES=[], STOCK_NAMES=[];
 
-  const $ = (id) => document.getElementById(id);
-  const fmt = (n) => (Number(n)||0).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+async function loadAll() {
+  const s = await fetch(`${API}?action=getStockLists`).then(r=>r.json()).catch(()=>({}));
+  STOCK_CODES = s.codes||[]; STOCK_NAMES = s.names||[];
 
-  // Dropdown kaynakları
-  let STOCK_CODES = [];
-  let STOCK_NAMES = [];
+  const a = await fetch(`${API}?action=getPesinAll`).then(r=>r.json()).catch(()=>({}));
+  const b = await fetch(`${API}?action=getPesinRows`).then(r=>r.json()).catch(()=>({}));
 
-  // ----- UI: Para Sayıları -----
-  const BANKNOTE_DENOMS_ORDER = ["200","100","50","20","10","5","1","0.5","0.25","0.10","0.05","0.01"]; // gelen veri yoksa fallback
+  renderBanknotes(a.banknotes||[]);
+  renderCorrections(a.corrections||[]);
+  fillKasa(a.kasa||{});
+  renderSales(b.rows||[]);
+}
 
-  function renderBanknoteRows(banknotes) {
-    const cont = $("paraSayiContainer");
-    cont.innerHTML = "";
-    const byDenom = {};
-    (banknotes||[]).forEach(b => { byDenom[String(b.denom)] = b; });
-
-    const denoms = (banknotes && banknotes.length ? banknotes.map(b => String(b.denom)) : BANKNOTE_DENOMS_ORDER);
-
-    denoms.forEach(d => {
-      const row = document.createElement("div");
-      row.className = "para-sayi-grid";
-
-      const adet = byDenom[d]?.adet ?? "";
-      const toplam = byDenom[d]?.toplam ?? "";
-
-      row.innerHTML = `
-        <input class="form-control banknot-denom" value="${d}" readonly>
-        <input class="form-control banknot-adet" type="number" step="1" value="${adet}">
-        <input class="form-control banknot-toplam" value="${toplam ? fmt(toplam) : ""}" readonly>
-      `;
-      cont.appendChild(row);
-    });
-
-    cont.querySelectorAll(".banknot-adet").forEach(inp => {
-      inp.addEventListener("input", runAllCalculations);
-    });
-  }
-
-  // ----- UI: Düzeltme Kayıtları -----
-  function renderCorrectionRows(list) {
-    const cont = $("duzeltmeContainer");
-    cont.innerHTML = "";
-    (list||[]).forEach(item => {
-      const row = document.createElement("div");
-      row.className = "duzeltme-grid";
-      row.innerHTML = `
-        <input class="form-control duzeltme-aciklama" value="${item.aciklama || ""}">
-        <input class="form-control duzeltme-tutar" type="number" step="any" value="${item.tutar ?? ""}">
-      `;
-      cont.appendChild(row);
-    });
-
-    // en alta boş satır ekle
-    const blank = document.createElement("div");
-    blank.className = "duzeltme-grid";
-    blank.innerHTML = `
-      <input class="form-control duzeltme-aciklama" placeholder="Açıklama">
-      <input class="form-control duzeltme-tutar" type="number" step="any" placeholder="0">
-    `;
-    cont.appendChild(blank);
-
-    cont.querySelectorAll(".duzeltme-tutar").forEach(inp => {
-      inp.addEventListener("input", runAllCalculations);
-    });
-  }
-
-  // ----- UI: Satış Satırları (kod/ad select) -----
-  function makeSelect(options, val) {
-    const sel = document.createElement("select");
-    sel.className = "form-control";
-    sel.innerHTML = `<option value="">Seçiniz…</option>` + options.map(o => `<option value="${o}">${o}</option>`).join("");
-    if (val) sel.value = val;
-    return sel;
-  }
-
-  function addSatisRow(initial = {code:"", name:"", qty:"", price:"", total:""}) {
-    const cont = $("satisKayitlariContainer");
-
-    const row = document.createElement("div");
-    row.className = "satis-item-row";
-
-    const codeSel = makeSelect(STOCK_CODES, initial.code);
-    const nameSel = makeSelect(STOCK_NAMES, initial.name);
-    const qtyInp  = document.createElement("input");
-    qtyInp.type = "number"; qtyInp.step = "any"; qtyInp.className = "form-control"; qtyInp.value = initial.qty ?? "";
-
-    const priceInp = document.createElement("input");
-    priceInp.type = "number"; priceInp.step = "any"; priceInp.className = "form-control"; priceInp.value = initial.price ?? "";
-
-    const totalInp = document.createElement("input");
-    totalInp.readOnly = true; totalInp.className = "form-control"; totalInp.value = initial.total ? fmt(initial.total) : "";
-
-    const delBtn = document.createElement("button");
-    delBtn.className = "btn-remove-row"; delBtn.innerHTML = "✖"; delBtn.title = "Satırı sil";
-
-    row.append(codeSel, nameSel, qtyInp, priceInp, totalInp, delBtn);
+function renderBanknotes(data){
+  const cont=$("paraSayiContainer");
+  const denoms=["200","100","50","20","10","5","1","0.5","0.25","0.10","0.05","0.01"];
+  cont.innerHTML="";
+  denoms.forEach(d=>{
+    const row=document.createElement("div");
+    row.className="para-sayi-grid";
+    const adet=data.find(x=>String(x.denom)==d)?.adet||"";
+    const toplam=data.find(x=>String(x.denom)==d)?.toplam||"";
+    row.innerHTML=`<input class="form-control" value="${d}" readonly>
+    <input class="form-control banknot-adet" value="${adet}">
+    <input class="form-control banknot-toplam" value="${fmt(toplam)}" readonly>`;
     cont.appendChild(row);
+  });
+  cont.querySelectorAll(".banknot-adet").forEach(inp=>inp.oninput=runAllCalculations);
+}
 
-    const recalc = () => {
-      const q = Number(qtyInp.value||0);
-      const p = Number(priceInp.value||0);
-      totalInp.value = fmt(q*p);
-      runAllCalculations(); // üst toplamları da güncelle
-    };
-
-    // Kod->Ad & Fiyat
-    codeSel.addEventListener("change", async () => {
-      const idx = STOCK_CODES.indexOf(codeSel.value);
-      if (idx >= 0) nameSel.value = STOCK_NAMES[idx] || "";
-      // fiyat çek
-      if (codeSel.value) {
-        const j = await fetch(`${API}?action=findPriceByCode&code=${encodeURIComponent(codeSel.value)}`, {cache:"no-store"}).then(r=>r.json()).catch(()=>null);
-        const price = j?.price ?? 0;
-        priceInp.value = price || "";
-        recalc();
-      }
-    });
-
-    // Ad->Kod & Fiyat
-    nameSel.addEventListener("change", async () => {
-      const idx = STOCK_NAMES.indexOf(nameSel.value);
-      if (idx >= 0) codeSel.value = STOCK_CODES[idx] || "";
-      if (codeSel.value) {
-        const j = await fetch(`${API}?action=findPriceByCode&code=${encodeURIComponent(codeSel.value)}`, {cache:"no-store"}).then(r=>r.json()).catch(()=>null);
-        const price = j?.price ?? 0;
-        priceInp.value = price || "";
-        recalc();
-      }
-    });
-
-    qtyInp.addEventListener("input", recalc);
-    priceInp.addEventListener("input", recalc);
-
-    delBtn.addEventListener("click", () => {
-      row.remove();
-      runAllCalculations();
-    });
+function renderCorrections(data){
+  const cont=$("duzeltmeContainer"); cont.innerHTML="";
+  for(let i=0;i<10;i++){
+    const a=data[i]?.aciklama||"", t=data[i]?.tutar||"";
+    const row=document.createElement("div");
+    row.className="duzeltme-grid";
+    row.innerHTML=`<input class="form-control duzeltme-aciklama" value="${a}">
+                   <input class="form-control duzeltme-tutar" type="number" value="${t}">`;
+    cont.appendChild(row);
   }
+  cont.querySelectorAll(".duzeltme-tutar").forEach(inp=>inp.oninput=runAllCalculations);
+}
 
-  // ----- HESAPLAMALAR -----
-  window.runAllCalculations = function runAllCalculations() {
-    // 1) Para Sayıları toplamı
-    let paraToplam = 0;
-    const wrap = $("paraSayiContainer");
-    wrap.querySelectorAll(".para-sayi-grid").forEach(row => {
-      const denom = Number(row.querySelector(".banknot-denom").value || 0);
-      const adet  = Number(row.querySelector(".banknot-adet").value || 0);
-      const toplam = denom * adet;
-      row.querySelector(".banknot-toplam").value = toplam ? fmt(toplam) : "";
-      paraToplam += toplam;
-    });
-    $("paraSayilariToplam").value = fmt(paraToplam);
+function fillKasa(k){
+  $("nakitSatisKasaDurumu").value = fmt(k.nakitSatisToplami||0);
+  $("kasaToplami").value = fmt(k.kasaToplami||0);
+  $("kasaBakiyesi").value = fmt(k.kasaBakiyesi||0);
+  $("kasaDurum").value = k.kasaDurum||"Tam";
+  updateKasaRenk(k.kasaDurum||"Tam");
+}
+function updateKasaRenk(durum){
+  const el=$("kasaDurumAciklama");
+  el.className="kasa-durum-aciklama";
+  if(durum==="Tam") el.classList.add("kasa-tam"), el.textContent="Kasa tam.";
+  else if(durum==="Eksik") el.classList.add("kasa-eksik"), el.textContent="Kasa hesabı eksik.";
+  else if(durum==="Fazla") el.classList.add("kasa-fazla"), el.textContent="Kasa hesabı fazla.";
+}
 
-    // 2) Düzeltme kayıtları toplamı
-    let duzToplam = 0;
-    $("duzeltmeContainer").querySelectorAll(".duzeltme-tutar").forEach(inp => {
-      duzToplam += Number(inp.value||0);
-    });
-    $("duzeltmeKayitlariToplam").value = fmt(duzToplam);
+function renderSales(rows){
+  const cont=$("satisKayitlariContainer"); cont.innerHTML="";
+  rows.forEach(r=>addRow(r));
+}
+function addRow(r={code:"",name:"",qty:"",price:"",total:""}){
+  const cont=$("satisKayitlariContainer");
+  const row=document.createElement("div"); row.className="satis-item-row";
+  const codeSel=select(STOCK_CODES,r.code), nameSel=select(STOCK_NAMES,r.name);
+  const qty=inp("number",r.qty), price=inp("number",r.price), total=inp("",fmt(r.total));
+  total.readOnly=true;
+  const del=btn("x","btn-remove-row");
+  row.append(codeSel,nameSel,qty,price,total,del);
+  cont.appendChild(row);
 
-    // 3) Nakit satış toplamı (düzeltme + satış kayıtları toplamından da hesaplanabilir ama şimdilik kasa panelinden okuyacağız)
-    const nakitFromPanel = Number(($("nakitSatisKasaDurumu").value || "").toString().replace(/\./g,"").replace(",","."));
-    const kasaToplami    = paraToplam + duzToplam;
-    $("kasaToplami").value = fmt(kasaToplami);
-
-    // 4) Kasa bakiyesi & durum
-    const beklenen = nakitFromPanel || 0;
-    const fark = kasaToplami - beklenen;
-    $("kasaBakiyesi").value = fmt(Math.abs(fark));
-    const durumInput = $("kasaDurum");
-    const aciklama = $("kasaDurumAciklama");
-    aciklama.style.display = "block";
-    if (Math.abs(fark) < 0.005) {
-      durumInput.value = "Tam";
-      aciklama.className = "kasa-durum-aciklama kasa-tam";
-      aciklama.textContent = "Kasa tam.";
-    } else if (fark > 0) {
-      durumInput.value = "Fazla";
-      aciklama.className = "kasa-durum-aciklama kasa-fazla";
-      aciklama.textContent = `${fmt(fark)} TL Kasa Hesabı Fazla`;
-    } else {
-      durumInput.value = "Eksik";
-      aciklama.className = "kasa-durum-aciklama kasa-eksik";
-      aciklama.textContent = `${fmt(-fark)} TL Kasa Hesabı Eksik`;
-    }
+  codeSel.onchange=async()=>{
+    const i=STOCK_CODES.indexOf(codeSel.value);
+    if(i>=0) nameSel.value=STOCK_NAMES[i]||"";
+    const f=await fetch(`${API}?action=findPriceByCode&code=${codeSel.value}`).then(r=>r.json()).catch(()=>({}));
+    price.value=f.price||"";
+    calc();
   };
+  nameSel.onchange=async()=>{
+    const i=STOCK_NAMES.indexOf(nameSel.value);
+    if(i>=0) codeSel.value=STOCK_CODES[i]||"";
+    const f=await fetch(`${API}?action=findPriceByCode&code=${codeSel.value}`).then(r=>r.json()).catch(()=>({}));
+    price.value=f.price||"";
+    calc();
+  };
+  qty.oninput=calc; price.oninput=calc;
+  del.onclick=()=>{row.remove(); runAllCalculations();};
+  function calc(){ total.value=fmt((+qty.value||0)*(+price.value||0)); runAllCalculations(); }
+}
+function select(opts,val){const s=document.createElement("select"); s.className="form-control"; s.innerHTML=`<option></option>`+opts.map(o=>`<option>${o}</option>`).join(""); s.value=val; return s;}
+function inp(type,v){const i=document.createElement("input"); i.className="form-control"; if(type)i.type=type; i.value=v; return i;}
+function btn(txt,cls){const b=document.createElement("button"); b.textContent=txt; b.className=cls; return b;}
 
-  // ----- YÜKLE & DOLDUR -----
-  async function initPage() {
-    // 1) Dropdown kaynakları
-    try {
-      const s = await fetch(`${API}?action=getStockLists`, {cache:"no-store"}).then(r=>r.json());
-      STOCK_CODES = s?.codes || [];
-      STOCK_NAMES = s?.names || [];
-    } catch {}
-
-    // 2) Para sayıları + düzeltme + kasa
-    try {
-      const meta = await fetch(`${API}?action=getPesinAll`, {cache:"no-store"}).then(r=>r.json());
-      const banknotes   = meta?.banknotes || [];
-      const corrections = meta?.corrections || [];
-      const kasa        = meta?.kasa || {};
-
-      renderBanknoteRows(banknotes);
-      renderCorrectionRows(corrections);
-
-      // Kasa alanlarını doldur
-      if (typeof kasa.nakitSatisToplami === "number") $("nakitSatisKasaDurumu").value = fmt(kasa.nakitSatisToplami);
-      if (typeof kasa.kasaToplami       === "number") $("kasaToplami").value          = fmt(kasa.kasaToplami);
-      if (typeof kasa.kasaBakiyesi      === "number") $("kasaBakiyesi").value         = fmt(kasa.kasaBakiyesi);
-      if (kasa.kasaDurum) $("kasaDurum").value = kasa.kasaDurum;
-
-    } catch (e) {
-      console.warn("getPesinAll hata:", e);
-    }
-
-    // 3) Satış satırları
-    try {
-      const r = await fetch(`${API}?action=getPesinRows`, {cache:"no-store"}).then(x=>x.json());
-      const rows = r?.rows || [];
-      // önce konteynerı temizle
-      $("satisKayitlariContainer").innerHTML = "";
-      // kayıtları bas
-      rows.forEach(obj => addSatisRow(obj));
-    } catch (e) {
-      console.warn("getPesinRows hata:", e);
-    }
-
-    // 4) “Satır Ekle” butonu
-    const btn = document.getElementById("btnAddSatisRow");
-    if (btn) btn.addEventListener("click", () => addSatisRow({}));
-
-    // 5) İlk hesap
-    runAllCalculations();
-  }
-
-  document.addEventListener("DOMContentLoaded", initPage, { once: true });
-
-  // Geri tuşu
-  window.goBack = () => { location.href = "index.html"; };
-
-})();
+function runAllCalculations(){
+  let para=0;
+  document.querySelectorAll(".para-sayi-grid").forEach(r=>{
+    const d=+r.children[0].value, a=+r.children[1].value; 
+    const t=d*a; r.children[2].value=fmt(t); para+=t;
+  });
+  $("paraSayilariToplam").value=fmt(para);
+  let duz=0; document.querySelectorAll(".duzeltme-tutar").forEach(i=>duz+=+i.value||0);
+  $("duzeltmeKayitlariToplam").value=fmt(duz);
+  const nakit=+$("nakitSatisKasaDurumu").value.replace(/\./g,"").replace(",","."), kasatop=para+duz;
+  $("kasaToplami").value=fmt(kasatop);
+  const fark=kasatop-nakit;
+  $("kasaBakiyesi").value=fmt(Math.abs(fark));
+  const durum = fark>0?"Fazla":fark<0?"Eksik":"Tam";
+  $("kasaDurum").value=durum;
+  updateKasaRenk(durum);
+}
+document.addEventListener("DOMContentLoaded",loadAll);
 </script>
 </body>
 </html>
