@@ -95,7 +95,7 @@ const parseTR=s=>{
 let STOCK_CODES=[],STOCK_NAMES=[],CODE_TO_NAME={},NAME_TO_CODE={},priceTimer=null;
 
 async function loadAll(){
-  const s=await fetch(`${API}?action=getStockLists`).then(r=>r.json()).catch(()=>({}));
+  const all = await fetch(`${API}?action=getPesinAll`).then(r=>r.json());
   STOCK_CODES=s.codes||[];STOCK_NAMES=s.names||[];
   STOCK_CODES.forEach((c,i)=>{CODE_TO_NAME[c]=STOCK_NAMES[i];NAME_TO_CODE[STOCK_NAMES[i]]=c;});
   renderBanknotes();
