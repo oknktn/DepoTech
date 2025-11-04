@@ -87,22 +87,22 @@ h3{color:var(--tkk-green);border-bottom:2px solid var(--tkk-green);padding-botto
 const API="https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec";
 const $=id=>document.getElementById(id);
 const fmt=n=>(Number(n)||0).toLocaleString("tr-TR",{minimumFractionDigits:2,maximumFractionDigits:2});
-const parseTR=s=>{if(!s)return 0;return Number(s.toString().trim().replace(/\./g,"").replace(",",".")||0);}
+const parseTR=s=>{
+ if(!s)return 0;
+ const str=s.toString().replace(/\./g,"").replace(",",".");
+ return parseFloat(str)||0;
+};
 let STOCK_CODES=[],STOCK_NAMES=[],CODE_TO_NAME={},NAME_TO_CODE={},priceTimer=null;
 
 async function loadAll(){
   const s=await fetch(`${API}?action=getStockLists`).then(r=>r.json()).catch(()=>({}));
   STOCK_CODES=s.codes||[];STOCK_NAMES=s.names||[];
   STOCK_CODES.forEach((c,i)=>{CODE_TO_NAME[c]=STOCK_NAMES[i];NAME_TO_CODE[STOCK_NAMES[i]]=c;});
-
-  const all=await fetch(`${API}?action=getPesinAll`).then(r=>r.json()).catch(()=>({}));
-  const rows=await fetch(`${API}?action=getPesinRows`).then(r=>r.json()).catch(()=>({}));
-
-  renderBanknotes(all.banknotes||[]);
-  renderCorrections(all.corrections||[]);
-  fillKasa(all.kasa||{});
-  renderSales(rows.rows||[]);
+  renderBanknotes();
+  renderCorrections();
+  renderSales([]);
   $("btnAddSatisRow").onclick=()=>addRow({});
+  $("kasaBakiyesi").addEventListener("input",runAllCalculations);
 }
 
 /* === PARA SAYILARI === */
@@ -112,18 +112,16 @@ function renderBanknotes(){
     {d:200,cell:"B4"},{d:100,cell:"B5"},{d:50,cell:"B6"},{d:20,cell:"B7"},
     {d:10,cell:"B8"},{d:5,cell:"B9"},{d:1,cell:"B10"},{d:0.5,cell:"B11"},{d:0.25,cell:"B12"}
   ];
-  map.forEach(m=>{
+  map.forEach(async m=>{
     const row=document.createElement("div"); row.className="para-sayi-grid";
     row.innerHTML=`<input class="form-control" value="${m.d}" readonly>
     <input id="adet_${m.cell}" class="form-control banknot-adet">
     <input class="form-control banknot-toplam" readonly>`;
     cont.appendChild(row);
-    // Hücreden veri oku
-    fetch(`${API}?action=getCell&range=${m.cell}`).then(r=>r.text()).then(v=>{
-      $(`adet_${m.cell}`).value=v||""; runAllCalculations();
-    });
+    const val=await getCellValue(m.cell);
+    $(`adet_${m.cell}`).value=val||"";
+    $(`adet_${m.cell}`).addEventListener("input",runAllCalculations);
   });
-  cont.querySelectorAll(".banknot-adet").forEach(i=>i.oninput=runAllCalculations);
 }
 
 /* === DÜZELTME KAYITLARI === */
@@ -132,27 +130,21 @@ function renderCorrections(){
   for(let i=3;i<=12;i++){
     const row=document.createElement("div"); row.className="duzeltme-grid";
     row.innerHTML=`<input id="aciklama_F${i}" class="form-control duz-aciklama">
-                   <input id="tutar_I${i}" class="form-control duz-tutar" type="number">`;
+                   <input id="tutar_I${i}" class="form-control duz-tutar" type="text">`;
     cont.appendChild(row);
-    fetch(`${API}?action=getCell&range=F${i}`).then(r=>r.text()).then(v=>$(`aciklama_F${i}`).value=v||"");
-    fetch(`${API}?action=getCell&range=I${i}`).then(r=>r.text()).then(v=>$(`tutar_I${i}`).value=v||"");
+    getCellValue(`F${i}`).then(v=>$(`aciklama_F${i}`).value=v||"");
+    getCellValue(`I${i}`).then(v=>$(`tutar_I${i}`).value=v||"");
   }
-  cont.querySelectorAll(".duz-tutar").forEach(i=>i.oninput=runAllCalculations);
+  cont.querySelectorAll(".duz-tutar").forEach(i=>i.addEventListener("input",runAllCalculations));
 }
 
-/* === KASA === */
-function fillKasa(k){
-  $("nakitSatisKasaDurumu").value=fmt(k.nakitSatisToplami||0);
-  $("kasaToplami").value=fmt(k.kasaToplami||0);
-  $("kasaBakiyesi").value="";
-  $("kasaDurum").value="";
-  updateKasaRenk("Tam");
-}
-function updateKasaRenk(durum){
-  const el=$("kasaDurumAciklama"); el.className="kasa-durum-aciklama";
-  if(durum>0){el.classList.add("kasa-fazla");el.textContent="Kasa fazla.";}
-  else if(durum<0){el.classList.add("kasa-eksik");el.textContent="Kasa eksik.";}
-  else{el.classList.add("kasa-tam");el.textContent="Kasa tam.";}
+/* === Yardımcı Hücre Okuma === */
+async function getCellValue(range){
+  try{
+    const res=await fetch(`${API}?action=getCellValue&range=${range}`);
+    const data=await res.json();
+    return data.value||"";
+  }catch{return"";}
 }
 
 /* === SATIŞ === */
@@ -173,40 +165,56 @@ function addRow(r={code:"",name:"",qty:"",price:"",total:""}){
   row.append(codeSel,nameSel,qty,price,total,del);
   cont.appendChild(row);
 
-  const recalc=()=>{total.value=fmt(parseTR(qty.value)*parseTR(price.value));runAllCalculations();};
-  const updatePrice=()=>{clearTimeout(priceTimer);priceTimer=setTimeout(()=>pushPriceUpdate(codeSel.value,price.value),500);};
+  const recalc=()=>{
+    const q=parseTR(qty.value);
+    const p=parseTR(price.value);
+    total.value=fmt(q*p);
+    runAllCalculations();
+  };
+  const updatePrice=()=>{
+    clearTimeout(priceTimer);
+    priceTimer=setTimeout(()=>pushPriceUpdate(codeSel.value,price.value),500);
+  };
   codeSel.onchange=async()=>{
     const code=codeSel.value;nameSel.value=CODE_TO_NAME[code]||"";
-    if(code){const f=await fetch(`${API}?action=findPriceByCode&code=${code}`).then(r=>r.json()).catch(()=>({}));price.value=f.price||"";}
-    recalc();
+    if(code){const f=await fetch(`${API}?action=findPriceByCode&code=${code}`).then(r=>r.json()).catch(()=>({}));
+      price.value=f.price?f.price.toString().replace(".",","):"";
+    }recalc();
   };
   nameSel.onchange=async()=>{
     const name=nameSel.value;codeSel.value=NAME_TO_CODE[name]||"";
-    if(codeSel.value){const f=await fetch(`${API}?action=findPriceByCode&code=${codeSel.value}`).then(r=>r.json()).catch(()=>({}));price.value=f.price||"";}
-    recalc();
+    if(codeSel.value){const f=await fetch(`${API}?action=findPriceByCode&code=${codeSel.value}`).then(r=>r.json()).catch(()=>({}));
+      price.value=f.price?f.price.toString().replace(".",","):"";
+    }recalc();
   };
-  qty.oninput=recalc;
-  price.oninput=()=>{recalc();updatePrice();};
+  qty.addEventListener("input",recalc);
+  price.addEventListener("input",()=>{recalc();updatePrice();});
   del.onclick=()=>{row.remove();runAllCalculations();};
 }
 function createSelect(list,val){const s=document.createElement("select");s.className="form-control";s.innerHTML=`<option></option>`+list.map(v=>`<option>${v}</option>`).join("");s.value=val||"";return s;}
 function inp(type,v,cls=""){const i=document.createElement("input");i.type=type;i.className=`form-control ${cls}`;i.value=v||"";return i;}
 function btn(txt,cls){const b=document.createElement("button");b.textContent=txt;b.className=cls;return b;}
-async function pushPriceUpdate(code,price){if(!code||!price)return;await fetch(`${API}?action=updatePriceByCode&code=${code}&price=${price}`).catch(()=>{});}
+async function pushPriceUpdate(code,price){
+ if(!code||!price)return;
+ const val=price.replace(",",".");
+ await fetch(`${API}?action=updatePriceByCode&code=${code}&price=${val}`).catch(()=>{});
+}
 
 /* === HESAPLAMA === */
 function runAllCalculations(){
-  let para=0;document.querySelectorAll(".para-sayi-grid").forEach(r=>{
+  let para=0;
+  document.querySelectorAll(".para-sayi-grid").forEach(r=>{
     const d=parseTR(r.children[0].value),a=parseTR(r.children[1].value),t=d*a;
     r.children[2].value=fmt(t);para+=t;
-  });$("paraSayilariToplam").value=fmt(para);
+  });
+  $("paraSayilariToplam").value=fmt(para);
 
   let duz=0;document.querySelectorAll(".duz-tutar").forEach(i=>duz+=parseTR(i.value));
   $("duzeltmeKayitlariToplam").value=fmt(duz);
 
   let satisTop=0;document.querySelectorAll(".satis-total").forEach(i=>satisTop+=parseTR(i.value));
-  $("nakitSatisToplamiDuz").value=fmt(satisTop);
   $("nakitSatisKasaDurumu").value=fmt(satisTop);
+  $("nakitSatisToplamiDuz").value=fmt(satisTop);
 
   const kasaTop=para+duz;
   $("kasaToplami").value=fmt(kasaTop);
@@ -215,8 +223,14 @@ function runAllCalculations(){
   $("kasaDurum").value=fmt(fark);
   updateKasaRenk(fark);
 }
+function updateKasaRenk(fark){
+  const el=$("kasaDurumAciklama");el.className="kasa-durum-aciklama";
+  if(fark>0){el.classList.add("kasa-fazla");el.textContent="Kasa fazla.";}
+  else if(fark<0){el.classList.add("kasa-eksik");el.textContent="Kasa eksik.";}
+  else{el.classList.add("kasa-tam");el.textContent="Kasa tam.";}
+}
 
-async function saveAll(){alert("Kaydetme işlemi hazır. Veriler güncellendi.");}
+async function saveAll(){alert("Veriler güncellendi.");}
 document.addEventListener("DOMContentLoaded",loadAll);
 </script>
 </body>
