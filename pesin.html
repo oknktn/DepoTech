@@ -6,16 +6,17 @@
 <title>Peşin Satış</title>
 <style>
 :root{
---tkk-green:#1A6B3B;--tkk-orange:#FF9800;--tkk-red:#E53935;
---tkk-white:#fff;--tkk-gray:#f5f5f5;--border:#ddd;
+  --tkk-green:#1A6B3B;--tkk-orange:#FF9800;--tkk-red:#E53935;
+  --tkk-white:#fff;--tkk-gray:#f5f5f5;--border:#ddd;
 }
+*{box-sizing:border-box}
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--tkk-gray);margin:0}
 .container{padding:10px}
 .panel{background:var(--tkk-white);border-radius:10px;box-shadow:0 0 4px rgba(0,0,0,.1);padding:15px;margin:10px;flex:1}
 .panels-row{display:flex;flex-wrap:wrap;gap:10px}
 h3{color:var(--tkk-green);border-bottom:2px solid var(--tkk-green);padding-bottom:4px;margin-bottom:10px}
-.form-control{border:1px solid var(--border);padding:5px;border-radius:6px;width:100%;box-sizing:border-box}
-.para-sayi-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:6px}
+.form-control{border:1px solid var(--border);padding:5px;border-radius:6px;width:100%}
+.para-sayi-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px}
 .duzeltme-grid{display:grid;grid-template-columns:3fr 1fr;gap:6px;margin-bottom:6px}
 .duzeltme-sum-grid{display:grid;grid-template-columns:3fr 1fr;gap:6px;margin-top:10px}
 .satis-item-row{display:grid;grid-template-columns:1fr 2fr 1fr 1fr 1fr 40px;gap:6px;align-items:center;margin-bottom:6px}
@@ -36,6 +37,9 @@ h3{color:var(--tkk-green);border-bottom:2px solid var(--tkk-green);padding-botto
     <!-- PARA SAYILARI -->
     <div class="panel">
       <h3>Para Sayıları</h3>
+      <div class="para-sayi-grid" style="font-weight:700;">
+        <label>Banknot</label><label>Adet</label><label>Toplam</label>
+      </div>
       <div id="paraSayiContainer"></div>
       <div class="duzeltme-sum-grid">
         <label>TOPLAM</label><input id="paraSayilariToplam" class="form-control" readonly>
@@ -45,15 +49,23 @@ h3{color:var(--tkk-green);border-bottom:2px solid var(--tkk-green);padding-botto
     <!-- KASA DURUMU -->
     <div class="panel">
       <h3>Kasa Durumu</h3>
-      <label>Nakit Satış Toplamı</label>
-      <input id="nakitSatisKasaDurumu" class="form-control" readonly>
-      <label>Kasa Toplamı</label>
-      <input id="kasaToplami" class="form-control" readonly>
-      <label>Kasa Bakiyesi</label>
-      <input id="kasaBakiyesi" class="form-control">
-      <label>Durum</label>
-      <input id="kasaDurum" class="form-control" readonly>
-      <label>Açıklama</label>
+      <div class="duzeltme-sum-grid">
+        <label>Nakit Satış Toplamı</label>
+        <input id="nakitSatisKasaDurumu" class="form-control" readonly>
+      </div>
+      <div class="duzeltme-sum-grid">
+        <label>Kasa Toplamı</label>
+        <input id="kasaToplami" class="form-control" readonly>
+      </div>
+      <div class="duzeltme-sum-grid">
+        <label>Kasa Bakiyesi</label>
+        <input id="kasaBakiyesi" class="form-control">
+      </div>
+      <div class="duzeltme-sum-grid">
+        <label>Durum</label>
+        <input id="kasaDurum" class="form-control" readonly>
+      </div>
+      <label style="margin-top:8px;">Açıklama</label>
       <div id="kasaDurumAciklama" class="kasa-durum-aciklama kasa-tam">Kasa tam.</div>
       <div class="buttons">
         <button class="btn btn-orange" onclick="window.print()">Yazdır</button>
@@ -64,6 +76,9 @@ h3{color:var(--tkk-green);border-bottom:2px solid var(--tkk-green);padding-botto
     <!-- DÜZELTME KAYITLARI -->
     <div class="panel">
       <h3>Düzeltme Kayıtları</h3>
+      <div class="duzeltme-grid" style="font-weight:700;">
+        <label>Açıklama</label><label>Tutar</label>
+      </div>
       <div id="duzeltmeContainer"></div>
       <div class="duzeltme-sum-grid">
         <label>Düzeltme Kayıtları Toplamı</label>
@@ -79,89 +94,106 @@ h3{color:var(--tkk-green);border-bottom:2px solid var(--tkk-green);padding-botto
   <!-- SATIŞ KAYITLARI -->
   <div class="panel" style="margin-top:12px;">
     <h3>Satış Kayıtları <span id="btnAddSatisRow" class="add-row-btn">+ Satır Ekle</span></h3>
+    <div class="satis-item-row" style="font-weight:700;background:#f0f3f0;border-radius:6px;padding:6px;">
+      <div>Stok Kodu</div><div>Stok Adı</div><div>Miktar</div><div>Birim Fiyat</div><div>Toplam</div><div></div>
+    </div>
     <div id="satisKayitlariContainer"></div>
   </div>
 </div>
 
 <script>
+// ======= AYAR =======
 const API="https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec";
+
+// ======= KÜTÜPHANE =======
 const $=id=>document.getElementById(id);
 const fmt=n=>(Number(n)||0).toLocaleString("tr-TR",{minimumFractionDigits:2,maximumFractionDigits:2});
 const parseTR=s=>{
- if(!s)return 0;
- const str=s.toString().replace(/\./g,"").replace(",",".");
- return parseFloat(str)||0;
+  if(s===null||s===undefined) return 0;
+  const str=s.toString().replace(/\./g,"").replace(",",".");
+  const v=parseFloat(str);
+  return isNaN(v)?0:v;
 };
+
+// ======= DURUMLAR =======
 let STOCK_CODES=[],STOCK_NAMES=[],CODE_TO_NAME={},NAME_TO_CODE={},priceTimer=null;
 
-async function loadAll(){
-  const all = await fetch(`${API}?action=getPesinAll`).then(r=>r.json());
-  STOCK_CODES=s.codes||[];STOCK_NAMES=s.names||[];
-  STOCK_CODES.forEach((c,i)=>{CODE_TO_NAME[c]=STOCK_NAMES[i];NAME_TO_CODE[STOCK_NAMES[i]]=c;});
-  renderBanknotes();
-  renderCorrections();
-  renderSales([]);
+// ======= INIT =======
+document.addEventListener("DOMContentLoaded", init);
+
+async function init(){
+  // 1) Tüm özet veriler (para sayıları, düzeltmeler)
+  const all = await fetch(`${API}?action=getPesinAll`).then(r=>r.json()).catch(()=>({}));
+
+  // 2) Stok listeleri
+  const s = await fetch(`${API}?action=getStockLists`).then(r=>r.json()).catch(()=>({}));
+  STOCK_CODES=s.codes||[]; STOCK_NAMES=s.names||[];
+  CODE_TO_NAME={}; NAME_TO_CODE={};
+  STOCK_CODES.forEach((c,i)=>{ CODE_TO_NAME[c]=STOCK_NAMES[i]; });
+  STOCK_NAMES.forEach((n,i)=>{ NAME_TO_CODE[n]=STOCK_CODES[i]; });
+
+  // 3) Satış satırları
+  const rowsRes = await fetch(`${API}?action=getPesinRows`).then(r=>r.json()).catch(()=>({rows:[]}));
+  const rows = (rowsRes && rowsRes.rows) ? rowsRes.rows : [];
+
+  renderBanknotes(all.banknotes);      // B4..B12 adetleri
+  renderCorrections(all.corrections);  // F3..F12 / I3..I12
+  renderSales(rows);                   // A,B,G,H,I
+
   $("btnAddSatisRow").onclick=()=>addRow({});
   $("kasaBakiyesi").addEventListener("input",runAllCalculations);
+
+  // İlk hesap
+  runAllCalculations();
 }
 
 /* === PARA SAYILARI === */
-function renderBanknotes(){
+function renderBanknotes(bankAdetArray){
   const cont=$("paraSayiContainer"); cont.innerHTML="";
-  const map=[
-    {d:200,cell:"B4"},{d:100,cell:"B5"},{d:50,cell:"B6"},{d:20,cell:"B7"},
-    {d:10,cell:"B8"},{d:5,cell:"B9"},{d:1,cell:"B10"},{d:0.5,cell:"B11"},{d:0.25,cell:"B12"}
-  ];
-  map.forEach(async m=>{
+  const denomList=[200,100,50,20,10,5,1,0.5,0.25]; // sırayla B4..B12
+  for(let i=0;i<denomList.length;i++){
+    const adet = bankAdetArray && bankAdetArray[i] ? bankAdetArray[i] : "";
     const row=document.createElement("div"); row.className="para-sayi-grid";
-    row.innerHTML=`<input class="form-control" value="${m.d}" readonly>
-    <input id="adet_${m.cell}" class="form-control banknot-adet">
-    <input class="form-control banknot-toplam" readonly>`;
+    row.innerHTML=`
+      <input class="form-control" value="${denomList[i]}" readonly>
+      <input class="form-control banknot-adet" value="${adet}">
+      <input class="form-control banknot-toplam" readonly>`;
     cont.appendChild(row);
-    const val=await getCellValue(m.cell);
-    $(`adet_${m.cell}`).value=val||"";
-    $(`adet_${m.cell}`).addEventListener("input",runAllCalculations);
-  });
+  }
+  cont.querySelectorAll(".banknot-adet").forEach(inp=>inp.addEventListener("input",runAllCalculations));
 }
 
 /* === DÜZELTME KAYITLARI === */
-function renderCorrections(){
+function renderCorrections(corr){
   const cont=$("duzeltmeContainer"); cont.innerHTML="";
-  for(let i=3;i<=12;i++){
+  const acik = (corr && corr.aciklama) ? corr.aciklama : [];
+  const tut  = (corr && corr.tutar)    ? corr.tutar    : [];
+  for(let i=0;i<10;i++){
     const row=document.createElement("div"); row.className="duzeltme-grid";
-    row.innerHTML=`<input id="aciklama_F${i}" class="form-control duz-aciklama">
-                   <input id="tutar_I${i}" class="form-control duz-tutar" type="text">`;
+    row.innerHTML=`
+      <input class="form-control duz-aciklama" value="${(acik[i]||"")}">
+      <input class="form-control duz-tutar" type="text" value="${(tut[i]||"")}">`;
     cont.appendChild(row);
-    getCellValue(`F${i}`).then(v=>$(`aciklama_F${i}`).value=v||"");
-    getCellValue(`I${i}`).then(v=>$(`tutar_I${i}`).value=v||"");
   }
   cont.querySelectorAll(".duz-tutar").forEach(i=>i.addEventListener("input",runAllCalculations));
-}
-
-/* === Yardımcı Hücre Okuma === */
-async function getCellValue(range){
-  try{
-    const res=await fetch(`${API}?action=getCellValue&range=${range}`);
-    const data=await res.json();
-    return data.value||"";
-  }catch{return"";}
 }
 
 /* === SATIŞ === */
 function renderSales(rows){
   const cont=$("satisKayitlariContainer"); cont.innerHTML="";
   (rows.length?rows:[{}]).forEach(r=>addRow(r));
-  runAllCalculations();
 }
 function addRow(r={code:"",name:"",qty:"",price:"",total:""}){
   const cont=$("satisKayitlariContainer");
   const row=document.createElement("div"); row.className="satis-item-row";
+
   const codeSel=createSelect(STOCK_CODES,r.code);
   const nameSel=createSelect(STOCK_NAMES,r.name);
-  const qty=inp("number",r.qty,"satis-qty");
-  const price=inp("text",r.price,"satis-price");
-  const total=inp("text",fmt(r.total||0),"satis-total"); total.readOnly=true;
+  const qty=inp("text", r.qty ? String(r.qty).replace(".",",") : "", "satis-qty");
+  const price=inp("text", r.price? String(r.price).replace(".",",") : "", "satis-price");
+  const total=inp("text", fmt(r.total||0), "satis-total"); total.readOnly=true;
   const del=btn("×","btn-remove-row");
+
   row.append(codeSel,nameSel,qty,price,total,del);
   cont.appendChild(row);
 
@@ -173,20 +205,26 @@ function addRow(r={code:"",name:"",qty:"",price:"",total:""}){
   };
   const updatePrice=()=>{
     clearTimeout(priceTimer);
-    priceTimer=setTimeout(()=>pushPriceUpdate(codeSel.value,price.value),500);
+    priceTimer=setTimeout(()=>pushPriceUpdate(codeSel.value,price.value),600);
   };
+
   codeSel.onchange=async()=>{
-    const code=codeSel.value;nameSel.value=CODE_TO_NAME[code]||"";
-    if(code){const f=await fetch(`${API}?action=findPriceByCode&code=${code}`).then(r=>r.json()).catch(()=>({}));
-      price.value=f.price?f.price.toString().replace(".",","):"";
-    }recalc();
+    const code=codeSel.value; nameSel.value=CODE_TO_NAME[code]||"";
+    if(code){
+      const f=await fetch(`${API}?action=findPriceByCode&code=${encodeURIComponent(code)}`).then(r=>r.json()).catch(()=>({}));
+      price.value = (f && typeof f.price==="number") ? f.price.toString().replace(".",",") : (price.value||"");
+    }
+    recalc();
   };
   nameSel.onchange=async()=>{
-    const name=nameSel.value;codeSel.value=NAME_TO_CODE[name]||"";
-    if(codeSel.value){const f=await fetch(`${API}?action=findPriceByCode&code=${codeSel.value}`).then(r=>r.json()).catch(()=>({}));
-      price.value=f.price?f.price.toString().replace(".",","):"";
-    }recalc();
+    const name=nameSel.value; codeSel.value=NAME_TO_CODE[name]||"";
+    if(codeSel.value){
+      const f=await fetch(`${API}?action=findPriceByCode&code=${encodeURIComponent(codeSel.value)}`).then(r=>r.json()).catch(()=>({}));
+      price.value = (f && typeof f.price==="number") ? f.price.toString().replace(".",",") : (price.value||"");
+    }
+    recalc();
   };
+
   qty.addEventListener("input",recalc);
   price.addEventListener("input",()=>{recalc();updatePrice();});
   del.onclick=()=>{row.remove();runAllCalculations();};
@@ -195,43 +233,71 @@ function createSelect(list,val){const s=document.createElement("select");s.class
 function inp(type,v,cls=""){const i=document.createElement("input");i.type=type;i.className=`form-control ${cls}`;i.value=v||"";return i;}
 function btn(txt,cls){const b=document.createElement("button");b.textContent=txt;b.className=cls;return b;}
 async function pushPriceUpdate(code,price){
- if(!code||!price)return;
- const val=price.replace(",",".");
- await fetch(`${API}?action=updatePriceByCode&code=${code}&price=${val}`).catch(()=>{});
+  if(!code||!price)return;
+  const val=price.replace(",",".");
+  await fetch(`${API}?action=updatePriceByCode&code=${encodeURIComponent(code)}&price=${encodeURIComponent(val)}`).catch(()=>{});
 }
 
 /* === HESAPLAMA === */
 function runAllCalculations(){
+  // Para sayıları
   let para=0;
-  document.querySelectorAll(".para-sayi-grid").forEach(r=>{
-    const d=parseTR(r.children[0].value),a=parseTR(r.children[1].value),t=d*a;
-    r.children[2].value=fmt(t);para+=t;
+  document.querySelectorAll("#paraSayiContainer .para-sayi-grid").forEach(r=>{
+    const d=parseTR(r.children[0].value);
+    const a=parseTR(r.children[1].value);
+    const t=d*a;
+    r.children[2].value=fmt(t);
+    para+=t;
   });
   $("paraSayilariToplam").value=fmt(para);
 
-  let duz=0;document.querySelectorAll(".duz-tutar").forEach(i=>duz+=parseTR(i.value));
+  // Düzeltme toplamı
+  let duz=0;
+  document.querySelectorAll(".duz-tutar").forEach(i=>duz+=parseTR(i.value));
   $("duzeltmeKayitlariToplam").value=fmt(duz);
 
-  let satisTop=0;document.querySelectorAll(".satis-total").forEach(i=>satisTop+=parseTR(i.value));
+  // Satış toplamları
+  let satisTop=0;
+  document.querySelectorAll(".satis-total").forEach(i=>satisTop+=parseTR(i.value));
   $("nakitSatisKasaDurumu").value=fmt(satisTop);
   $("nakitSatisToplamiDuz").value=fmt(satisTop);
 
+  // Kasa hesapları
   const kasaTop=para+duz;
   $("kasaToplami").value=fmt(kasaTop);
-
-  const fark=kasaTop-parseTR($("nakitSatisKasaDurumu").value)-parseTR($("kasaBakiyesi").value);
+  const fark = kasaTop - parseTR($("nakitSatisKasaDurumu").value) - parseTR($("kasaBakiyesi").value);
   $("kasaDurum").value=fmt(fark);
   updateKasaRenk(fark);
 }
 function updateKasaRenk(fark){
-  const el=$("kasaDurumAciklama");el.className="kasa-durum-aciklama";
+  const el=$("kasaDurumAciklama"); el.className="kasa-durum-aciklama";
   if(fark>0){el.classList.add("kasa-fazla");el.textContent="Kasa fazla.";}
   else if(fark<0){el.classList.add("kasa-eksik");el.textContent="Kasa eksik.";}
   else{el.classList.add("kasa-tam");el.textContent="Kasa tam.";}
 }
 
-async function saveAll(){alert("Veriler güncellendi.");}
-document.addEventListener("DOMContentLoaded",loadAll);
+/* === KAYDET (sadece satış satırlarını Sheets'e yazar) === */
+async function saveAll(){
+  // Satış satırlarını topla
+  const rows=[];
+  document.querySelectorAll("#satisKayitlariContainer .satis-item-row").forEach(r=>{
+    const code = r.children[0].value || "";
+    const name = r.children[1].value || "";
+    const qty  = parseTR(r.children[2].value);
+    const price= parseTR(r.children[3].value);
+    const total= qty*price;
+    if(code || name || qty || price || total){
+      rows.push({code,name,qty,price,total});
+    }
+  });
+  await fetch(`${API}?action=setPesinRows`,{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},
+    body:`rows=${encodeURIComponent(JSON.stringify(rows))}`
+  }).then(r=>r.json()).catch(()=>({}));
+
+  alert("Satış satırları kaydedildi.");
+}
 </script>
 </body>
 </html>
