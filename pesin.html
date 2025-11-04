@@ -113,10 +113,11 @@ async function init(){
 
 /* PARA SAYILARI */
 function renderBanknotes(list){
-  const cont=$("paraSayiContainer");cont.innerHTML="";
+  const cont=$("paraSayiContainer");
+  cont.innerHTML="";
   const denom=[200,100,50,20,10,5,1,0.5,0.25];
   denom.forEach((d,i)=>{
-    const adet=list&&list[i]?list[i].adet:"";
+    const adet = Array.isArray(list) ? (list[i] ?? "") : "";
     const row=document.createElement("div");row.className="para-sayi-grid";
     row.innerHTML=`<input class="form-control" value="${d}" readonly>
                    <input class="form-control banknot-adet" value="${adet}">
@@ -125,6 +126,7 @@ function renderBanknotes(list){
   });
   cont.querySelectorAll(".banknot-adet").forEach(i=>i.addEventListener("input",runAllCalculations));
 }
+
 
 /* DÜZELTME */
 function renderCorrections(corr){
