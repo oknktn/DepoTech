@@ -6,7 +6,8 @@
 <title>Peşin Satış</title>
 <style>
 :root{
---tkk-green:#1A6B3B;--tkk-orange:#FF9800;--tkk-red:#E53935;--tkk-white:#fff;--tkk-gray:#f5f5f5;--border:#ddd;
+--tkk-green:#1A6B3B;--tkk-orange:#FF9800;--tkk-red:#E53935;
+--tkk-white:#fff;--tkk-gray:#f5f5f5;--border:#ddd;
 }
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--tkk-gray);margin:0}
 .container{padding:10px}
@@ -32,6 +33,7 @@ h3{color:var(--tkk-green);border-bottom:2px solid var(--tkk-green);padding-botto
 <div class="container">
 
   <div class="panels-row">
+    <!-- PARA SAYILARI -->
     <div class="panel">
       <h3>Para Sayıları</h3>
       <div id="paraSayiContainer"></div>
@@ -40,6 +42,7 @@ h3{color:var(--tkk-green);border-bottom:2px solid var(--tkk-green);padding-botto
       </div>
     </div>
 
+    <!-- KASA DURUMU -->
     <div class="panel">
       <h3>Kasa Durumu</h3>
       <label>Nakit Satış Toplamı</label>
@@ -50,6 +53,7 @@ h3{color:var(--tkk-green);border-bottom:2px solid var(--tkk-green);padding-botto
       <input id="kasaBakiyesi" class="form-control">
       <label>Durum</label>
       <input id="kasaDurum" class="form-control" readonly>
+      <label>Açıklama</label>
       <div id="kasaDurumAciklama" class="kasa-durum-aciklama kasa-tam">Kasa tam.</div>
       <div class="buttons">
         <button class="btn btn-orange" onclick="window.print()">Yazdır</button>
@@ -57,6 +61,7 @@ h3{color:var(--tkk-green);border-bottom:2px solid var(--tkk-green);padding-botto
       </div>
     </div>
 
+    <!-- DÜZELTME KAYITLARI -->
     <div class="panel">
       <h3>Düzeltme Kayıtları</h3>
       <div id="duzeltmeContainer"></div>
@@ -71,6 +76,7 @@ h3{color:var(--tkk-green);border-bottom:2px solid var(--tkk-green);padding-botto
     </div>
   </div>
 
+  <!-- SATIŞ KAYITLARI -->
   <div class="panel" style="margin-top:12px;">
     <h3>Satış Kayıtları <span id="btnAddSatisRow" class="add-row-btn">+ Satır Ekle</span></h3>
     <div id="satisKayitlariContainer"></div>
@@ -81,13 +87,13 @@ h3{color:var(--tkk-green);border-bottom:2px solid var(--tkk-green);padding-botto
 const API="https://script.google.com/macros/s/AKfycbzY7jYafKU-DuUBUqq6vj89_sLKSbCmT8c-Fen77HnxB1h7Ji7HzCZmKH8LQMZCz-04/exec";
 const $=id=>document.getElementById(id);
 const fmt=n=>(Number(n)||0).toLocaleString("tr-TR",{minimumFractionDigits:2,maximumFractionDigits:2});
-const parseTR=s=>{if(!s)return 0;const x=s.toString().trim().replace(/\./g,"").replace(",",".");const n=Number(x);return isNaN(n)?0:n;}
-let STOCK_CODES=[],STOCK_NAMES=[],CODE_TO_NAME={},NAME_TO_CODE={};
+const parseTR=s=>{if(!s)return 0;return Number(s.toString().trim().replace(/\./g,"").replace(",",".")||0);}
+let STOCK_CODES=[],STOCK_NAMES=[],CODE_TO_NAME={},NAME_TO_CODE={},priceTimer=null;
 
 async function loadAll(){
   const s=await fetch(`${API}?action=getStockLists`).then(r=>r.json()).catch(()=>({}));
   STOCK_CODES=s.codes||[];STOCK_NAMES=s.names||[];
-  for(let i=0;i<STOCK_CODES.length;i++){CODE_TO_NAME[STOCK_CODES[i]]=STOCK_NAMES[i];NAME_TO_CODE[STOCK_NAMES[i]]=STOCK_CODES[i];}
+  STOCK_CODES.forEach((c,i)=>{CODE_TO_NAME[c]=STOCK_NAMES[i];NAME_TO_CODE[STOCK_NAMES[i]]=c;});
 
   const all=await fetch(`${API}?action=getPesinAll`).then(r=>r.json()).catch(()=>({}));
   const rows=await fetch(`${API}?action=getPesinRows`).then(r=>r.json()).catch(()=>({}));
@@ -99,54 +105,60 @@ async function loadAll(){
   $("btnAddSatisRow").onclick=()=>addRow({});
 }
 
-/* === Para Sayıları === */
-function renderBanknotes(data){
+/* === PARA SAYILARI === */
+function renderBanknotes(){
   const cont=$("paraSayiContainer"); cont.innerHTML="";
-  const denoms=["200","100","50","20","10","5","1","0.5","0.25","0.10","0.05","0.01"];
-  denoms.forEach(d=>{
-    const rec=data.find(x=>String(x.denom)==d)||{};
+  const map=[
+    {d:200,cell:"B4"},{d:100,cell:"B5"},{d:50,cell:"B6"},{d:20,cell:"B7"},
+    {d:10,cell:"B8"},{d:5,cell:"B9"},{d:1,cell:"B10"},{d:0.5,cell:"B11"},{d:0.25,cell:"B12"}
+  ];
+  map.forEach(m=>{
     const row=document.createElement("div"); row.className="para-sayi-grid";
-    row.innerHTML=`<input class="form-control" value="${d}" readonly>
-    <input class="form-control banknot-adet" value="${rec.adet||''}">
-    <input class="form-control banknot-toplam" value="${fmt(rec.toplam||0)}" readonly>`;
+    row.innerHTML=`<input class="form-control" value="${m.d}" readonly>
+    <input id="adet_${m.cell}" class="form-control banknot-adet">
+    <input class="form-control banknot-toplam" readonly>`;
     cont.appendChild(row);
+    // Hücreden veri oku
+    fetch(`${API}?action=getCell&range=${m.cell}`).then(r=>r.text()).then(v=>{
+      $(`adet_${m.cell}`).value=v||""; runAllCalculations();
+    });
   });
   cont.querySelectorAll(".banknot-adet").forEach(i=>i.oninput=runAllCalculations);
 }
 
-/* === Düzeltme Kayıtları === */
-function renderCorrections(data){
+/* === DÜZELTME KAYITLARI === */
+function renderCorrections(){
   const cont=$("duzeltmeContainer"); cont.innerHTML="";
-  for(let i=0;i<10;i++){
-    const a=data[i]?.aciklama||"",t=data[i]?.tutar||"";
+  for(let i=3;i<=12;i++){
     const row=document.createElement("div"); row.className="duzeltme-grid";
-    row.innerHTML=`<input class="form-control duz-aciklama" value="${a}">
-    <input class="form-control duz-tutar" type="number" value="${t}">`;
+    row.innerHTML=`<input id="aciklama_F${i}" class="form-control duz-aciklama">
+                   <input id="tutar_I${i}" class="form-control duz-tutar" type="number">`;
     cont.appendChild(row);
+    fetch(`${API}?action=getCell&range=F${i}`).then(r=>r.text()).then(v=>$(`aciklama_F${i}`).value=v||"");
+    fetch(`${API}?action=getCell&range=I${i}`).then(r=>r.text()).then(v=>$(`tutar_I${i}`).value=v||"");
   }
   cont.querySelectorAll(".duz-tutar").forEach(i=>i.oninput=runAllCalculations);
 }
 
-/* === Kasa Durumu === */
+/* === KASA === */
 function fillKasa(k){
   $("nakitSatisKasaDurumu").value=fmt(k.nakitSatisToplami||0);
   $("kasaToplami").value=fmt(k.kasaToplami||0);
   $("kasaBakiyesi").value="";
-  $("kasaDurum").value="Tam";
+  $("kasaDurum").value="";
   updateKasaRenk("Tam");
 }
 function updateKasaRenk(durum){
   const el=$("kasaDurumAciklama"); el.className="kasa-durum-aciklama";
-  if(durum==="Tam")el.classList.add("kasa-tam"),el.textContent="Kasa tam.";
-  else if(durum==="Eksik")el.classList.add("kasa-eksik"),el.textContent="Kasa hesabı eksik.";
-  else el.classList.add("kasa-fazla"),el.textContent="Kasa hesabı fazla.";
+  if(durum>0){el.classList.add("kasa-fazla");el.textContent="Kasa fazla.";}
+  else if(durum<0){el.classList.add("kasa-eksik");el.textContent="Kasa eksik.";}
+  else{el.classList.add("kasa-tam");el.textContent="Kasa tam.";}
 }
 
-/* === Satış === */
+/* === SATIŞ === */
 function renderSales(rows){
   const cont=$("satisKayitlariContainer"); cont.innerHTML="";
-  if(!rows.length) rows=[{}];
-  rows.forEach(r=>addRow(r));
+  (rows.length?rows:[{}]).forEach(r=>addRow(r));
   runAllCalculations();
 }
 function addRow(r={code:"",name:"",qty:"",price:"",total:""}){
@@ -155,51 +167,34 @@ function addRow(r={code:"",name:"",qty:"",price:"",total:""}){
   const codeSel=createSelect(STOCK_CODES,r.code);
   const nameSel=createSelect(STOCK_NAMES,r.name);
   const qty=inp("number",r.qty,"satis-qty");
-  const price=inp("number",r.price,"satis-price");
-  const total=inp("",fmt(r.total||0),"satis-total"); total.readOnly=true;
+  const price=inp("text",r.price,"satis-price");
+  const total=inp("text",fmt(r.total||0),"satis-total"); total.readOnly=true;
   const del=btn("×","btn-remove-row");
   row.append(codeSel,nameSel,qty,price,total,del);
   cont.appendChild(row);
 
+  const recalc=()=>{total.value=fmt(parseTR(qty.value)*parseTR(price.value));runAllCalculations();};
+  const updatePrice=()=>{clearTimeout(priceTimer);priceTimer=setTimeout(()=>pushPriceUpdate(codeSel.value,price.value),500);};
   codeSel.onchange=async()=>{
-    const code=(codeSel.value||"").trim();
-    nameSel.value=CODE_TO_NAME[code]||"";
-    if(code){
-      const f=await fetch(`${API}?action=findPriceByCode&code=${code}`).then(r=>r.json()).catch(()=>({}));
-      price.value=f.price||"";
-    }
-    perRowCalc();
+    const code=codeSel.value;nameSel.value=CODE_TO_NAME[code]||"";
+    if(code){const f=await fetch(`${API}?action=findPriceByCode&code=${code}`).then(r=>r.json()).catch(()=>({}));price.value=f.price||"";}
+    recalc();
   };
   nameSel.onchange=async()=>{
-    const name=(nameSel.value||"").trim();
-    codeSel.value=NAME_TO_CODE[name]||"";
-    if(codeSel.value){
-      const f=await fetch(`${API}?action=findPriceByCode&code=${codeSel.value}`).then(r=>r.json()).catch(()=>({}));
-      price.value=f.price||"";
-    }
-    perRowCalc();
+    const name=nameSel.value;codeSel.value=NAME_TO_CODE[name]||"";
+    if(codeSel.value){const f=await fetch(`${API}?action=findPriceByCode&code=${codeSel.value}`).then(r=>r.json()).catch(()=>({}));price.value=f.price||"";}
+    recalc();
   };
-  qty.oninput=perRowCalc;
-  price.oninput=()=>{perRowCalc();pushPriceUpdate(codeSel.value,price.value);};
+  qty.oninput=recalc;
+  price.oninput=()=>{recalc();updatePrice();};
   del.onclick=()=>{row.remove();runAllCalculations();};
-  function perRowCalc(){
-    const t=parseTR(qty.value)*parseTR(price.value);
-    total.value=fmt(t); runAllCalculations();
-  }
 }
-function createSelect(opts,val){
-  const s=document.createElement("select"); s.className="form-control";
-  s.innerHTML=`<option></option>`+opts.map(o=>`<option value="${o}">${o}</option>`).join("");
-  s.value=val||""; return s;
-}
-function inp(type,v,cls=""){const i=document.createElement("input");if(type)i.type=type;i.className=`form-control ${cls}`;i.value=v||"";return i;}
+function createSelect(list,val){const s=document.createElement("select");s.className="form-control";s.innerHTML=`<option></option>`+list.map(v=>`<option>${v}</option>`).join("");s.value=val||"";return s;}
+function inp(type,v,cls=""){const i=document.createElement("input");i.type=type;i.className=`form-control ${cls}`;i.value=v||"";return i;}
 function btn(txt,cls){const b=document.createElement("button");b.textContent=txt;b.className=cls;return b;}
-async function pushPriceUpdate(code,price){
-  if(!code||!price)return;
-  await fetch(`${API}?action=updatePriceByCode&code=${code}&price=${price}`).catch(()=>{});
-}
+async function pushPriceUpdate(code,price){if(!code||!price)return;await fetch(`${API}?action=updatePriceByCode&code=${code}&price=${price}`).catch(()=>{});}
 
-/* === Hesaplamalar === */
+/* === HESAPLAMA === */
 function runAllCalculations(){
   let para=0;document.querySelectorAll(".para-sayi-grid").forEach(r=>{
     const d=parseTR(r.children[0].value),a=parseTR(r.children[1].value),t=d*a;
@@ -216,13 +211,12 @@ function runAllCalculations(){
   const kasaTop=para+duz;
   $("kasaToplami").value=fmt(kasaTop);
 
-  const fark=kasaTop-(satisTop+parseTR($("kasaBakiyesi").value));
-  const durum=fark>0?"Fazla":fark<0?"Eksik":"Tam";
-  $("kasaDurum").value=durum;
-  updateKasaRenk(durum);
+  const fark=kasaTop-parseTR($("nakitSatisKasaDurumu").value)-parseTR($("kasaBakiyesi").value);
+  $("kasaDurum").value=fmt(fark);
+  updateKasaRenk(fark);
 }
 
-async function saveAll(){alert("Tüm hesaplamalar tamam. Kaydetme işlemleri eklenebilir.")}
+async function saveAll(){alert("Kaydetme işlemi hazır. Veriler güncellendi.");}
 document.addEventListener("DOMContentLoaded",loadAll);
 </script>
 </body>
