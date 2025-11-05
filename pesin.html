@@ -122,7 +122,7 @@ function renderBanknotes(list){
     row.innerHTML=`<input class="form-control" value="${d}" readonly>
                    <input class="form-control banknot-adet" value="${adet}">
                    <input class="form-control banknot-toplam" readonly>`;
-    cont.appendChild(row);
+    cont.appendChild(row);  
   });
   cont.querySelectorAll(".banknot-adet").forEach(i=>i.addEventListener("input",runAllCalculations));
 }
@@ -171,13 +171,40 @@ async function pushPriceUpdate(code,price){if(!code||!price)return;const val=pri
 
 /* HESAPLAMA */
 function runAllCalculations(){
-  let para=0;document.querySelectorAll("#paraSayiContainer .para-sayi-grid").forEach(r=>{const d=parseTR(r.children[0].value),a=parseTR(r.children[1].value),t=d*a;r.children[2].value=fmt(t);para+=t;});
+  let para=0;
+  document.querySelectorAll("#paraSayiContainer .para-sayi-grid").forEach(r=>{
+    const d=parseTR(r.children[0].value),a=parseTR(r.children[1].value),t=d*a;
+    r.children[2].value=fmt(t);
+    para+=t;
+  });
   $("paraSayilariToplam").value=fmt(para);
-  let duz=0;document.querySelectorAll(".duz-tutar").forEach(i=>duz+=parseTR(i.value));$("duzeltmeKayitlariToplam").value=fmt(duz);
-  let satisTop=0;document.querySelectorAll(".satis-total").forEach(i=>satisTop+=parseTR(i.value));$("nakitSatisKasaDurumu").value=fmt(satisTop);$("nakitSatisToplamiDuz").value=fmt(satisTop);
-  const kasaTop=para+duz;$("kasaToplami").value=fmt(kasaTop);
-  const fark=kasaTop-parseTR($("nakitSatisKasaDurumu").value)-parseTR($("kasaBakiyesi").value);$("kasaDurum").value=fmt(fark);updateKasaRenk(fark);
+
+  // 🔽 Yeni düzeltme kayıtları hesaplama bölümü 🔽
+  let duz = 0;
+  document.querySelectorAll(".duz-tutar").forEach(i => {
+    duz += parseTR(i.value);
+    i.addEventListener("input", () => {
+      let sum = 0;
+      document.querySelectorAll(".duz-tutar").forEach(x => sum += parseTR(x.value));
+      $("duzeltmeKayitlariToplam").value = fmt(sum);
+    });
+  });
+  $("duzeltmeKayitlariToplam").value = fmt(duz);
+  // 🔼 Yeni bölüm sonu 🔼
+
+  let satisTop=0;
+  document.querySelectorAll(".satis-total").forEach(i=>satisTop+=parseTR(i.value));
+  $("nakitSatisKasaDurumu").value=fmt(satisTop);
+  $("nakitSatisToplamiDuz").value=fmt(satisTop);
+
+  const kasaTop=para+duz;
+  $("kasaToplami").value=fmt(kasaTop);
+
+  const fark=kasaTop-parseTR($("nakitSatisKasaDurumu").value)-parseTR($("kasaBakiyesi").value);
+  $("kasaDurum").value=fmt(fark);
+  updateKasaRenk(fark);
 }
+
 function updateKasaRenk(fark){const el=$("kasaDurumAciklama");el.className="kasa-durum-aciklama";if(fark>0){el.classList.add("kasa-fazla");el.textContent="Kasa fazla.";}else if(fark<0){el.classList.add("kasa-eksik");el.textContent="Kasa eksik.";}else{el.classList.add("kasa-tam");el.textContent="Kasa tam.";}}
 
 /* ✅ KAYDET (GET yöntemiyle) */
