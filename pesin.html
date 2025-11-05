@@ -181,8 +181,9 @@ function runAllCalculations(){
 function updateKasaRenk(fark){const el=$("kasaDurumAciklama");el.className="kasa-durum-aciklama";if(fark>0){el.classList.add("kasa-fazla");el.textContent="Kasa fazla.";}else if(fark<0){el.classList.add("kasa-eksik");el.textContent="Kasa eksik.";}else{el.classList.add("kasa-tam");el.textContent="Kasa tam.";}}
 
 /* ✅ KAYDET (GET yöntemiyle) */
-async function saveAll(){
-  const rows=[];
+async function saveAll() {
+  // --- SATIŞ KAYITLARI ---
+  const rows = [];
   document.querySelectorAll("#satisKayitlariContainer .satis-item-row").forEach(r=>{
     const code=r.children[0].value||"";
     const name=r.children[1].value||"";
@@ -193,8 +194,38 @@ async function saveAll(){
   });
   await fetch(`${API}?action=setPesinRows&rows=${encodeURIComponent(JSON.stringify(rows))}`)
     .then(r=>r.json()).catch(()=>({}));
-  alert("Satış satırları kaydedildi.");
+
+  // --- PARA SAYILARI ---
+  const banknotes = [];
+  document.querySelectorAll("#paraSayiContainer .para-sayi-grid").forEach(r=>{
+    const denom=parseTR(r.children[0].value);
+    const adet=parseTR(r.children[1].value);
+    const toplam=denom*adet;
+    banknotes.push({denom,adet,toplam});
+  });
+  await fetch(`${API}?action=setBanknotes&data=${encodeURIComponent(JSON.stringify(banknotes))}`);
+
+  // --- DÜZELTME KAYITLARI ---
+  const corrections = [];
+  document.querySelectorAll("#duzeltmeContainer .duzeltme-grid").forEach(r=>{
+    const aciklama=r.children[0].value||"";
+    const tutar=parseTR(r.children[1].value);
+    if(aciklama||tutar)corrections.push({aciklama,tutar});
+  });
+  await fetch(`${API}?action=setCorrections&data=${encodeURIComponent(JSON.stringify(corrections))}`);
+
+  // --- KASA DURUMU ---
+  const kasaData = {
+    nakitSatisToplami: parseTR($("nakitSatisKasaDurumu").value),
+    kasaToplami: parseTR($("kasaToplami").value),
+    kasaBakiyesi: parseTR($("kasaBakiyesi").value),
+    kasaDurum: parseTR($("kasaDurum").value)
+  };
+  await fetch(`${API}?action=setKasaDurumu&data=${encodeURIComponent(JSON.stringify(kasaData))}`);
+
+  alert("Tüm veriler başarıyla kaydedildi.");
 }
+
 </script>
 </body>
 </html>
